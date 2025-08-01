@@ -9,7 +9,7 @@ import java.util.Objects;
 @SpringBootApplication
 public class Application {
     public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.load();
+        final Dotenv dotenv = Dotenv.configure().load();
 
         System.setProperty("DB_URL", Objects.requireNonNull(dotenv.get("DB_URL")));
         System.setProperty("DB_USER", Objects.requireNonNull(dotenv.get("DB_USER")));
