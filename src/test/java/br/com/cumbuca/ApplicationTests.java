@@ -10,7 +10,7 @@ class ApplicationTests {
 
     @BeforeAll
     static void setup() {
-        final Dotenv dotenv = Dotenv.load();
+        final Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
         dotenv.entries().forEach(entry -> {
             if (System.getProperty(entry.getKey()) == null && System.getenv(entry.getKey()) == null) {
                 System.setProperty(entry.getKey(), entry.getValue());
