@@ -2,6 +2,7 @@ package br.com.cumbuca.controller;
 
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
+import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +26,12 @@ public class UsuarioController {
 
     @PostMapping("/criar")
     public ResponseEntity<UsuarioResponseDTO> criar(@RequestBody @Valid UsuarioRequestDTO usuarioRequestDTO, UriComponentsBuilder uriBuilder) {
-        UsuarioResponseDTO usuario = usuarioService.criar(usuarioRequestDTO);
+        Usuario usuario = usuarioService.criar(usuarioRequestDTO);
         URI uri = uriBuilder
                 .path("/usuario/{username}")
                 .buildAndExpand(usuario.getUsername())
                 .toUri();
 
-        return ResponseEntity.created(uri).body(usuario);
+        return ResponseEntity.created(uri).body(new UsuarioResponseDTO(usuario));
     }
 }

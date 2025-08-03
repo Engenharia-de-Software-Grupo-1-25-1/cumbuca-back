@@ -1,7 +1,6 @@
 package br.com.cumbuca.service.usuario;
 
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
-import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;
 import org.modelmapper.ModelMapper;
@@ -9,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
@@ -30,14 +31,22 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public UsuarioResponseDTO criar(UsuarioRequestDTO usuarioRequestDTO) {
+    public Usuario criar(UsuarioRequestDTO usuarioRequestDTO) {
         modelMapper.typeMap(UsuarioRequestDTO.class, Usuario.class)
                 .addMappings(mapper -> mapper.skip(Usuario::setSenha));
 
         Usuario usuario = modelMapper.map(usuarioRequestDTO, Usuario.class);
         usuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.getSenha()));
-        usuario = usuarioRepository.save(usuario);
 
-        return modelMapper.map(usuario, UsuarioResponseDTO.class);
+        if (usuarioRequestDTO.getFoto() != null && !usuarioRequestDTO.getFoto().isEmpty()) {
+            try {
+                usuario.setFoto(usuarioRequestDTO.getFoto().getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        usuario = usuarioRepository.save(usuario);
+        return usuario;
     }
 }

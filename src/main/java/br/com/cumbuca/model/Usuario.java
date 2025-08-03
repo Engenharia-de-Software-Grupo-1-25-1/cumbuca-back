@@ -33,8 +33,7 @@ public class Usuario implements UserDetails {
     @Column(name = "DT_NASCIMENTO", nullable = false)
     private LocalDate dtNascimento;
 
-    @Lob
-    @Column(name = "FOTO", columnDefinition = "bytea")
+    @Column(name = "FOTO")
     private byte[] foto;
 
     @Override
