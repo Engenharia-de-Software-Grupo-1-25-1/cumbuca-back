@@ -18,7 +18,7 @@ public class TokenService {
 
     private static final String ISSUER = "Cumbuca";
 
-    public String geraToken(Usuario usuario) {
+    public String gerarToken(Usuario usuario) {
         try {
             Algorithm algorithm = Algorithm.HMAC256("12345678");
             return JWT.create()
@@ -31,7 +31,7 @@ public class TokenService {
         }
     }
 
-    public String verificaToken(String token) {
+    public String verificarToken(String token) {
         DecodedJWT decodedJWT;
         try {
             Algorithm algorithm = Algorithm.HMAC256("12345678");
