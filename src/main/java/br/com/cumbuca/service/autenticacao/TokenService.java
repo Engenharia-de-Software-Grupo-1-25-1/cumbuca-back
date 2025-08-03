@@ -16,11 +16,13 @@ import java.time.ZoneOffset;
 @Service
 public class TokenService {
 
-    public String gerarToken(Usuario usuario) {
+    private static final String ISSUER = "Cumbuca";
+
+    public String geraToken(Usuario usuario) {
         try {
             Algorithm algorithm = Algorithm.HMAC256("12345678");
             return JWT.create()
-                    .withIssuer("Cumbuca")
+                    .withIssuer(ISSUER)
                     .withSubject(usuario.getUsername())
                     .withExpiresAt(getExpiracao(120))
                     .sign(algorithm);
@@ -29,17 +31,17 @@ public class TokenService {
         }
     }
 
-    public String verificarToken(String token){
+    public String verificaToken(String token) {
         DecodedJWT decodedJWT;
         try {
             Algorithm algorithm = Algorithm.HMAC256("12345678");
             JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("Cumbuca")
+                    .withIssuer(ISSUER)
                     .build();
 
             decodedJWT = verifier.verify(token);
             return decodedJWT.getSubject();
-        } catch (JWTVerificationException exception){
+        } catch (JWTVerificationException exception) {
             throw new RuntimeException("Erro ao verificar token JWT de acesso!");
         }
     }

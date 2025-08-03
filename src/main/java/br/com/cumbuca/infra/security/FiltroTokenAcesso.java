@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,11 +28,13 @@ public class FiltroTokenAcesso extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = recuperarTokenRequisicao(request);
+    protected void doFilterInternal(@NotNull HttpServletRequest request,
+                                    @NotNull HttpServletResponse response,
+                                    @NotNull FilterChain filterChain) throws ServletException, IOException {
+        String token = getToken(request);
 
-        if(token != null){
-            String username = tokenService.verificarToken(token);
+        if (token != null) {
+            String username = tokenService.verificaToken(token);
             Usuario usuario = usuarioRepository.findByUsernameIgnoreCase(username).orElseThrow();
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
@@ -41,7 +44,7 @@ public class FiltroTokenAcesso extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String recuperarTokenRequisicao(HttpServletRequest request) {
+    private String getToken(HttpServletRequest request) {
         var authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null) {
             return authorizationHeader.replace("Bearer ", "");

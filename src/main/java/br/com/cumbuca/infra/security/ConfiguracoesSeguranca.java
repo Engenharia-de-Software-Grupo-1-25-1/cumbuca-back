@@ -37,12 +37,12 @@ public class ConfiguracoesSeguranca {
     }
 
     @Bean
-    public PasswordEncoder encriptador(){
+    public PasswordEncoder encriptador() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager gerenciadorAutenticacao(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
