@@ -31,10 +31,10 @@ public class Usuario implements UserDetails {
     private String username;
 
     @Column(name = "DT_NASCIMENTO", nullable = false)
-    private LocalDate dataNascimento;
+    private LocalDate dtNascimento;
 
     @Lob
-    @Column(name = "FOTO")
+    @Column(name = "FOTO", columnDefinition = "bytea")
     private byte[] foto;
 
     @Override
