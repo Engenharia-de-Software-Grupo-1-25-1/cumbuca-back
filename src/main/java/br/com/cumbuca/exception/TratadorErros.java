@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
@@ -23,7 +24,7 @@ public class TratadorErros {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> tratarErro400(MethodArgumentNotValidException ex) {
-        var erros = ex.getFieldErrors();
+        final List<FieldError> erros = ex.getFieldErrors();
         return ResponseEntity.badRequest().body(erros.stream().map(DadosErroValidacao::new).toList());
     }
 
