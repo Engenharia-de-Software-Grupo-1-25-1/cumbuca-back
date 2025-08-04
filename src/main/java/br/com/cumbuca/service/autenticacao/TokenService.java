@@ -1,5 +1,6 @@
 package br.com.cumbuca.service.autenticacao;
 
+import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Usuario;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -30,15 +31,15 @@ public class TokenService {
             final Algorithm algorithm = Algorithm.HMAC256(chave);
             return JWT.create()
                     .withIssuer(ISSUER)
-                    .withSubject(usuario.getUsername())
+                    .withSubject(String.valueOf(usuario.getId()))
                     .withExpiresAt(getExpiracao(expiracaoMinutos))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
-            throw new RuntimeException("Erro ao gerar token JWT de acesso!");
+            throw new CumbucaException("Erro ao gerar token JWT de acesso.");
         }
     }
 
-    public String verificarToken(String token) {
+    public Long verificarToken(String token) {
         final DecodedJWT decodedJWT;
         try {
             final Algorithm algorithm = Algorithm.HMAC256(chave);
@@ -47,9 +48,9 @@ public class TokenService {
                     .build();
 
             decodedJWT = verifier.verify(token);
-            return decodedJWT.getSubject();
+            return Long.parseLong(decodedJWT.getSubject());
         } catch (JWTVerificationException exception) {
-            throw new RuntimeException("Erro ao verificar token JWT de acesso!");
+            throw new CumbucaException("Erro ao gerar token JWT de acesso.");
         }
     }
 
