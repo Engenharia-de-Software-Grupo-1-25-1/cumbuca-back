@@ -37,7 +37,7 @@ public class Usuario implements UserDetails {
     private String username;
 
     @Column(name = "DT_NASCIMENTO", nullable = false)
-    private LocalDate dataNascimento;
+    private LocalDate dtNascimento;
 
     @Column(name = "FOTO")
     private byte[] foto;
