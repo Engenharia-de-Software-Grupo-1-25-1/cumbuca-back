@@ -7,6 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -18,13 +19,19 @@ public class TokenService {
 
     private static final String ISSUER = "Cumbuca";
 
+    @Value("${spring.jwt.secret}")
+    private String chave;
+
+    @Value("${spring.jwt.expiration-minutes}")
+    private int expiracaoMinutos;
+
     public String gerarToken(Usuario usuario) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256("12345678");
+            final Algorithm algorithm = Algorithm.HMAC256(chave);
             return JWT.create()
                     .withIssuer(ISSUER)
                     .withSubject(usuario.getUsername())
-                    .withExpiresAt(getExpiracao(120))
+                    .withExpiresAt(getExpiracao(expiracaoMinutos))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
             throw new RuntimeException("Erro ao gerar token JWT de acesso!");
@@ -32,10 +39,10 @@ public class TokenService {
     }
 
     public String verificarToken(String token) {
-        DecodedJWT decodedJWT;
+        final DecodedJWT decodedJWT;
         try {
-            Algorithm algorithm = Algorithm.HMAC256("12345678");
-            JWTVerifier verifier = JWT.require(algorithm)
+            final Algorithm algorithm = Algorithm.HMAC256(chave);
+            final JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer(ISSUER)
                     .build();
 

@@ -12,6 +12,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -24,12 +29,26 @@ public class ConfiguracoesSeguranca {
     }
 
     @Bean
-    public SecurityFilterChain filtrosSeguranca(HttpSecurity http) throws Exception {
+    public CorsConfigurationSource corsConfigurationSource() {
+        final CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    @Bean
+    public SecurityFilterChain filtrosSeguranca(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         return http
-//                .authorizeHttpRequests(req -> {
-//                    req.requestMatchers("/login").permitAll();
-//                    req.anyRequest().authenticated();
-//                })
+                .authorizeHttpRequests(req -> {
+                    req.requestMatchers("/login").permitAll();
+                    req.anyRequest().authenticated();
+                })
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(filtroTokenAcesso, UsernamePasswordAuthenticationFilter.class)
