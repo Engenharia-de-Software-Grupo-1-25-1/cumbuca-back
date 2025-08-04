@@ -44,10 +44,10 @@ public class ConfiguracoesSeguranca {
     @Bean
     public SecurityFilterChain filtrosSeguranca(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         return http
-                .authorizeHttpRequests(req -> {
-                    req.requestMatchers("/login").permitAll();
-                    req.anyRequest().authenticated();
-                })
+//                .authorizeHttpRequests(req -> {
+//                    req.requestMatchers("/login").permitAll();
+//                    req.anyRequest().authenticated();
+//                })
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
