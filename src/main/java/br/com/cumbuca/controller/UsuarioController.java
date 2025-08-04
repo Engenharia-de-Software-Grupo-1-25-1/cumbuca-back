@@ -6,8 +6,8 @@ import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -25,7 +25,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/criar")
-    public ResponseEntity<UsuarioResponseDTO> criar(@RequestBody @Valid UsuarioRequestDTO usuarioRequestDTO, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<UsuarioResponseDTO> criar(@ModelAttribute @Valid UsuarioRequestDTO usuarioRequestDTO, UriComponentsBuilder uriBuilder) {
         final Usuario usuario = usuarioService.criar(usuarioRequestDTO);
         final URI uri = uriBuilder
                 .path("/usuario/{username}")
