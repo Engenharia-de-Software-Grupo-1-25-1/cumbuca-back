@@ -31,13 +31,13 @@ public class FiltroTokenAcesso extends OncePerRequestFilter {
     protected void doFilterInternal(@NotNull HttpServletRequest request,
                                     @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
-        String token = getToken(request);
+        final String token = getToken(request);
 
         if (token != null) {
-            String username = tokenService.verificarToken(token);
-            Usuario usuario = usuarioRepository.findByUsernameIgnoreCase(username).orElseThrow();
+            final String username = tokenService.verificarToken(token);
+            final Usuario usuario = usuarioRepository.findByUsernameIgnoreCase(username).orElseThrow();
 
-            Authentication authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+            final Authentication authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
@@ -45,7 +45,7 @@ public class FiltroTokenAcesso extends OncePerRequestFilter {
     }
 
     private String getToken(HttpServletRequest request) {
-        var authorizationHeader = request.getHeader("Authorization");
+        final String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null) {
             return authorizationHeader.replace("Bearer ", "");
         }

@@ -27,7 +27,7 @@ public class TokenService {
 
     public String gerarToken(Usuario usuario) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(chave);
+            final Algorithm algorithm = Algorithm.HMAC256(chave);
             return JWT.create()
                     .withIssuer(ISSUER)
                     .withSubject(usuario.getUsername())
@@ -39,10 +39,10 @@ public class TokenService {
     }
 
     public String verificarToken(String token) {
-        DecodedJWT decodedJWT;
+        final DecodedJWT decodedJWT;
         try {
-            Algorithm algorithm = Algorithm.HMAC256(chave);
-            JWTVerifier verifier = JWT.require(algorithm)
+            final Algorithm algorithm = Algorithm.HMAC256(chave);
+            final JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer(ISSUER)
                     .build();
 

@@ -1,6 +1,12 @@
 package br.com.cumbuca.model;
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.GenerationType;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,7 +39,6 @@ public class Usuario implements UserDetails {
     @Column(name = "DT_NASCIMENTO", nullable = false)
     private LocalDate dataNascimento;
 
-    @Lob
     @Column(name = "FOTO")
     private byte[] foto;
 
