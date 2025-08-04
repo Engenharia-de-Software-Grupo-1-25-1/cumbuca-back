@@ -31,7 +31,7 @@ public class TokenService {
             final Algorithm algorithm = Algorithm.HMAC256(chave);
             return JWT.create()
                     .withIssuer(ISSUER)
-                    .withSubject(usuario.getUsername())
+                    .withSubject(String.valueOf(usuario.getId()))
                     .withExpiresAt(getExpiracao(expiracaoMinutos))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
@@ -39,7 +39,7 @@ public class TokenService {
         }
     }
 
-    public String verificarToken(String token) {
+    public Long verificarToken(String token) {
         final DecodedJWT decodedJWT;
         try {
             final Algorithm algorithm = Algorithm.HMAC256(chave);
@@ -48,7 +48,7 @@ public class TokenService {
                     .build();
 
             decodedJWT = verifier.verify(token);
-            return decodedJWT.getSubject();
+            return Long.parseLong(decodedJWT.getSubject());
         } catch (JWTVerificationException exception) {
             throw new CumbucaException("Erro ao gerar token JWT de acesso.");
         }

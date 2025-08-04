@@ -26,7 +26,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return usuarioRepository.findByUsernameIgnoreCase(username)
+        return usuarioRepository.findByUsernameOrEmail(username, username)
                 .orElseThrow(() -> new UsernameNotFoundException("O usuário não foi encontrado."));
     }
 
