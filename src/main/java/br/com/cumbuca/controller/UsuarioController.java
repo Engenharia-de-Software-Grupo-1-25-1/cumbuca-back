@@ -26,8 +26,8 @@ public class UsuarioController {
 
     @PostMapping("/criar")
     public ResponseEntity<UsuarioResponseDTO> criar(@RequestBody @Valid UsuarioRequestDTO usuarioRequestDTO, UriComponentsBuilder uriBuilder) {
-        Usuario usuario = usuarioService.criar(usuarioRequestDTO);
-        URI uri = uriBuilder
+        final Usuario usuario = usuarioService.criar(usuarioRequestDTO);
+        final URI uri = uriBuilder
                 .path("/usuario/{username}")
                 .buildAndExpand(usuario.getUsername())
                 .toUri();
