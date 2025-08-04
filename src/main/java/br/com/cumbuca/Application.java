@@ -15,6 +15,9 @@ public class Application {
         System.setProperty("DB_USER", Objects.requireNonNull(dotenv.get("DB_USER")));
         System.setProperty("DB_PASS", Objects.requireNonNull(dotenv.get("DB_PASS")));
 
+        System.setProperty("JWT_SECRET", Objects.requireNonNull(dotenv.get("JWT_SECRET")));
+        System.setProperty("JWT_EXPIRATION_MINUTES", Objects.requireNonNull(dotenv.get("JWT_EXPIRATION_MINUTES")));
+
         SpringApplication.run(Application.class, args);
     }
 }
