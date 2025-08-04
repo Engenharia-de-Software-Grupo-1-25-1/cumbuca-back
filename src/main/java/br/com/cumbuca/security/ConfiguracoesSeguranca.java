@@ -1,4 +1,4 @@
-package br.com.cumbuca.infra.security;
+package br.com.cumbuca.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package br.com.cumbuca.infra.security;
+package br.com.cumbuca.security;
 
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;
