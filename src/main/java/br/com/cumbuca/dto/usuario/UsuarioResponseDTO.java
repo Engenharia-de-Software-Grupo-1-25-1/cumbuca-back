@@ -14,6 +14,7 @@ public class UsuarioResponseDTO {
     private String username;
     private LocalDate dtNascimento;
     private String foto;
+    private String status;
 
     public UsuarioResponseDTO(Usuario usuario) {
         this.id = usuario.getId();
@@ -22,5 +23,6 @@ public class UsuarioResponseDTO {
         this.username = usuario.getUsername();
         this.dtNascimento = usuario.getDtNascimento();
         this.foto = usuario.getFoto() != null ? Base64.getEncoder().encodeToString(usuario.getFoto()) : null;
+        this.status = usuario.getStatus();
     }
 }
