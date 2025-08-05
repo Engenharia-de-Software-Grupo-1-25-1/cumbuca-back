@@ -7,6 +7,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class TokenService {
                     .withExpiresAt(getExpiracao(expiracaoMinutos))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
-            throw new CumbucaException("Erro ao gerar token JWT de acesso.");
+            throw new CumbucaException("Erro ao gerar token JWT.");
         }
     }
 
@@ -49,8 +50,10 @@ public class TokenService {
 
             decodedJWT = verifier.verify(token);
             return Long.parseLong(decodedJWT.getSubject());
-        } catch (JWTVerificationException exception) {
-            throw new CumbucaException("Erro ao gerar token JWT de acesso.");
+        } catch (TokenExpiredException e) {
+            throw new CumbucaException("Token expirado.");
+        }    catch (JWTVerificationException exception) {
+            throw new CumbucaException("Erro ao gerar token JWT.");
         }
     }
 
