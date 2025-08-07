@@ -13,7 +13,7 @@ import java.util.List;
 public class AvaliacaoRequestDTO {
 
     @NotNull(message = "Informações do estabelecimento são obrigatórias")
-    private EstabelecimentoRequestDTO estabelecimentoRequestDTO;
+    private EstabelecimentoRequestDTO estabelecimento;
 
     @NotBlank(message = "Item consumido é obrigatório")
     private String itemConsumido;
