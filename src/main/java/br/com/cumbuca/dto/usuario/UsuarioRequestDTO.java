@@ -11,19 +11,14 @@ import java.time.LocalDate;
 @Data
 public class UsuarioRequestDTO {
 
-    @NotBlank
     private String email;
 
-    @NotBlank
     private String senha;
 
-    @NotBlank
     private String nome;
 
-    @NotBlank
     private String username;
 
-    @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dtNascimento;
 

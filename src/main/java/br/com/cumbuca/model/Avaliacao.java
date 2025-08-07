@@ -2,8 +2,6 @@ package br.com.cumbuca.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -28,33 +26,25 @@ public class Avaliacao {
     @JoinColumn(name="ID_ESTABELECIMENTO", nullable = false)
     private Estabelecimento estabelecimento;
 
-    @Column(name = "CONSUMO", length = 50)
+    @Column(name = "CONSUMO", length = 50, nullable = false)
     private String itemConsumido;
 
-    @Column(name = "DESCRICAO", length = 255)
+    @Column(name = "DESCRICAO", nullable = false)
     private String descricao;
 
-    @DecimalMin(value = "0.0", inclusive = true)
+    @DecimalMin(value = "0.0")
     @Column(name = "PRECO")
     private BigDecimal preco;
 
-    @Min(1)
-    @Max(5)
-    @Column(name = "NOTA_GERAL", nullable = false)
+    @Column(name = "NOTA_GERAL")
     private Integer notaGeral;
 
-    @Min(1)
-    @Max(5)
     @Column(name="NOTA_COMIDA")
     private Integer notaComida;
 
-    @Min(1)
-    @Max(5)
     @Column(name="NOTA_ATENDIMENTO")
     private Integer notaAtendimento;
 
-    @Min(1)
-    @Max(5)
     @Column(name="NOTA_AMBIENTE")
     private Integer notaAmbiente;
 
