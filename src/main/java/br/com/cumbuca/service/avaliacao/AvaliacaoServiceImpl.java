@@ -49,7 +49,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
         Avaliacao avaliacao = modelMapper.map(avaliacaoRequestDTO, Avaliacao.class);
         Estabelecimento estabelecimento = estabelecimentoService
-                .buscaOuCria(avaliacaoRequestDTO.getEstabelecimentoRequestDTO());
+                .buscaOuCria(avaliacaoRequestDTO.getEstabelecimento());
         avaliacao.setUsuario(usuario);
         avaliacao.setEstabelecimento(estabelecimento);
 
