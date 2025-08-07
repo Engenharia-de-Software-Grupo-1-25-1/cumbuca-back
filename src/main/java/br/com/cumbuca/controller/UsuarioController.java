@@ -2,14 +2,12 @@ package br.com.cumbuca.controller;
 
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
+import br.com.cumbuca.dto.usuario.UsuarioUpdateDTO;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -33,5 +31,19 @@ public class UsuarioController {
                 .toUri();
 
         return ResponseEntity.created(uri).body(new UsuarioResponseDTO(usuario));
+    }
+    @PutMapping("/atualizar/{id}")
+    public ResponseEntity<UsuarioResponseDTO> atualizar(
+            @PathVariable Long id,
+            @ModelAttribute @Valid UsuarioUpdateDTO dto) {
+
+        Usuario usuarioAtualizado = usuarioService.atualizar(id, dto);
+        return ResponseEntity.ok(new UsuarioResponseDTO(usuarioAtualizado));
+    }
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        usuarioService.deletar(id);
+        return ResponseEntity.noContent().build();
+
     }
 }
