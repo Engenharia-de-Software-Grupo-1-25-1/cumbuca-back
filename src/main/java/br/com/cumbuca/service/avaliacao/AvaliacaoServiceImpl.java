@@ -1,7 +1,12 @@
 package br.com.cumbuca.service.avaliacao;
 
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
-import br.com.cumbuca.model.*;
+
+import br.com.cumbuca.model.Avaliacao;
+import br.com.cumbuca.model.Estabelecimento;
+import br.com.cumbuca.model.Foto;
+import br.com.cumbuca.model.Usuario;
+import br.com.cumbuca.model.Tag;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import br.com.cumbuca.service.foto.FotoService;
@@ -37,7 +42,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     @Override
     @Transactional
     public Avaliacao criar(AvaliacaoRequestDTO avaliacaoRequestDTO) {
-        Usuario usuario = usuarioService.getUsuarioLogado();
+        final Usuario usuario = usuarioService.getUsuarioLogado();
 
         modelMapper.typeMap(AvaliacaoRequestDTO.class, Avaliacao.class)
                 .addMappings(mapper -> {
@@ -47,19 +52,19 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
                     mapper.skip(Avaliacao::setTags);
                 });
 
-        Avaliacao avaliacao = modelMapper.map(avaliacaoRequestDTO, Avaliacao.class);
-        Estabelecimento estabelecimento = estabelecimentoService
+        final Avaliacao avaliacao = modelMapper.map(avaliacaoRequestDTO, Avaliacao.class);
+        final Estabelecimento estabelecimento = estabelecimentoService
                 .buscaOuCria(avaliacaoRequestDTO.getEstabelecimento());
         avaliacao.setUsuario(usuario);
         avaliacao.setEstabelecimento(estabelecimento);
 
         if (avaliacaoRequestDTO.getFotos() != null && !avaliacaoRequestDTO.getFotos().isEmpty()) {
-            List<Foto> fotos = fotoService.gerarFotos(avaliacaoRequestDTO.getFotos(), avaliacao);
+            final List<Foto> fotos = fotoService.gerarFotos(avaliacaoRequestDTO.getFotos(), avaliacao);
             avaliacao.setFotos(fotos);
         }
 
         if (avaliacaoRequestDTO.getTags() != null && !avaliacaoRequestDTO.getTags().isEmpty()) {
-            List<Tag> tags = tagService.gerarTags(avaliacaoRequestDTO.getTags(), avaliacao);
+            final List<Tag> tags = tagService.gerarTags(avaliacaoRequestDTO.getTags(), avaliacao);
             avaliacao.setTags(tags);
         }
 

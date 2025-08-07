@@ -13,7 +13,7 @@ public class TagServiceImpl implements TagService {
     public List<Tag> gerarTags(List<String> nomes, Avaliacao avaliacao) {
         return nomes.stream()
                 .map(nome -> {
-                    Tag tag = new Tag();
+                    final Tag tag = new Tag();
                     tag.setTag(nome);
                     tag.setAvaliacao(avaliacao);
                     return tag;

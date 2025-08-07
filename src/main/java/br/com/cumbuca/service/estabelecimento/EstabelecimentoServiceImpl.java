@@ -20,9 +20,12 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     @Override
     public Estabelecimento buscaOuCria(EstabelecimentoRequestDTO estabelecimentoRequestDTO) {
         return estabelecimentoRepository.findByNomeAndRuaAndCidadeAndEstadoAndCep(
-                estabelecimentoRequestDTO.getNome(), estabelecimentoRequestDTO.getRua(), estabelecimentoRequestDTO.getCidade(), estabelecimentoRequestDTO.getEstado(), estabelecimentoRequestDTO.getCep())
+                        estabelecimentoRequestDTO.getNome(), estabelecimentoRequestDTO.getRua()
+                        , estabelecimentoRequestDTO.getCidade()
+                        , estabelecimentoRequestDTO.getEstado()
+                        , estabelecimentoRequestDTO.getCep())
                 .orElseGet(() -> {
-                    Estabelecimento novo = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
+                    final Estabelecimento novo = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
                     return estabelecimentoRepository.save(novo);
                 });
     }

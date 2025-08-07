@@ -17,7 +17,7 @@ public class FotoServiceImpl implements FotoService {
                 .filter(f -> !f.isEmpty())
                 .map(f -> {
                     try {
-                        Foto foto = new Foto();
+                        final Foto foto = new Foto();
                         foto.setFoto(f.getBytes());
                         foto.setAvaliacao(avaliacao);
                         return foto;
