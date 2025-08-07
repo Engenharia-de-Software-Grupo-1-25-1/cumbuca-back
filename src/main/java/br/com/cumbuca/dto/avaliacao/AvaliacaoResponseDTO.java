@@ -1,5 +1,6 @@
 package br.com.cumbuca.dto.avaliacao;
 
+import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 public class AvaliacaoResponseDTO {
     private Long id;
     private UsuarioResponseDTO usuario;
-    private Estabelecimento estabelecimento;
+    private EstabelecimentoResponseDTO estabelecimento;
     private String itemConsumido;
     private String descricao;
     private BigDecimal preco;
@@ -32,7 +33,7 @@ public class AvaliacaoResponseDTO {
     public AvaliacaoResponseDTO(Avaliacao avaliacao) {
         this.id = avaliacao.getId();
         this.usuario = new UsuarioResponseDTO(avaliacao.getUsuario());
-        this.estabelecimento = avaliacao.getEstabelecimento();
+        this.estabelecimento = new EstabelecimentoResponseDTO((avaliacao.getEstabelecimento()));
         this.itemConsumido = avaliacao.getItemConsumido();
         this.descricao = avaliacao.getDescricao();
         this.preco = avaliacao.getPreco();

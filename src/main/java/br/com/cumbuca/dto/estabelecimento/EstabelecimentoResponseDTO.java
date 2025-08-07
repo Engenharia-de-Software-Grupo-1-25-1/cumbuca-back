@@ -1,10 +1,13 @@
 package br.com.cumbuca.dto.estabelecimento;
 
 import br.com.cumbuca.model.Estabelecimento;
+import br.com.cumbuca.model.Horario;
+import lombok.Data;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Data
 public class EstabelecimentoResponseDTO {
 
     private Long id;
@@ -30,7 +33,7 @@ public class EstabelecimentoResponseDTO {
         this.cep = estabelecimento.getCep();
         if (estabelecimento.getHorarios() != null) {
             this.horarios = estabelecimento.getHorarios().stream()
-                    .map(h -> h.getHorario())
+                    .map(Horario::getHorario)
                     .collect(Collectors.toList());
         } else {
             this.horarios = List.of();
