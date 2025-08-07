@@ -3,7 +3,6 @@ package br.com.cumbuca.dto.avaliacao;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
-import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.model.Tag;
 import lombok.Data;
 
