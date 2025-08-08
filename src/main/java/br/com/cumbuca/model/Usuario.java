@@ -42,6 +42,9 @@ public class Usuario implements UserDetails {
     @Column(name = "FOTO")
     private byte[] foto;
 
+    @Column(name = "STATUS")
+    private String status = "ATIVO";
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

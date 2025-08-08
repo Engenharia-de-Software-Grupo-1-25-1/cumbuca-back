@@ -1,0 +1,60 @@
+package br.com.cumbuca.service.autenticacao;
+
+import br.com.cumbuca.exception.CumbucaException;
+import br.com.cumbuca.model.Usuario;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
+@Service
+public class TokenServiceImpl implements TokenService {
+
+    private static final String ISSUER = "Cumbuca";
+
+    @Value("${spring.jwt.secret}")
+    private String chave;
+
+    @Value("${spring.jwt.expiration-minutes}")
+    private int expiracaoMinutos;
+
+    public String gerarToken(Usuario usuario) {
+        try {
+            final Algorithm algorithm = Algorithm.HMAC256(chave);
+            return JWT.create()
+                    .withIssuer(ISSUER)
+                    .withSubject(String.valueOf(usuario.getId()))
+                    .withExpiresAt(getExpiracao(expiracaoMinutos))
+                    .sign(algorithm);
+        } catch (JWTCreationException exception) {
+            throw new CumbucaException("Erro ao gerar token JWT de acesso.");
+        }
+    }
+
+    public Long verificarToken(String token) {
+        final DecodedJWT decodedJWT;
+        try {
+            final Algorithm algorithm = Algorithm.HMAC256(chave);
+            final JWTVerifier verifier = JWT.require(algorithm)
+                    .withIssuer(ISSUER)
+                    .build();
+
+            decodedJWT = verifier.verify(token);
+            return Long.parseLong(decodedJWT.getSubject());
+        } catch (JWTVerificationException exception) {
+            throw new CumbucaException("Erro ao gerar token JWT de acesso.");
+        }
+    }
+
+    private Instant getExpiracao(Integer minutos) {
+        return LocalDateTime.now().plusMinutes(minutos).toInstant(ZoneOffset.of("-03:00"));
+    }
+}
