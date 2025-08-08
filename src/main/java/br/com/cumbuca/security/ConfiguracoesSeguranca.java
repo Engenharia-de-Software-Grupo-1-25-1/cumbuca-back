@@ -46,6 +46,8 @@ public class ConfiguracoesSeguranca {
         return http
 //                .authorizeHttpRequests(req -> {
 //                    req.requestMatchers("/login").permitAll();
+//                    req.requestMatchers("/recuperarSenha/**").permitAll();
+//                    req.requestMatchers("/alterarSenha/**").permitAll();
 //                    req.anyRequest().authenticated();
 //                })
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
