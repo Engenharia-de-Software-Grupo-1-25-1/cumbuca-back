@@ -45,11 +45,7 @@ public class AutenticacaoController {
 
     @PostMapping("/alterarSenha")
     public ResponseEntity<String> alterarSenha(@RequestBody AlterarSenhaRequestDTO alterarSenhaRequestDTO) {
-        try {
-            recuperarSenhaService.alterarSenha(alterarSenhaRequestDTO.getToken(), alterarSenhaRequestDTO.getNovaSenha(), alterarSenhaRequestDTO.getConfirmarNovaSenha());
-            return ResponseEntity.ok("Senha alterada com sucesso.");
-        } catch (CumbucaException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        recuperarSenhaService.alterarSenha(alterarSenhaRequestDTO.getToken(), alterarSenhaRequestDTO.getNovaSenha(), alterarSenhaRequestDTO.getConfirmarNovaSenha());
+        return ResponseEntity.ok("Senha alterada com sucesso.");
     }
 }
