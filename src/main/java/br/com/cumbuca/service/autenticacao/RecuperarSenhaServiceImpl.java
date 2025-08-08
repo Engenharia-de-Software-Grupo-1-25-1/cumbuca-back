@@ -2,7 +2,6 @@ package br.com.cumbuca.service.autenticacao;
 
 import br.com.cumbuca.dto.recuperarSenha.EmailRequestDTO;
 import br.com.cumbuca.exception.CumbucaException;
-import br.com.cumbuca.exception.TratadorErros;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;
 import org.springframework.mail.SimpleMailMessage;
@@ -10,8 +9,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class RecuperarSenhaServiceImpl implements RecuperarSenhaService {
@@ -30,13 +27,13 @@ public class RecuperarSenhaServiceImpl implements RecuperarSenhaService {
 
     @Override
     public void recuperarSenha(String email) {
-        Usuario usuario = usuarioRepository.findByEmail(email)
+        final Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
-        String token = tokenService.gerarToken(usuario);
+        final String token = tokenService.gerarToken(usuario);
         final String link = "http://localhost:3000/alterar-senha?token=" + token;
 
-        EmailRequestDTO mail = EmailRequestDTO.builder()
+        final EmailRequestDTO mail = EmailRequestDTO.builder()
                 .destinatario(email)
                 .assunto("Recuperação de senha do Cumbuca")
                 .texto("Clique no link para redefinir sua senha: " + link)
@@ -51,8 +48,8 @@ public class RecuperarSenhaServiceImpl implements RecuperarSenhaService {
             throw new CumbucaException("As senhas não coincidem.");
         }
 
-        Long idUsuario = tokenService.verificarToken(token);
-        Usuario usuario = usuarioRepository.findById(idUsuario)
+        final Long idUsuario = tokenService.verificarToken(token);
+        final Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
         usuario.setSenha(passwordEncoder.encode(novaSenha));
@@ -60,7 +57,7 @@ public class RecuperarSenhaServiceImpl implements RecuperarSenhaService {
     }
 
     private void enviarEmail(EmailRequestDTO mailBody) {
-        SimpleMailMessage mensagem = new SimpleMailMessage();
+        final SimpleMailMessage mensagem = new SimpleMailMessage();
         mensagem.setTo(mailBody.getDestinatario());
         mensagem.setFrom("cumbuca.software@gmail.com");
         mensagem.setSubject(mailBody.getAssunto());
