@@ -19,11 +19,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
     @Override
     public Estabelecimento buscarOuCriar(EstabelecimentoRequestDTO estabelecimentoRequestDTO) {
-        return estabelecimentoRepository.findByNomeAndRuaAndCidadeAndEstadoAndCep(
-                        estabelecimentoRequestDTO.getNome(), estabelecimentoRequestDTO.getRua()
-                        , estabelecimentoRequestDTO.getCidade()
-                        , estabelecimentoRequestDTO.getEstado()
-                        , estabelecimentoRequestDTO.getCep())
+        return estabelecimentoRepository.findById(estabelecimentoRequestDTO.getId())
                 .orElseGet(() -> {
                     final Estabelecimento novo = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
                     return estabelecimentoRepository.save(novo);

@@ -1,10 +1,8 @@
 package br.com.cumbuca.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
@@ -20,7 +18,6 @@ import java.util.List;
 public class Estabelecimento {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
 
