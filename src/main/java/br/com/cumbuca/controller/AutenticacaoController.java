@@ -1,9 +1,8 @@
 package br.com.cumbuca.controller;
 
-import br.com.cumbuca.dto.recuperarSenha.AlterarSenhaRequestDTO;
 import br.com.cumbuca.dto.login.LoginRequestDTO;
+import br.com.cumbuca.dto.recuperarSenha.AlterarSenhaRequestDTO;
 import br.com.cumbuca.dto.recuperarSenha.RecuperarSenhaRequestDTO;
-import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.service.autenticacao.RecuperarSenhaService;
 import br.com.cumbuca.service.autenticacao.TokenService;
