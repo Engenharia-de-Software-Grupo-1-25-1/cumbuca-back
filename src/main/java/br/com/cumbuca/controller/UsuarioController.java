@@ -2,7 +2,6 @@ package br.com.cumbuca.controller;
 
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
-import br.com.cumbuca.dto.usuario.UsuarioUpdateDTO;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import jakarta.validation.Valid;
@@ -35,14 +34,14 @@ public class UsuarioController {
     @PutMapping("/atualizar/{id}")
     public ResponseEntity<UsuarioResponseDTO> atualizar(
             @PathVariable Long id,
-            @ModelAttribute @Valid UsuarioUpdateDTO dto) {
+            @ModelAttribute @Valid UsuarioRequestDTO usuarioRequestDTO) {
 
-        Usuario usuarioAtualizado = usuarioService.atualizar(id, dto);
-        return ResponseEntity.ok(new UsuarioResponseDTO(usuarioAtualizado));
+        Usuario usuario = usuarioService.atualizar(id, usuarioRequestDTO);
+        return ResponseEntity.ok(new UsuarioResponseDTO(usuario));
     }
-    @DeleteMapping("/deletar/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        usuarioService.deletar(id);
+    @DeleteMapping("/remover/{id}")
+    public ResponseEntity<Void> remover(@PathVariable Long id) {
+        usuarioService.remover(id);
         return ResponseEntity.noContent().build();
 
     }
