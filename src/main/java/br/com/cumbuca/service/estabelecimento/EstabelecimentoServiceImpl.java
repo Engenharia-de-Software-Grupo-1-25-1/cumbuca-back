@@ -12,9 +12,9 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     private final EstabelecimentoRepository estabelecimentoRepository;
     private final ModelMapper modelMapper;
 
-    public EstabelecimentoServiceImpl(EstabelecimentoRepository estabelecimentoRepository) {
+    public EstabelecimentoServiceImpl(EstabelecimentoRepository estabelecimentoRepository, ModelMapper modelMapper) {
         this.estabelecimentoRepository = estabelecimentoRepository;
-        this.modelMapper = new ModelMapper();
+        this.modelMapper = modelMapper;
     }
 
     @Override
