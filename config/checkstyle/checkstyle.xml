@@ -32,8 +32,4 @@
         <property name="eachLine" value="true"/>
     </module>
 
-    <module name="LineLength">
-        <property name="max" value="150"/>
-    </module>
-
 </module>
