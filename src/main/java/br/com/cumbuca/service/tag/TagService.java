@@ -6,5 +6,5 @@ import br.com.cumbuca.model.Tag;
 import java.util.List;
 
 public interface TagService {
-    List<Tag> gerarTags(List<String> nomes, Avaliacao avaliacao);
+    List<Tag> criarTags(List<String> nomes, Avaliacao avaliacao);
 }

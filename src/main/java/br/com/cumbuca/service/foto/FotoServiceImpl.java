@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 public class FotoServiceImpl implements FotoService {
 
-    public List<Foto> gerarFotos(List<MultipartFile> arquivos, Avaliacao avaliacao) {
+    public List<Foto> criarFotos(List<MultipartFile> arquivos, Avaliacao avaliacao) {
         return arquivos.stream()
                 .filter(f -> !f.isEmpty())
                 .map(f -> {

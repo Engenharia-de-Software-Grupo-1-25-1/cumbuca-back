@@ -54,17 +54,17 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
         final Avaliacao avaliacao = modelMapper.map(avaliacaoRequestDTO, Avaliacao.class);
         final Estabelecimento estabelecimento = estabelecimentoService
-                .buscaOuCria(avaliacaoRequestDTO.getEstabelecimento());
+                .buscarOuCriar(avaliacaoRequestDTO.getEstabelecimento());
         avaliacao.setUsuario(usuario);
         avaliacao.setEstabelecimento(estabelecimento);
 
         if (avaliacaoRequestDTO.getFotos() != null && !avaliacaoRequestDTO.getFotos().isEmpty()) {
-            final List<Foto> fotos = fotoService.gerarFotos(avaliacaoRequestDTO.getFotos(), avaliacao);
+            final List<Foto> fotos = fotoService.criarFotos(avaliacaoRequestDTO.getFotos(), avaliacao);
             avaliacao.setFotos(fotos);
         }
 
         if (avaliacaoRequestDTO.getTags() != null && !avaliacaoRequestDTO.getTags().isEmpty()) {
-            final List<Tag> tags = tagService.gerarTags(avaliacaoRequestDTO.getTags(), avaliacao);
+            final List<Tag> tags = tagService.criarTags(avaliacaoRequestDTO.getTags(), avaliacao);
             avaliacao.setTags(tags);
         }
 

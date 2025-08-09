@@ -5,5 +5,5 @@ import br.com.cumbuca.model.Estabelecimento;
 
 public interface EstabelecimentoService {
 
-    Estabelecimento buscaOuCria(EstabelecimentoRequestDTO estabelecimentoRequestDTO);
+    Estabelecimento buscarOuCriar(EstabelecimentoRequestDTO estabelecimentoRequestDTO);
 }

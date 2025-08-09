@@ -18,7 +18,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     @Override
-    public Estabelecimento buscaOuCria(EstabelecimentoRequestDTO estabelecimentoRequestDTO) {
+    public Estabelecimento buscarOuCriar(EstabelecimentoRequestDTO estabelecimentoRequestDTO) {
         return estabelecimentoRepository.findByNomeAndRuaAndCidadeAndEstadoAndCep(
                         estabelecimentoRequestDTO.getNome(), estabelecimentoRequestDTO.getRua()
                         , estabelecimentoRequestDTO.getCidade()

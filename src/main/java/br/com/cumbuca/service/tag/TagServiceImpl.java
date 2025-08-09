@@ -10,7 +10,7 @@ import java.util.List;
 public class TagServiceImpl implements TagService {
 
     @Override
-    public List<Tag> gerarTags(List<String> nomes, Avaliacao avaliacao) {
+    public List<Tag> criarTags(List<String> nomes, Avaliacao avaliacao) {
         return nomes.stream()
                 .map(nome -> {
                     final Tag tag = new Tag();

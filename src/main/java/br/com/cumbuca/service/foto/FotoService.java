@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface FotoService {
 
-    List<Foto> gerarFotos(List<MultipartFile> arquivos, Avaliacao avaliacao);
+    List<Foto> criarFotos(List<MultipartFile> arquivos, Avaliacao avaliacao);
 
 }
 
