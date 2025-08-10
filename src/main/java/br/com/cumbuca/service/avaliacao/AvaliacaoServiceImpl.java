@@ -76,7 +76,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    public Avaliacao atualizar(Long id, AvaliacaoAtualizacaoRequestDTO dto) {
+    public Avaliacao atualizar(Long id, AvaliacaoRequestDTO dto) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
 

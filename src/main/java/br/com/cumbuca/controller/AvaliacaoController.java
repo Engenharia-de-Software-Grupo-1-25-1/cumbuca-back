@@ -38,8 +38,8 @@ public class AvaliacaoController {
         return ResponseEntity.created(uri).body(new AvaliacaoResponseDTO(avaliacao));
     }
 
-    @PostMapping("/atualizar/{id}")
-    public ResponseEntity<Avaliacao> atualizar(@PathVariable Long id, @RequestBody @Valid AvaliacaoAtualizacaoRequestDTO dto) {
+    @PutMapping("/atualizar/{id}")
+    public ResponseEntity<Avaliacao> atualizar(@PathVariable Long id, @RequestBody @Valid AvaliacaoRequestDTO dto) {
         final Avaliacao avaliacaoAtualizada = avaliacaoService.atualizar(id, dto);
         return ResponseEntity.ok(avaliacaoAtualizada);
     }
