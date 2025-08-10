@@ -1,17 +1,22 @@
 package br.com.cumbuca.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.CascadeType;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Entity
@@ -23,24 +28,25 @@ public class Avaliacao {
     @Column(name = "ID")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_USUARIO", nullable = false)
     private Usuario usuario;
 
-//    @ManyToOne
-//    @JoinColumn(name = "ID_ESTABELECIMENTO", nullable = false)
-//    private Estabelecimento estabelecimento;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_ESTABELECIMENTO", nullable = false)
+    private Estabelecimento estabelecimento;
 
-    @Column(name = "CONSUMO", length = 50)
-    private String consumo;
+    @Column(name = "CONSUMO", length = 50, nullable = false)
+    private String itemConsumido;
 
-    @Column(name = "DESCRICAO")
+    @Column(name = "DESCRICAO", nullable = false)
     private String descricao;
 
+    @DecimalMin(value = "0.0")
     @Column(name = "PRECO")
     private BigDecimal preco;
 
-    @Column(name = "NOTA_GERAL", nullable = false)
+    @Column(name = "NOTA_GERAL")
     private Integer notaGeral;
 
     @Column(name = "NOTA_COMIDA")
@@ -52,6 +58,13 @@ public class Avaliacao {
     @Column(name = "NOTA_AMBIENTE")
     private Integer notaAmbiente;
 
-    @Column(name = "DATA", nullable = false)
-    private LocalDate data;
+    @Column(name = "DATA")
+    private LocalDate data =  LocalDate.now();
+
+    @OneToMany(mappedBy = "avaliacao", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Foto> fotos;
+
+    @OneToMany(mappedBy = "avaliacao", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Tag> tags;
+
 }
