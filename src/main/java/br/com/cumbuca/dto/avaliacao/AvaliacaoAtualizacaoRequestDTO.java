@@ -31,8 +31,6 @@ public class AvaliacaoAtualizacaoRequestDTO {
     @Min(1) @Max(5)
     private Integer notaAtendimento;
 
-
-
     private BigDecimal preco;
     private List<MultipartFile> fotos;
     private List<String> tags;

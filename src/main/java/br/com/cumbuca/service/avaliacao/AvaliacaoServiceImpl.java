@@ -74,17 +74,18 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
         return avaliacaoRepository.save(avaliacao);
     }
+
+    @Override
     public Avaliacao atualizar(Long id, AvaliacaoAtualizacaoRequestDTO dto) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
 
-
-
-        if (avaliacaoRequestDTO.getTags() != null && !avaliacaoRequestDTO.getTags().isEmpty()) {
-            final List<Tag> tags = tagService.criarTags(avaliacaoRequestDTO.getTags(), avaliacao);
-            avaliacao.setTags(tags);
+        final Usuario usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!avaliacao.getUsuario().getId().equals(usuarioLogado.getId())) {
+            throw new CumbucaException("Você não tem permissão para editar esta avaliação.");
         }
-        avaliacao.setConsumo(dto.getConsumo());
+
+        avaliacao.setItemConsumido(dto.getConsumo());
         avaliacao.setDescricao(dto.getDescricao());
         avaliacao.setPreco(dto.getPreco());
         avaliacao.setNotaGeral(dto.getNotaGeral());
@@ -94,7 +95,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
         return avaliacaoRepository.save(avaliacao);
     }
-
 
     @Override
     public void remover(Long id) {

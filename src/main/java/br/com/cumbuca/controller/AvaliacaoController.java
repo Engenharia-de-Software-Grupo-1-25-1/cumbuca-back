@@ -1,5 +1,6 @@
 package br.com.cumbuca.controller;
 
+import br.com.cumbuca.dto.avaliacao.AvaliacaoAtualizacaoRequestDTO;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
@@ -8,11 +9,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -36,16 +35,18 @@ public class AvaliacaoController {
                 .path("/avaliacao/{id}")
                 .buildAndExpand(avaliacao.getId())
                 .toUri();
-    @PutMapping("/{id}")
+        return ResponseEntity.created(uri).body(new AvaliacaoResponseDTO(avaliacao));
+    }
+
+    @PostMapping("/atualizar/{id}")
     public ResponseEntity<Avaliacao> atualizar(@PathVariable Long id, @RequestBody @Valid AvaliacaoAtualizacaoRequestDTO dto) {
-        final Avaliacao avaliacaoAtualizada = avaliacaoServiceImpl.atualizar(id, dto);
+        final Avaliacao avaliacaoAtualizada = avaliacaoService.atualizar(id, dto);
         return ResponseEntity.ok(avaliacaoAtualizada);
     }
 
-        return ResponseEntity.created(uri).body(new AvaliacaoResponseDTO(avaliacao));
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remover(@PathVariable Long id) {
-        avaliacaoServiceImpl.remover(id);
+        avaliacaoService.remover(id);
         return ResponseEntity.noContent().build();
     }
 }
