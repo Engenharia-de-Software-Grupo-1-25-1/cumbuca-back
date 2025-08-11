@@ -1,7 +1,6 @@
 package br.com.cumbuca.service.avaliacao;
 
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
-
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
@@ -14,7 +13,6 @@ import br.com.cumbuca.service.foto.FotoService;
 import br.com.cumbuca.service.tag.TagService;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +30,8 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     private final FotoService fotoService;
 
     public AvaliacaoServiceImpl(AvaliacaoRepository avaliacaoRepository, ModelMapper modelMapper,
-            UsuarioService usuarioService, EstabelecimentoService estabelecimentoService, TagService tagService,
-            FotoService fotoService) {
+                                UsuarioService usuarioService, EstabelecimentoService estabelecimentoService, TagService tagService,
+                                FotoService fotoService) {
         this.avaliacaoRepository = avaliacaoRepository;
         this.modelMapper = modelMapper;
         this.usuarioService = usuarioService;
@@ -79,9 +77,9 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
 
-        final Usuario usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!avaliacao.getUsuario().getId().equals(usuarioLogado.getId())) {
-            throw new CumbucaException("Você não tem permissão para editar esta avaliação.");
+        final Usuario usuario = usuarioService.getUsuarioLogado();
+        if (!avaliacao.getUsuario().getId().equals(usuario.getId())) {
+            throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }
 
         avaliacao.setItemConsumido(dto.getItemConsumido());
@@ -100,9 +98,9 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
 
-        final Usuario usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!avaliacao.getUsuario().getId().equals(usuarioLogado.getId())) {
-            throw new CumbucaException("Você não tem permissão para remover esta avaliação.");
+        final Usuario usuario = usuarioService.getUsuarioLogado();
+        if (!avaliacao.getUsuario().getId().equals(usuario.getId())) {
+            throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }
 
         avaliacaoRepository.delete(avaliacao);

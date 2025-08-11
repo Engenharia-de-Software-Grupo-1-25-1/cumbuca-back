@@ -8,5 +8,9 @@ public interface UsuarioService extends UserDetailsService {
 
     Usuario criar(UsuarioRequestDTO usuarioRequestDTO);
 
+    Usuario atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO);
+
+    void remover(Long id);
+
     Usuario getUsuarioLogado();
 }
