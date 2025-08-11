@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.net.URI;
 
@@ -31,7 +32,7 @@ public class AvaliacaoController {
         return ResponseEntity.created(uri).body(new AvaliacaoResponseDTO(avaliacao));
     }
 
-    @PutMapping("/atualizar/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Avaliacao> atualizar(@PathVariable Long id, @RequestBody @Valid AvaliacaoRequestDTO dto) {
         final Avaliacao avaliacaoAtualizada = avaliacaoService.atualizar(id, dto);
         return ResponseEntity.ok(avaliacaoAtualizada);
