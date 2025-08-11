@@ -38,7 +38,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Usuario criar(UsuarioRequestDTO usuarioRequestDTO) {
         modelMapper.typeMap(UsuarioRequestDTO.class, Usuario.class)
                 .addMappings(mapper -> mapper.skip(Usuario::setSenha));
-
         Usuario usuario = modelMapper.map(usuarioRequestDTO, Usuario.class);
         usuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.getSenha()));
 
@@ -61,6 +60,11 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }
 
+        modelMapper.typeMap(UsuarioRequestDTO.class, Usuario.class)
+                .addMappings(mapper -> mapper.skip(Usuario::setSenha));
+        modelMapper.map(usuarioRequestDTO, usuario);
+        usuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.getSenha()));
+
         if (usuarioRequestDTO.getFoto() != null && !usuarioRequestDTO.getFoto().isEmpty()) {
             try {
                 usuario.setFoto(usuarioRequestDTO.getFoto().getBytes());
@@ -68,7 +72,6 @@ public class UsuarioServiceImpl implements UsuarioService {
                 throw new CumbucaException("Erro ao processar a foto.");
             }
         }
-
         return usuarioRepository.save(usuario);
     }
 
