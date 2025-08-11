@@ -2,6 +2,7 @@ package br.com.cumbuca.service.avaliacao;
 
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
 
+import br.com.cumbuca.dto.avaliacao.FiltrarAvaliacaoRequestDTO;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
@@ -106,5 +107,9 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         }
 
         avaliacaoRepository.delete(avaliacao);
+    }
+
+    public List<Avaliacao> filtrar(FiltrarAvaliacaoRequestDTO filtrarAvaliacaoRequestDTO) {
+        return null;
     }
 }
