@@ -18,6 +18,8 @@ public class Application {
         System.setProperty("JWT_SECRET", Objects.requireNonNull(dotenv.get("JWT_SECRET")));
         System.setProperty("JWT_EXPIRATION_MINUTES", Objects.requireNonNull(dotenv.get("JWT_EXPIRATION_MINUTES")));
 
+        System.setProperty("MAIL_PASSWORD", Objects.requireNonNull(dotenv.get("MAIL_PASSWORD")));
+
         SpringApplication.run(Application.class, args);
     }
 }

@@ -1,11 +1,11 @@
 package br.com.cumbuca.service.usuario;
 
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
-import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,7 +20,8 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder,
+            ModelMapper modelMapper) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
@@ -53,7 +54,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    @Transactional
     public Usuario atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
@@ -70,10 +70,21 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    @Transactional
     public void remover(Long id) {
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new CumbucaException("Usuário não encontrado"));
         usuarioRepository.delete(usuario);
     }
 
+    @Override
+    public Usuario getUsuarioLogado() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final String login = authentication.getName();
+
+        if (!authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            throw new UsernameNotFoundException("Usuário não autenticado");
+        }
+
+        return usuarioRepository.findByUsernameOrEmail(login, login)
+                .orElseThrow(() -> new UsernameNotFoundException("O usuário não foi encontrado."));
+    }
 }

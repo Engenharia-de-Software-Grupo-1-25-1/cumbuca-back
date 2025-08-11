@@ -12,5 +12,5 @@ public interface UsuarioService extends UserDetailsService {
 
    void remover (Long id );
 
-
+    Usuario getUsuarioLogado();
 }
