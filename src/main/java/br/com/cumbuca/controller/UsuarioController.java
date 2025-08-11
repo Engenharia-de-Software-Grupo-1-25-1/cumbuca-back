@@ -22,7 +22,8 @@ public class UsuarioController {
     }
 
     @PostMapping("/criar")
-    public ResponseEntity<UsuarioResponseDTO> criar(@ModelAttribute @Valid UsuarioRequestDTO usuarioRequestDTO, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<UsuarioResponseDTO> criar(@ModelAttribute @Valid UsuarioRequestDTO usuarioRequestDTO,
+                                                    UriComponentsBuilder uriBuilder) {
         final Usuario usuario = usuarioService.criar(usuarioRequestDTO);
         final URI uri = uriBuilder
                 .path("/usuario/{username}")
@@ -31,18 +32,17 @@ public class UsuarioController {
 
         return ResponseEntity.created(uri).body(new UsuarioResponseDTO(usuario));
     }
-    @PutMapping("/atualizar/{id}")
-    public ResponseEntity<UsuarioResponseDTO> atualizar(
-            @PathVariable Long id,
-            @ModelAttribute @Valid UsuarioRequestDTO usuarioRequestDTO) {
 
+    @PutMapping("/atualizar/{id}")
+    public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Long id,
+                                                        @ModelAttribute @Valid UsuarioRequestDTO usuarioRequestDTO) {
         Usuario usuario = usuarioService.atualizar(id, usuarioRequestDTO);
         return ResponseEntity.ok(new UsuarioResponseDTO(usuario));
     }
+
     @DeleteMapping("/remover/{id}")
     public ResponseEntity<Void> remover(@PathVariable Long id) {
         usuarioService.remover(id);
         return ResponseEntity.noContent().build();
-
     }
 }

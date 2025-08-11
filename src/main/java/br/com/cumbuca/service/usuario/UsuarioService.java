@@ -10,7 +10,7 @@ public interface UsuarioService extends UserDetailsService {
 
     Usuario atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO);
 
-   void remover (Long id );
+    void remover(Long id);
 
     Usuario getUsuarioLogado();
 }

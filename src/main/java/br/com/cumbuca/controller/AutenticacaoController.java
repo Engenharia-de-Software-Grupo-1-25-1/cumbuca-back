@@ -37,7 +37,7 @@ public class AutenticacaoController {
     }
 
     @PostMapping("/recuperarSenha")
-    public ResponseEntity<String> recuperarSenha(@Valid @RequestBody RecuperarSenhaRequestDTO recuperarSenhaRequestDTO) throws Exception {
+    public ResponseEntity<String> recuperarSenha(@Valid @RequestBody RecuperarSenhaRequestDTO recuperarSenhaRequestDTO) {
         this.recuperarSenhaService.recuperarSenha(recuperarSenhaRequestDTO.getEmail());
         return ResponseEntity.ok("E-mail enviado.");
     }
