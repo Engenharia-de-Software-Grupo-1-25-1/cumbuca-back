@@ -44,14 +44,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     public Avaliacao criar(AvaliacaoRequestDTO avaliacaoRequestDTO) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
 
-        modelMapper.typeMap(AvaliacaoRequestDTO.class, Avaliacao.class)
-                .addMappings(mapper -> {
-                    mapper.skip(Avaliacao::setUsuario);
-                    mapper.skip(Avaliacao::setEstabelecimento);
-                    mapper.skip(Avaliacao::setFotos);
-                    mapper.skip(Avaliacao::setTags);
-                });
-
         final Avaliacao avaliacao = modelMapper.map(avaliacaoRequestDTO, Avaliacao.class);
         final Estabelecimento estabelecimento = estabelecimentoService
                 .buscarOuCriar(avaliacaoRequestDTO.getEstabelecimento());
