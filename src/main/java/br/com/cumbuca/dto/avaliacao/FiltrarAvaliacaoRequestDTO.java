@@ -1,16 +1,14 @@
 package br.com.cumbuca.dto.avaliacao;
 
-import br.com.cumbuca.enums.FiltrarAvaliacao;
-import br.com.cumbuca.model.Estabelecimento;
-import br.com.cumbuca.model.Tag;
-import br.com.cumbuca.model.Usuario;
+import br.com.cumbuca.enums.FiltrosAvaliacao;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 @Getter
 public class FiltrarAvaliacaoRequestDTO {
 
-    private FiltrarAvaliacao filtrarAvaliacao;
+    private FiltrosAvaliacao filtrarAvaliacao;
+
+    @NotBlank(message = "Filtro é obrigatório")
+    private String filtro;
 }

@@ -1,6 +1,6 @@
 package br.com.cumbuca.enums;
 
-public enum FiltrarAvaliacao {
+public enum FiltrosAvaliacao {
     USUARIO,
     ESTABELECIMENTO,
     ITEM_CONSUMIDO,

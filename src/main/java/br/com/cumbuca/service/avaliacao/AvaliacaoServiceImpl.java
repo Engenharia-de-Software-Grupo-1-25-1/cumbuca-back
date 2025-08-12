@@ -2,6 +2,7 @@ package br.com.cumbuca.service.avaliacao;
 
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
 
+import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
 import br.com.cumbuca.dto.avaliacao.FiltrarAvaliacaoRequestDTO;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
@@ -19,8 +20,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class AvaliacaoServiceImpl implements AvaliacaoService {
@@ -33,8 +36,8 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     private final FotoService fotoService;
 
     public AvaliacaoServiceImpl(AvaliacaoRepository avaliacaoRepository, ModelMapper modelMapper,
-            UsuarioService usuarioService, EstabelecimentoService estabelecimentoService, TagService tagService,
-            FotoService fotoService) {
+                                UsuarioService usuarioService, EstabelecimentoService estabelecimentoService, TagService tagService,
+                                FotoService fotoService) {
         this.avaliacaoRepository = avaliacaoRepository;
         this.modelMapper = modelMapper;
         this.usuarioService = usuarioService;
@@ -109,7 +112,53 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         avaliacaoRepository.delete(avaliacao);
     }
 
-    public List<Avaliacao> filtrar(FiltrarAvaliacaoRequestDTO filtrarAvaliacaoRequestDTO) {
-        return null;
+    public List<AvaliacaoResponseDTO> filtrar(FiltrarAvaliacaoRequestDTO filtrarAvaliacaoRequestDTO) {
+        if (filtrarAvaliacaoRequestDTO == null || filtrarAvaliacaoRequestDTO.getFiltrarAvaliacao() == null || filtrarAvaliacaoRequestDTO.getFiltro() == null) {
+            throw new CumbucaException("Selecione o filtro desejado");
+        }
+
+        List<Avaliacao> avaliacoes = switch (filtrarAvaliacaoRequestDTO.getFiltrarAvaliacao()) {
+            case USUARIO -> avaliacaoRepository.findByUsuario_Nome(filtrarAvaliacaoRequestDTO.getFiltro());
+            case ESTABELECIMENTO -> avaliacaoRepository.findByEstabelecimento_Nome(filtrarAvaliacaoRequestDTO.getFiltro());
+            case ITEM_CONSUMIDO -> avaliacaoRepository.findByItemConsumido(filtrarAvaliacaoRequestDTO.getFiltro());
+            case TAGS -> avaliacaoRepository.findByTags_Tag(filtrarAvaliacaoRequestDTO.getFiltro());
+            case PRECO -> parseBigDecimal(filtrarAvaliacaoRequestDTO.getFiltro())
+                    .map(avaliacaoRepository::findByPreco)
+                    .orElse(List.of());
+            case NOTA_GERAL -> parseInt(filtrarAvaliacaoRequestDTO.getFiltro())
+                    .map(avaliacaoRepository::findByNotaGeral)
+                    .orElse(List.of());
+            case NOTA_COMIDA -> parseInt(filtrarAvaliacaoRequestDTO.getFiltro())
+                    .map(avaliacaoRepository::findByNotaComida)
+                    .orElse(List.of());
+            case NOTA_AMBIENTE -> parseInt(filtrarAvaliacaoRequestDTO.getFiltro())
+                    .map(avaliacaoRepository::findByNotaAmbiente)
+                    .orElse(List.of());
+            case NOTA_ATENDIMENTO -> parseInt(filtrarAvaliacaoRequestDTO.getFiltro())
+                    .map(avaliacaoRepository::findByNotaAtendimento)
+                    .orElse(List.of());
+        };
+        return avaliacoes.stream()
+                .map(AvaliacaoResponseDTO::new)
+                .toList();
+    }
+
+    private Optional<BigDecimal> parseBigDecimal(String value) {
+        if (value == null || value.isBlank()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(new BigDecimal(value));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<Integer> parseInt(String value) {
+        try {
+            return Optional.of(Integer.parseInt(value));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 }

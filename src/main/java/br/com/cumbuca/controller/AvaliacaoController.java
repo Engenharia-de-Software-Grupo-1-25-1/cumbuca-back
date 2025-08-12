@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/avaliacao")
@@ -53,7 +54,8 @@ public class AvaliacaoController {
     }
 
     @PostMapping("/filtrar")
-    public List<Avaliacao> filtrar(@RequestBody FiltrarAvaliacaoRequestDTO filtrarAvaliacaoRequestDTO) {
-        return avaliacaoService.filtrar(filtrarAvaliacaoRequestDTO);
+    public ResponseEntity<List<AvaliacaoResponseDTO>> filtrar(@RequestBody FiltrarAvaliacaoRequestDTO filtrarAvaliacaoRequestDTO) {
+        final List<AvaliacaoResponseDTO> avaliacoesFiltradas = avaliacaoService.filtrar(filtrarAvaliacaoRequestDTO);
+        return ResponseEntity.ok(avaliacoesFiltradas);
     }
 }
