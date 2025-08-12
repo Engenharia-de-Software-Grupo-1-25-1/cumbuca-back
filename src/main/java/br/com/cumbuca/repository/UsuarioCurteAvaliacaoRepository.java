@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UsuarioCurteAvaliacaoRepository extends JpaRepository<UsuarioCurteAvaliacao, Long> {
 
-    int countByAvaliacaoId(Long avaliacaoId);
+    int countByAvaliacaoId(Long idAvaliacao);
 
 }
