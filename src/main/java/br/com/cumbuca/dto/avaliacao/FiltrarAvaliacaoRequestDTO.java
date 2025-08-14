@@ -1,6 +1,7 @@
 package br.com.cumbuca.dto.avaliacao;
 
-import br.com.cumbuca.enums.FiltrosAvaliacao;
+import br.com.cumbuca.enums.avaliacao.FiltrosAvaliacao;
+import br.com.cumbuca.enums.avaliacao.OrdenacaoAvaliacao;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
@@ -11,4 +12,5 @@ public class FiltrarAvaliacaoRequestDTO {
 
     @NotBlank(message = "Filtro é obrigatório")
     private String filtro;
+    private OrdenacaoAvaliacao ordenacao;
 }

@@ -1,4 +1,4 @@
-package br.com.cumbuca.enums;
+package br.com.cumbuca.enums.avaliacao;
 
 public enum FiltrosAvaliacao {
     USUARIO,

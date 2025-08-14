@@ -4,6 +4,7 @@ import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
 
 import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
 import br.com.cumbuca.dto.avaliacao.FiltrarAvaliacaoRequestDTO;
+import br.com.cumbuca.enums.avaliacao.OrdenacaoAvaliacao;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
@@ -16,6 +17,7 @@ import br.com.cumbuca.service.foto.FotoService;
 import br.com.cumbuca.service.tag.TagService;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,34 +115,53 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     public List<AvaliacaoResponseDTO> filtrar(FiltrarAvaliacaoRequestDTO filtrarAvaliacaoRequestDTO) {
-        if (filtrarAvaliacaoRequestDTO == null || filtrarAvaliacaoRequestDTO.getFiltrarAvaliacao() == null || filtrarAvaliacaoRequestDTO.getFiltro() == null) {
+        if (filtrarAvaliacaoRequestDTO == null
+                || filtrarAvaliacaoRequestDTO.getFiltrarAvaliacao() == null
+                || filtrarAvaliacaoRequestDTO.getFiltro() == null) {
             throw new CumbucaException("Selecione o filtro desejado");
         }
 
+        Sort sort = getOrdenacao(filtrarAvaliacaoRequestDTO.getOrdenacao());
+
         List<Avaliacao> avaliacoes = switch (filtrarAvaliacaoRequestDTO.getFiltrarAvaliacao()) {
-            case USUARIO -> avaliacaoRepository.findByUsuario_Nome(filtrarAvaliacaoRequestDTO.getFiltro());
-            case ESTABELECIMENTO -> avaliacaoRepository.findByEstabelecimento_Nome(filtrarAvaliacaoRequestDTO.getFiltro());
-            case ITEM_CONSUMIDO -> avaliacaoRepository.findByItemConsumido(filtrarAvaliacaoRequestDTO.getFiltro());
-            case TAGS -> avaliacaoRepository.findByTags_Tag(filtrarAvaliacaoRequestDTO.getFiltro());
+            case USUARIO -> avaliacaoRepository.findByUsuario_Nome(filtrarAvaliacaoRequestDTO.getFiltro(), sort);
+            case ESTABELECIMENTO -> avaliacaoRepository.findByEstabelecimento_Nome(filtrarAvaliacaoRequestDTO.getFiltro(), sort);
+            case ITEM_CONSUMIDO -> avaliacaoRepository.findByItemConsumido(filtrarAvaliacaoRequestDTO.getFiltro(), sort);
+            case TAGS -> avaliacaoRepository.findByTags_Tag(filtrarAvaliacaoRequestDTO.getFiltro(), sort);
             case PRECO -> parseBigDecimal(filtrarAvaliacaoRequestDTO.getFiltro())
-                    .map(avaliacaoRepository::findByPreco)
+                    .map(preco -> avaliacaoRepository.findByPreco(preco, sort))
                     .orElse(List.of());
+
             case NOTA_GERAL -> parseInt(filtrarAvaliacaoRequestDTO.getFiltro())
-                    .map(avaliacaoRepository::findByNotaGeral)
+                    .map(nota -> avaliacaoRepository.findByNotaGeral(nota, sort))
                     .orElse(List.of());
+
             case NOTA_COMIDA -> parseInt(filtrarAvaliacaoRequestDTO.getFiltro())
-                    .map(avaliacaoRepository::findByNotaComida)
+                    .map(nota -> avaliacaoRepository.findByNotaComida(nota, sort))
                     .orElse(List.of());
+
             case NOTA_AMBIENTE -> parseInt(filtrarAvaliacaoRequestDTO.getFiltro())
-                    .map(avaliacaoRepository::findByNotaAmbiente)
+                    .map(nota -> avaliacaoRepository.findByNotaAmbiente(nota, sort))
                     .orElse(List.of());
+
             case NOTA_ATENDIMENTO -> parseInt(filtrarAvaliacaoRequestDTO.getFiltro())
-                    .map(avaliacaoRepository::findByNotaAtendimento)
+                    .map(nota -> avaliacaoRepository.findByNotaAtendimento(nota, sort))
                     .orElse(List.of());
+
         };
+
         return avaliacoes.stream()
                 .map(AvaliacaoResponseDTO::new)
                 .toList();
+    }
+
+    private Sort getOrdenacao(OrdenacaoAvaliacao ordenacaoAvaliacao) {
+        if (ordenacaoAvaliacao == null) return Sort.unsorted();
+        return switch (ordenacaoAvaliacao) {
+            case PRECO -> Sort.by(Sort.Direction.DESC, "preco");
+            case MAIS_RECENTE -> Sort.by(Sort.Direction.DESC, "data");
+            case NOTA_GERAL -> Sort.by(Sort.Direction.DESC, "notaGeral");
+        };
     }
 
     private Optional<BigDecimal> parseBigDecimal(String value) {
