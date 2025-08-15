@@ -28,6 +28,8 @@ public class AvaliacaoResponseDTO {
     private LocalDate data;
     private List<String> fotos;
     private List<String> tags;
+    private String titulo;
+
 
     public AvaliacaoResponseDTO(Avaliacao avaliacao) {
         this.id = avaliacao.getId();
