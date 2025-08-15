@@ -1,10 +1,13 @@
 package br.com.cumbuca.service.estabelecimento;
 
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoRequestDTO;
+import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResumoResponseDTO;
 import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.repository.EstabelecimentoRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class EstabelecimentoServiceImpl implements EstabelecimentoService {
@@ -24,5 +27,10 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                     final Estabelecimento novo = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
                     return estabelecimentoRepository.save(novo);
                 });
+    }
+
+    @Override
+    public List<EstabelecimentoResumoResponseDTO> listarEstabelecimentosResumidos() {
+        return estabelecimentoRepository.findEstabelecimentosSummary();
     }
 }
