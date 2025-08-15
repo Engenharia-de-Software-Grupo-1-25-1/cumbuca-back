@@ -47,4 +47,7 @@ public class Estabelecimento {
 
     @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, fetch = FetchType.LAZY )
     private List<Horario> horarios;
+
+    @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Avaliacao> avaliacoes;
 }
