@@ -1,6 +1,7 @@
 package br.com.cumbuca.service.avaliacao;
 
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
+import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
@@ -105,4 +106,11 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
         avaliacaoRepository.delete(avaliacao);
     }
+    @Override
+    public AvaliacaoResponseDTO buscarAvaliacao(Long id){
+        Avaliacao avaliacao = avaliacaoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
+        return  new AvaliacaoResponseDTO(avaliacao);
+    }
+
 }
