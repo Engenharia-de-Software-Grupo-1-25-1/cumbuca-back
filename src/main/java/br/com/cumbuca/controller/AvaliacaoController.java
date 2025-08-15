@@ -38,13 +38,13 @@ public class AvaliacaoController {
         return ResponseEntity.created(uri).body(new AvaliacaoResponseDTO(avaliacao));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/atualizar/{id}")
     public ResponseEntity<Avaliacao> atualizar(@PathVariable Long id, @RequestBody @Valid AvaliacaoRequestDTO dto) {
         final Avaliacao avaliacaoAtualizada = avaliacaoService.atualizar(id, dto);
         return ResponseEntity.ok(avaliacaoAtualizada);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/remover/{id}")
     public ResponseEntity<Void> remover(@PathVariable Long id) {
         avaliacaoService.remover(id);
         return ResponseEntity.noContent().build();
