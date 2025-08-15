@@ -1,5 +1,3 @@
-// cumbuca-back/src/main/java/br/com/cumbuca/dto/estabelecimento/EstabelecimentoSummaryDTO.java
-
 package br.com.cumbuca.dto.estabelecimento;
 
 import lombok.Data;
