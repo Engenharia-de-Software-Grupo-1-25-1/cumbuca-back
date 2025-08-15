@@ -38,13 +38,13 @@ public class AutenticacaoController {
         return ResponseEntity.ok(new LoginResponseDTO(tokenAcesso, usuario.getId()));
     }
 
-    @PostMapping("/recuperarSenha")
+    @PostMapping("/recuperar-senha")
     public ResponseEntity<String> recuperarSenha(@Valid @RequestBody RecuperarSenhaRequestDTO recuperarSenhaRequestDTO) {
         this.recuperarSenhaService.recuperarSenha(recuperarSenhaRequestDTO.getEmail());
         return ResponseEntity.ok("E-mail enviado.");
     }
 
-    @PostMapping("/alterarSenha")
+    @PostMapping("/alterar-senha")
     public ResponseEntity<String> alterarSenha(@RequestBody AlterarSenhaRequestDTO alterarSenhaRequestDTO) {
         recuperarSenhaService.alterarSenha(alterarSenhaRequestDTO.getToken(), alterarSenhaRequestDTO.getNovaSenha(), alterarSenhaRequestDTO.getConfirmarNovaSenha());
         return ResponseEntity.ok("Senha alterada com sucesso.");
