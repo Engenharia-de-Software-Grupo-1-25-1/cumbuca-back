@@ -1,6 +1,7 @@
 package br.com.cumbuca.controller;
 
 import br.com.cumbuca.dto.login.LoginRequestDTO;
+import br.com.cumbuca.dto.login.LoginResponseDTO;
 import br.com.cumbuca.dto.recuperarSenha.AlterarSenhaRequestDTO;
 import br.com.cumbuca.dto.recuperarSenha.RecuperarSenhaRequestDTO;
 import br.com.cumbuca.model.Usuario;
@@ -29,20 +30,21 @@ public class AutenticacaoController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         final UsernamePasswordAuthenticationToken autenticationToken = new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(), loginRequestDTO.getSenha());
         final Authentication authentication = authenticationManager.authenticate(autenticationToken);
-        final String tokenAcesso = tokenService.gerarToken((Usuario) authentication.getPrincipal());
-        return ResponseEntity.ok(tokenAcesso);
+        final Usuario usuario = (Usuario) authentication.getPrincipal();
+        final String tokenAcesso = tokenService.gerarToken(usuario);
+        return ResponseEntity.ok(new LoginResponseDTO(tokenAcesso, usuario.getId()));
     }
 
-    @PostMapping("/recuperarSenha")
+    @PostMapping("/recuperar-senha")
     public ResponseEntity<String> recuperarSenha(@Valid @RequestBody RecuperarSenhaRequestDTO recuperarSenhaRequestDTO) {
         this.recuperarSenhaService.recuperarSenha(recuperarSenhaRequestDTO.getEmail());
         return ResponseEntity.ok("E-mail enviado.");
     }
 
-    @PostMapping("/alterarSenha")
+    @PostMapping("/alterar-senha")
     public ResponseEntity<String> alterarSenha(@RequestBody AlterarSenhaRequestDTO alterarSenhaRequestDTO) {
         recuperarSenhaService.alterarSenha(alterarSenhaRequestDTO.getToken(), alterarSenhaRequestDTO.getNovaSenha(), alterarSenhaRequestDTO.getConfirmarNovaSenha());
         return ResponseEntity.ok("Senha alterada com sucesso.");
