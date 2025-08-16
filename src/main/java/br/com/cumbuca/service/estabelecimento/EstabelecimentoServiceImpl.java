@@ -56,24 +56,19 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     public EstabelecimentoDetalheResponseDTO buscarDetalhesEstabelecimento(Long id) {
         final Estabelecimento estabelecimento = estabelecimentoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Estabelecimento não encontrado."));
-
         final List<Avaliacao> avaliacoes = estabelecimento.getAvaliacoes();
         final double notaGeralMedia = avaliacoes.stream()
                 .mapToDouble(Avaliacao::getNotaGeral)
                 .average()
                 .orElse(0.0);
-
         final long quantidadeAvaliacoes = avaliacoes.size();
-
         final BigDecimal precoMedio = avaliacoes.stream()
                 .map(Avaliacao::getPreco)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         final BigDecimal precoMedioFinal = quantidadeAvaliacoes > 0 ? precoMedio.divide(BigDecimal.valueOf(quantidadeAvaliacoes), RoundingMode.HALF_UP) : BigDecimal.ZERO;
-
         final List<AvaliacaoResponseDTO> avaliacaoResponseDTOS = avaliacoes.stream()
                 .map(AvaliacaoResponseDTO::new)
                 .toList();
-
         final List<String> tagsPopulares = avaliacoes.stream()
                 .flatMap(avaliacao -> avaliacao.getTags().stream())
                 .map(tag -> tag.getTag())
@@ -83,10 +78,8 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                 .limit(5)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
-
         final Usuario usuarioLogado = usuarioService.getUsuarioLogado();
         final boolean isFavorito = favoritoRepository.existsById(new UsuarioFavoritaEstabelecimentoId(usuarioLogado.getId(), id));
-
         return new EstabelecimentoDetalheResponseDTO(
                 estabelecimento,
                 notaGeralMedia,
