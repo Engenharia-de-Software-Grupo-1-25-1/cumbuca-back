@@ -1,6 +1,5 @@
 package br.com.cumbuca.service.usuario;
 
-import br.com.cumbuca.dto.usuario.PerfilResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.model.Usuario;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,7 +12,7 @@ public interface UsuarioService extends UserDetailsService {
 
     void remover(Long id);
 
-    Usuario getUsuarioLogado();
+    Usuario recuperar(Long id);
 
-    PerfilResponseDTO exibirPerfil(Long id);
+    Usuario getUsuarioLogado();
 }

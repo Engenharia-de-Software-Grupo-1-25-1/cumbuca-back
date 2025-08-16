@@ -1,13 +1,8 @@
 package br.com.cumbuca.service.usuario;
 
-import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
-import br.com.cumbuca.dto.usuario.PerfilResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.exception.CumbucaException;
-import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Usuario;
-import br.com.cumbuca.repository.AvaliacaoRepository;
-import br.com.cumbuca.repository.TagRepository;
 import br.com.cumbuca.repository.UsuarioRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
@@ -18,8 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
@@ -27,16 +20,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
-    private final AvaliacaoRepository avaliacaoRepository;
-    private final TagRepository tagRepository;
 
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder,
-                              ModelMapper modelMapper, AvaliacaoRepository avaliacaoRepository, TagRepository tagRepository) {
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
-        this.avaliacaoRepository = avaliacaoRepository;
-        this.tagRepository = tagRepository;
     }
 
     @Override
@@ -96,41 +84,26 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public Usuario recuperar(Long id) {
+        verificaUsuarioLogado();
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+    }
+
+    @Override
     public Usuario getUsuarioLogado() {
+        verificaUsuarioLogado();
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final String login = authentication.getName();
-
-        if (!authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            throw new UsernameNotFoundException("Usuário não autenticado");
-        }
-
         return usuarioRepository.findByUsernameOrEmail(login, login)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
     }
-    @Override
-    public PerfilResponseDTO exibirPerfil(Long perfilId) {
-        Usuario usuario = usuarioRepository.findById(perfilId).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        List<AvaliacaoResponseDTO> avaliacoes = avaliacaoRepository
-                .findByUsuarioIdOrderByCriadoEmDesc(usuario.getId())
-                .stream()
-                .map(a -> modelMapper.map(a, AvaliacaoResponseDTO.class))
-                .collect(Collectors.toList());
-
-        List<String> tagsPopulares = tagRepository.findTagsPopulares();
-
-        boolean podeEditar = perfilId.equals(getUsuarioLogado().getId());
-
-        return new PerfilResponseDTO(
-                usuario.getNome(),
-                usuario.getUsername(),
-                usuario.getFoto(),
-                avaliacoes,
-                tagsPopulares,
-                podeEditar
-        );
+    private void verificaUsuarioLogado() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            throw new UsernameNotFoundException("Usuário não autenticado");
+        }
     }
-
-
 
 }
