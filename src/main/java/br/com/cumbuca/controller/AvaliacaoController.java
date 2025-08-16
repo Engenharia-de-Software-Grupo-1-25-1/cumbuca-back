@@ -6,7 +6,15 @@ import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.service.avaliacao.AvaliacaoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -45,11 +53,10 @@ public class AvaliacaoController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/detalhar")
-    public ResponseEntity<AvaliacaoResponseDTO> detalharAvaliacao(@PathVariable Long id) {
-        AvaliacaoResponseDTO avaliacao = avaliacaoService.buscarAvaliacao(id);
-        return ResponseEntity.ok(avaliacao);
-
+    @GetMapping("/recuperar/{id}")
+    public ResponseEntity<AvaliacaoResponseDTO> recuperar(@PathVariable Long id) {
+        final Avaliacao avaliacao = avaliacaoService.recuperar(id);
+        return ResponseEntity.ok(new AvaliacaoResponseDTO(avaliacao));
     }
 
 }

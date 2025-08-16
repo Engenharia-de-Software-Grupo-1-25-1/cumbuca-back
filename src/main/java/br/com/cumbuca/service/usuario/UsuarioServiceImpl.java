@@ -99,7 +99,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
     }
 
-    private void verificaUsuarioLogado() {
+    public void verificaUsuarioLogado() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
             throw new UsernameNotFoundException("Usuário não autenticado");
