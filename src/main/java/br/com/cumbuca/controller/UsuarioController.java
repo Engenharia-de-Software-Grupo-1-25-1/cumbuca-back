@@ -53,9 +53,9 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/exibir/{id}")
-    public ResponseEntity<UsuarioResponseDTO> exibir(@PathVariable Long id) {
-        final Usuario usuario = usuarioService.exibir(id);
+    @GetMapping("/recuperar/{id}")
+    public ResponseEntity<UsuarioResponseDTO> recuperar(@PathVariable Long id) {
+        final Usuario usuario = usuarioService.recuperar(id);
         return ResponseEntity.ok(new UsuarioResponseDTO(usuario));
     }
 

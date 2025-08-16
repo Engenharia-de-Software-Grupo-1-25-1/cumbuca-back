@@ -84,7 +84,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public Usuario exibir(Long id) {
+    public Usuario recuperar(Long id) {
         verificaUsuarioLogado();
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
