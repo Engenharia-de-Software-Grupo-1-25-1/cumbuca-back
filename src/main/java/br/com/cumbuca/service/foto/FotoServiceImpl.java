@@ -12,6 +12,7 @@ import java.util.List;
 @Service
 public class FotoServiceImpl implements FotoService {
 
+    @Override
     public List<Foto> criarFotos(List<MultipartFile> arquivos, Avaliacao avaliacao) {
         return arquivos.stream()
                 .filter(f -> !f.isEmpty())
@@ -27,3 +28,4 @@ public class FotoServiceImpl implements FotoService {
                 }).toList();
     }
 }
+

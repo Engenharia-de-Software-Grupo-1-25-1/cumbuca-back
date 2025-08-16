@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface TagService {
     List<Tag> criarTags(List<String> nomes, Avaliacao avaliacao);
+
 }
