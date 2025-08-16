@@ -112,4 +112,12 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
         avaliacaoRepository.delete(avaliacao);
     }
+
+    @Override
+    public Avaliacao recuperar(Long id) {
+        usuarioService.verificaUsuarioLogado();
+        return avaliacaoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
+    }
+
 }

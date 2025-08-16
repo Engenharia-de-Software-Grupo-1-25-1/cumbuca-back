@@ -7,6 +7,7 @@ import br.com.cumbuca.service.avaliacao.AvaliacaoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,9 @@ public class AvaliacaoController {
 
     private final AvaliacaoService avaliacaoService;
 
-    public AvaliacaoController(AvaliacaoService avaliacaoService) { this.avaliacaoService = avaliacaoService; }
+    public AvaliacaoController(AvaliacaoService avaliacaoService) {
+        this.avaliacaoService = avaliacaoService;
+    }
 
     @PostMapping("/criar")
     public ResponseEntity<AvaliacaoResponseDTO> criar(
@@ -49,4 +52,11 @@ public class AvaliacaoController {
         avaliacaoService.remover(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/recuperar/{id}")
+    public ResponseEntity<AvaliacaoResponseDTO> recuperar(@PathVariable Long id) {
+        final Avaliacao avaliacao = avaliacaoService.recuperar(id);
+        return ResponseEntity.ok(new AvaliacaoResponseDTO(avaliacao));
+    }
+
 }

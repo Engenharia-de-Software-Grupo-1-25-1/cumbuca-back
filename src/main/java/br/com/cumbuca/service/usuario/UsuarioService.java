@@ -15,4 +15,6 @@ public interface UsuarioService extends UserDetailsService {
     Usuario recuperar(Long id);
 
     Usuario getUsuarioLogado();
+
+    void verificaUsuarioLogado();
 }
