@@ -7,6 +7,7 @@ import br.com.cumbuca.service.usuario.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,4 +52,11 @@ public class UsuarioController {
         usuarioService.remover(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/exibir/{id}")
+    public ResponseEntity<UsuarioResponseDTO> exibir(@PathVariable Long id) {
+        final Usuario usuario = usuarioService.exibir(id);
+        return ResponseEntity.ok(new UsuarioResponseDTO(usuario));
+    }
+
 }
