@@ -1,10 +1,7 @@
 package br.com.cumbuca.service.usuario;
 
-import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
-import br.com.cumbuca.dto.usuario.PerfilResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.exception.CumbucaException;
-import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.TagRepository;
@@ -18,8 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
@@ -96,6 +91,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public Usuario exibir(Long id) {
+        final Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        return usuario;
+    }
+
+    @Override
     public Usuario getUsuarioLogado() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final String login = authentication.getName();
@@ -107,30 +109,5 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepository.findByUsernameOrEmail(login, login)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
     }
-    @Override
-    public PerfilResponseDTO exibirPerfil(Long perfilId) {
-        Usuario usuario = usuarioRepository.findById(perfilId).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        List<AvaliacaoResponseDTO> avaliacoes = avaliacaoRepository
-                .findByUsuarioIdOrderByCriadoEmDesc(usuario.getId())
-                .stream()
-                .map(a -> modelMapper.map(a, AvaliacaoResponseDTO.class))
-                .collect(Collectors.toList());
-
-        List<String> tagsPopulares = tagRepository.findTagsPopulares();
-
-        boolean podeEditar = perfilId.equals(getUsuarioLogado().getId());
-
-        return new PerfilResponseDTO(
-                usuario.getNome(),
-                usuario.getUsername(),
-                usuario.getFoto(),
-                avaliacoes,
-                tagsPopulares,
-                podeEditar
-        );
-    }
-
-
 
 }

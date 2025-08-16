@@ -1,14 +1,19 @@
 package br.com.cumbuca.controller;
 
-import br.com.cumbuca.dto.usuario.PerfilResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -47,24 +52,11 @@ public class UsuarioController {
         usuarioService.remover(id);
         return ResponseEntity.noContent().build();
     }
-    @GetMapping("/{id}/perfil")
-    public ResponseEntity<PerfilResponseDTO> exibirPerfil(@PathVariable Long id){
-        PerfilResponseDTO perfil = usuarioService.exibirPerfil(id);
-        return  ResponseEntity.ok(perfil);
+
+    @GetMapping("/exibir/{id}")
+    public ResponseEntity<UsuarioResponseDTO> exibir(@PathVariable Long id) {
+        final Usuario usuario = usuarioService.exibir(id);
+        return ResponseEntity.ok(new UsuarioResponseDTO(usuario));
     }
-
-    @GetMapping("/me/perfil")
-    public ResponseEntity<PerfilResponseDTO> meuPerfil(){
-        Long idUsuarioLogado = usuarioService.getUsuarioLogado().getId();
-        PerfilResponseDTO perfil = usuarioService.exibirPerfil(idUsuarioLogado);
-        return ResponseEntity.ok(perfil);
-    }
-
-
-
-
-
-
-
 
 }
