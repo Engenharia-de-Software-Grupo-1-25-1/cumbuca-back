@@ -22,6 +22,8 @@ public class EstabelecimentoResponseDTO {
     private String estado;
     private String cep;
     private List<String> horarios;
+    private int qtdAvaliacoes;
+    private Double notaGeral;
 
     public EstabelecimentoResponseDTO(Estabelecimento estabelecimento) {
         this.id = estabelecimento.getId();
