@@ -2,7 +2,6 @@ package br.com.cumbuca.controller;
 
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
-import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.service.avaliacao.AvaliacaoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -32,18 +31,18 @@ public class AvaliacaoController {
     public ResponseEntity<AvaliacaoResponseDTO> criar(
             @ModelAttribute @Valid AvaliacaoRequestDTO avaliacaoRequestDTO,
             UriComponentsBuilder uriBuilder) {
-        final Avaliacao avaliacao = avaliacaoService.criar(avaliacaoRequestDTO);
+        final AvaliacaoResponseDTO avaliacao = avaliacaoService.criar(avaliacaoRequestDTO);
         final URI uri = uriBuilder
                 .path("/avaliacao/{id}")
                 .buildAndExpand(avaliacao.getId())
                 .toUri();
-        return ResponseEntity.created(uri).body(new AvaliacaoResponseDTO(avaliacao));
+        return ResponseEntity.created(uri).body(avaliacao);
     }
 
     @PutMapping("/atualizar/{id}")
     public ResponseEntity<AvaliacaoResponseDTO> atualizar(@PathVariable Long id, @ModelAttribute @Valid AvaliacaoRequestDTO avaliacaoRequestDTO) {
-        final Avaliacao avaliacao = avaliacaoService.atualizar(id, avaliacaoRequestDTO);
-        return ResponseEntity.ok(new AvaliacaoResponseDTO(avaliacao));
+        final AvaliacaoResponseDTO avaliacao = avaliacaoService.atualizar(id, avaliacaoRequestDTO);
+        return ResponseEntity.ok(avaliacao);
     }
 
     @DeleteMapping("/remover/{id}")

@@ -38,7 +38,7 @@ public class FotoServiceImpl implements FotoService {
 
     @Override
     public List<String> recuperar(Long avaliacaoId) {
-        List<Foto> fotos = fotoRepository.findByAvaliacaoId(avaliacaoId);
+        final List<Foto> fotos = fotoRepository.findByAvaliacaoId(avaliacaoId);
         return fotos.stream()
                 .map(foto -> Base64.getEncoder().encodeToString(foto.getFoto()))
                 .toList();

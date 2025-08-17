@@ -38,7 +38,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    public Avaliacao criar(AvaliacaoRequestDTO avaliacaoRequestDTO) {
+    public AvaliacaoResponseDTO criar(AvaliacaoRequestDTO avaliacaoRequestDTO) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
 
         final Avaliacao avaliacao = modelMapper.map(avaliacaoRequestDTO, Avaliacao.class);
@@ -56,11 +56,11 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             tagService.criar(avaliacaoRequestDTO.getTags(), avaliacao);
         }
 
-        return avaliacao;
+        return modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
     }
 
     @Override
-    public Avaliacao atualizar(Long id, AvaliacaoRequestDTO avaliacaoRequestDTO) {
+    public AvaliacaoResponseDTO atualizar(Long id, AvaliacaoRequestDTO avaliacaoRequestDTO) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
 
@@ -79,7 +79,8 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             tagService.criar(avaliacaoRequestDTO.getTags(), avaliacao);
         }
 
-        return avaliacaoRepository.save(avaliacao);
+        avaliacaoRepository.save(avaliacao);
+        return modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
     }
 
     @Override
@@ -98,7 +99,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         usuarioService.verificaUsuarioLogado();
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
-        AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
+        final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
         avaliacaoResponseDTO.setFotos(fotoService.recuperar(id));
         avaliacaoResponseDTO.setTags(tagService.recuperar(id));
         return avaliacaoResponseDTO;
