@@ -14,6 +14,7 @@ import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -103,6 +104,20 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         avaliacaoResponseDTO.setFotos(fotoService.recuperar(id));
         avaliacaoResponseDTO.setTags(tagService.recuperar(id));
         return avaliacaoResponseDTO;
+    }
+
+    @Override
+    public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento) {
+        List<Avaliacao> avaliacoes = avaliacaoRepository.findAllByOrderByDataDesc();
+        if (idUsuario != null) {
+            avaliacoes = avaliacaoRepository.findByUsuarioIdOrderByDataDesc(idUsuario);
+        }
+        if (idEstabelecimento != null) {
+            avaliacoes = avaliacaoRepository.findByEstabelecimentoIdOrderByDataDesc(idEstabelecimento);
+        }
+        return avaliacoes.stream()
+                .map(avaliacao -> modelMapper.map(avaliacao, AvaliacaoResponseDTO.class))
+                .toList();
     }
 
 }
