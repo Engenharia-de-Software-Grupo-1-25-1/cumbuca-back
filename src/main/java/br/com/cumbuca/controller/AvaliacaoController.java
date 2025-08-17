@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -42,9 +41,9 @@ public class AvaliacaoController {
     }
 
     @PutMapping("/atualizar/{id}")
-    public ResponseEntity<Avaliacao> atualizar(@PathVariable Long id, @RequestBody @Valid AvaliacaoRequestDTO dto) {
-        final Avaliacao avaliacaoAtualizada = avaliacaoService.atualizar(id, dto);
-        return ResponseEntity.ok(avaliacaoAtualizada);
+    public ResponseEntity<AvaliacaoResponseDTO> atualizar(@PathVariable Long id, @ModelAttribute @Valid AvaliacaoRequestDTO avaliacaoRequestDTO) {
+        final Avaliacao avaliacao = avaliacaoService.atualizar(id, avaliacaoRequestDTO);
+        return ResponseEntity.ok(new AvaliacaoResponseDTO(avaliacao));
     }
 
     @DeleteMapping("/remover/{id}")
