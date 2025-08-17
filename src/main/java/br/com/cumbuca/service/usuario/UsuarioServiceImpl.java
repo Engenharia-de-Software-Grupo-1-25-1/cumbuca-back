@@ -21,8 +21,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder,
-                              ModelMapper modelMapper) {
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
@@ -85,15 +84,26 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public Usuario recuperar(Long id) {
+        verificaUsuarioLogado();
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+    }
+
+    @Override
     public Usuario getUsuarioLogado() {
+        verificaUsuarioLogado();
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final String login = authentication.getName();
-
-        if (!authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            throw new UsernameNotFoundException("Usuário não autenticado");
-        }
-
         return usuarioRepository.findByUsernameOrEmail(login, login)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
     }
+
+    public void verificaUsuarioLogado() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            throw new UsernameNotFoundException("Usuário não autenticado");
+        }
+    }
+
 }
