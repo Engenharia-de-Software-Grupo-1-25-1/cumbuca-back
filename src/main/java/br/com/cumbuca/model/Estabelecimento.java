@@ -1,10 +1,14 @@
 package br.com.cumbuca.model;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -34,15 +38,12 @@ public class Estabelecimento {
     @Column(name = "CIDADE", length = 50)
     private String cidade;
 
-    @Column(name = "ESTADO",  length = 2)
+    @Column(name = "ESTADO", length = 2)
     private String estado;
 
     @Column(name = "CEP", length = 10)
     private String cep;
 
-    @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, fetch = FetchType.LAZY )
+    @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Horario> horarios;
-
-    @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Avaliacao> avaliacoes;
 }
