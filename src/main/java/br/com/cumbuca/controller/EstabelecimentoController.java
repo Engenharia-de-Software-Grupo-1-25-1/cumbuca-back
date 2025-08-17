@@ -1,6 +1,6 @@
 package br.com.cumbuca.controller;
 
-import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResumoResponseDTO;
+import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/estabelecimentos")
+@RequestMapping("/estabelecimento")
 public class EstabelecimentoController {
 
     private final EstabelecimentoService estabelecimentoService;
@@ -19,9 +19,9 @@ public class EstabelecimentoController {
         this.estabelecimentoService = estabelecimentoService;
     }
 
-    @GetMapping("/resumo")
-    public ResponseEntity<List<EstabelecimentoResumoResponseDTO>> listarResumo() {
-        final List<EstabelecimentoResumoResponseDTO> estabelecimentos = estabelecimentoService.listarEstabelecimentosResumidos();
+    @GetMapping("/listar")
+    public ResponseEntity<List<EstabelecimentoResponseDTO>> listar() {
+        final List<EstabelecimentoResponseDTO> estabelecimentos = estabelecimentoService.listar();
         return ResponseEntity.ok(estabelecimentos);
     }
 }

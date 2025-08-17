@@ -1,9 +1,11 @@
 package br.com.cumbuca.dto.estabelecimento;
 
+import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.model.Horario;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +22,8 @@ public class EstabelecimentoResponseDTO {
     private String estado;
     private String cep;
     private List<String> horarios;
+    private int quantidadeAvaliacoes;
+    private Double notaGeral;
 
     public EstabelecimentoResponseDTO(Estabelecimento estabelecimento) {
         this.id = estabelecimento.getId();
@@ -31,6 +35,8 @@ public class EstabelecimentoResponseDTO {
         this.cidade = estabelecimento.getCidade();
         this.estado = estabelecimento.getEstado();
         this.cep = estabelecimento.getCep();
+        this.notaGeral = calculaNotaGeral(estabelecimento);
+        this.quantidadeAvaliacoes = estabelecimento.getAvaliacoes().size();
         if (estabelecimento.getHorarios() != null) {
             this.horarios = estabelecimento.getHorarios().stream()
                     .map(Horario::getHorario)
@@ -38,6 +44,18 @@ public class EstabelecimentoResponseDTO {
         } else {
             this.horarios = List.of();
         }
+    }
+
+    public Double calculaNotaGeral(Estabelecimento estabelecimento) {
+        if (estabelecimento.getAvaliacoes() != null && !estabelecimento.getAvaliacoes().isEmpty()) {
+            double somaDasNotas = estabelecimento.getAvaliacoes().stream()
+                    .mapToDouble(Avaliacao::getNotaGeral)
+                    .sum();
+
+            return somaDasNotas / estabelecimento.getAvaliacoes().size();
+        }
+
+        return 0.0;
     }
 }
 
