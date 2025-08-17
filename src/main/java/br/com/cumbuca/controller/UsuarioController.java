@@ -31,20 +31,20 @@ public class UsuarioController {
     @PostMapping("/criar")
     public ResponseEntity<UsuarioResponseDTO> criar(@ModelAttribute @Valid UsuarioRequestDTO usuarioRequestDTO,
                                                     UriComponentsBuilder uriBuilder) {
-        final Usuario usuario = usuarioService.criar(usuarioRequestDTO);
+        final UsuarioResponseDTO usuario = usuarioService.criar(usuarioRequestDTO);
         final URI uri = uriBuilder
                 .path("/usuario/{username}")
                 .buildAndExpand(usuario.getUsername())
                 .toUri();
 
-        return ResponseEntity.created(uri).body(new UsuarioResponseDTO(usuario));
+        return ResponseEntity.created(uri).body(usuario);
     }
 
     @PutMapping("/atualizar/{id}")
     public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Long id,
                                                         @ModelAttribute @Valid UsuarioRequestDTO usuarioRequestDTO) {
-        final Usuario usuario = usuarioService.atualizar(id, usuarioRequestDTO);
-        return ResponseEntity.ok(new UsuarioResponseDTO(usuario));
+        final UsuarioResponseDTO usuario = usuarioService.atualizar(id, usuarioRequestDTO);
+        return ResponseEntity.ok(usuario);
     }
 
     @DeleteMapping("/remover/{id}")
@@ -55,8 +55,8 @@ public class UsuarioController {
 
     @GetMapping("/recuperar/{id}")
     public ResponseEntity<UsuarioResponseDTO> recuperar(@PathVariable Long id) {
-        final Usuario usuario = usuarioService.recuperar(id);
-        return ResponseEntity.ok(new UsuarioResponseDTO(usuario));
+        final UsuarioResponseDTO usuario = usuarioService.recuperar(id);
+        return ResponseEntity.ok(usuario);
     }
 
 }

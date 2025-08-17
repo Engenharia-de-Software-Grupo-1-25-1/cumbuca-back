@@ -1,6 +1,7 @@
 package br.com.cumbuca.service.usuario;
 
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
+import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;
@@ -34,7 +35,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public Usuario criar(UsuarioRequestDTO usuarioRequestDTO) {
+    public UsuarioResponseDTO criar(UsuarioRequestDTO usuarioRequestDTO) {
         modelMapper.typeMap(UsuarioRequestDTO.class, Usuario.class)
                 .addMappings(mapper -> mapper.skip(Usuario::setSenha));
         Usuario usuario = modelMapper.map(usuarioRequestDTO, Usuario.class);
@@ -48,12 +49,12 @@ public class UsuarioServiceImpl implements UsuarioService {
             }
         }
 
-        usuario = usuarioRepository.save(usuario);
-        return usuario;
+        usuarioRepository.save(usuario);
+        return modelMapper.map(usuario, UsuarioResponseDTO.class);
     }
 
     @Override
-    public Usuario atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO) {
+    public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO) {
         final Usuario usuario = getUsuarioLogado();
         if (!id.equals(usuario.getId())) {
             throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
@@ -71,7 +72,8 @@ public class UsuarioServiceImpl implements UsuarioService {
                 throw new CumbucaException("Erro ao processar a foto.");
             }
         }
-        return usuarioRepository.save(usuario);
+        usuarioRepository.save(usuario);
+        return modelMapper.map(usuario, UsuarioResponseDTO.class);
     }
 
     @Override
@@ -84,10 +86,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public Usuario recuperar(Long id) {
+    public UsuarioResponseDTO recuperar(Long id) {
         verificaUsuarioLogado();
-        return usuarioRepository.findById(id)
+        final Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+        return modelMapper.map(usuario, UsuarioResponseDTO.class);
     }
 
     @Override
