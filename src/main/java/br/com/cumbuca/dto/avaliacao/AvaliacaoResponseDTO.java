@@ -4,11 +4,14 @@ import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
+@NoArgsConstructor
 public class AvaliacaoResponseDTO {
     private Long id;
     private UsuarioResponseDTO usuario;
@@ -21,6 +24,8 @@ public class AvaliacaoResponseDTO {
     private Integer notaAtendimento;
     private Integer notaAmbiente;
     private LocalDate data;
+    private List<String> fotos;
+    private List<String> tags;
 
     public AvaliacaoResponseDTO(Avaliacao avaliacao) {
         this.id = avaliacao.getId();

@@ -1,6 +1,7 @@
 package br.com.cumbuca.service.avaliacao;
 
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
+import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
@@ -85,20 +86,22 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     public void remover(Long id) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
-
         final Usuario usuario = usuarioService.getUsuarioLogado();
         if (!avaliacao.getUsuario().getId().equals(usuario.getId())) {
             throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }
-
         avaliacaoRepository.delete(avaliacao);
     }
 
     @Override
-    public Avaliacao recuperar(Long id) {
+    public AvaliacaoResponseDTO recuperar(Long id) {
         usuarioService.verificaUsuarioLogado();
-        return avaliacaoRepository.findById(id)
+        final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
+        AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
+        avaliacaoResponseDTO.setFotos(fotoService.recuperar(id));
+        avaliacaoResponseDTO.setTags(tagService.recuperar(id));
+        return avaliacaoResponseDTO;
     }
 
 }

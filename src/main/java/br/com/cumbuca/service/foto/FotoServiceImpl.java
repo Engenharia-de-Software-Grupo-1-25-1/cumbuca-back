@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -33,6 +34,14 @@ public class FotoServiceImpl implements FotoService {
                         throw new CumbucaException("Erro ao processar arquivo de foto: " + f.getOriginalFilename());
                     }
                 });
+    }
+
+    @Override
+    public List<String> recuperar(Long avaliacaoId) {
+        List<Foto> fotos = fotoRepository.findByAvaliacaoId(avaliacaoId);
+        return fotos.stream()
+                .map(foto -> Base64.getEncoder().encodeToString(foto.getFoto()))
+                .toList();
     }
 
 }

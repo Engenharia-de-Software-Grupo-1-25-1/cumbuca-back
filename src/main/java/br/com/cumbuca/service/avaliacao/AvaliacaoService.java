@@ -1,6 +1,7 @@
 package br.com.cumbuca.service.avaliacao;
 
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
+import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
 
 public interface AvaliacaoService {
@@ -10,5 +11,5 @@ public interface AvaliacaoService {
 
     void remover(Long id);
 
-    Avaliacao recuperar(Long id);
+    AvaliacaoResponseDTO recuperar(Long id);
 }

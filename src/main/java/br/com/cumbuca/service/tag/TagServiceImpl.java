@@ -27,4 +27,13 @@ public class TagServiceImpl implements TagService {
                     tagRepository.save(tag);
                 });
     }
+
+    @Override
+    public List<String> recuperar(Long avaliacaoId) {
+        return tagRepository.findByAvaliacaoId(avaliacaoId)
+                .stream()
+                .map(Tag::getTag)
+                .toList();
+    }
+
 }

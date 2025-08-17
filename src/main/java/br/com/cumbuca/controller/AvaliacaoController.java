@@ -54,8 +54,8 @@ public class AvaliacaoController {
 
     @GetMapping("/recuperar/{id}")
     public ResponseEntity<AvaliacaoResponseDTO> recuperar(@PathVariable Long id) {
-        final Avaliacao avaliacao = avaliacaoService.recuperar(id);
-        return ResponseEntity.ok(new AvaliacaoResponseDTO(avaliacao));
+        final AvaliacaoResponseDTO avaliacao = avaliacaoService.recuperar(id);
+        return ResponseEntity.ok(avaliacao);
     }
 
 }

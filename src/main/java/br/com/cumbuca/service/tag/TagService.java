@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface TagService {
     void criar(List<String> tags, Avaliacao avaliacao);
+
+    List<String> recuperar(Long avaliacaoId);
 }

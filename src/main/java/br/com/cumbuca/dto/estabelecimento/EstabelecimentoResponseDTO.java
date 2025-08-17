@@ -3,11 +3,13 @@ package br.com.cumbuca.dto.estabelecimento;
 import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.model.Horario;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
 public class EstabelecimentoResponseDTO {
 
     private Long id;
