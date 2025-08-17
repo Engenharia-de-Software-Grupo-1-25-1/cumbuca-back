@@ -3,17 +3,15 @@ package br.com.cumbuca.dto.avaliacao;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
-import br.com.cumbuca.model.Tag;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
 public class AvaliacaoResponseDTO {
     private Long id;
     private UsuarioResponseDTO usuario;
@@ -41,19 +39,5 @@ public class AvaliacaoResponseDTO {
         this.notaAtendimento = avaliacao.getNotaAtendimento();
         this.notaAmbiente = avaliacao.getNotaAmbiente();
         this.data = avaliacao.getData();
-        if (avaliacao.getFotos() != null) {
-            this.fotos = avaliacao.getFotos().stream()
-                    .map(f -> Base64.getEncoder().encodeToString(f.getFoto()))
-                    .collect(Collectors.toList());
-        } else {
-            this.fotos = new ArrayList<>();
-        }
-        if (avaliacao.getTags() != null) {
-            this.tags = avaliacao.getTags().stream()
-                    .map(Tag::getTag)
-                    .collect(Collectors.toList());
-        } else {
-            this.tags = new ArrayList<>();
-        }
     }
 }

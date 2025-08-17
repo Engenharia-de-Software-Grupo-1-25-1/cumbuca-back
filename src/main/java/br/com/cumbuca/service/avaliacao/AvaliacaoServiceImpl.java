@@ -1,12 +1,11 @@
 package br.com.cumbuca.service.avaliacao;
 
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
+import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
-import br.com.cumbuca.model.Foto;
 import br.com.cumbuca.model.Usuario;
-import br.com.cumbuca.model.Tag;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import br.com.cumbuca.service.foto.FotoService;
@@ -15,7 +14,6 @@ import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -40,38 +38,29 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    public Avaliacao criar(AvaliacaoRequestDTO avaliacaoRequestDTO) {
+    public AvaliacaoResponseDTO criar(AvaliacaoRequestDTO avaliacaoRequestDTO) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
-
-        modelMapper.typeMap(AvaliacaoRequestDTO.class, Avaliacao.class)
-                .addMappings(mapper -> {
-                    mapper.skip(Avaliacao::setUsuario);
-                    mapper.skip(Avaliacao::setEstabelecimento);
-                    mapper.skip(Avaliacao::setFotos);
-                    mapper.skip(Avaliacao::setTags);
-                });
 
         final Avaliacao avaliacao = modelMapper.map(avaliacaoRequestDTO, Avaliacao.class);
         final Estabelecimento estabelecimento = estabelecimentoService
                 .buscarOuCriar(avaliacaoRequestDTO.getEstabelecimento());
         avaliacao.setUsuario(usuario);
         avaliacao.setEstabelecimento(estabelecimento);
+        avaliacaoRepository.save(avaliacao);
 
         if (avaliacaoRequestDTO.getFotos() != null && !avaliacaoRequestDTO.getFotos().isEmpty()) {
-            final List<Foto> fotos = fotoService.criarFotos(avaliacaoRequestDTO.getFotos(), avaliacao);
-            avaliacao.setFotos(fotos);
+            fotoService.criar(avaliacaoRequestDTO.getFotos(), avaliacao);
         }
 
         if (avaliacaoRequestDTO.getTags() != null && !avaliacaoRequestDTO.getTags().isEmpty()) {
-            final List<Tag> tags = tagService.criarTags(avaliacaoRequestDTO.getTags(), avaliacao);
-            avaliacao.setTags(tags);
+            tagService.criar(avaliacaoRequestDTO.getTags(), avaliacao);
         }
 
-        return avaliacaoRepository.save(avaliacao);
+        return modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
     }
 
     @Override
-    public Avaliacao atualizar(Long id, AvaliacaoRequestDTO avaliacaoRequestDTO) {
+    public AvaliacaoResponseDTO atualizar(Long id, AvaliacaoRequestDTO avaliacaoRequestDTO) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
 
@@ -80,36 +69,40 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }
 
-        modelMapper.typeMap(AvaliacaoRequestDTO.class, Avaliacao.class)
-                .addMappings(mapper -> {
-                    mapper.skip(Avaliacao::setFotos);
-                    mapper.skip(Avaliacao::setTags);
-                });
-
         modelMapper.map(avaliacaoRequestDTO, avaliacao);
+
         if (avaliacaoRequestDTO.getFotos() != null && !avaliacaoRequestDTO.getFotos().isEmpty()) {
-            final List<Foto> fotos = fotoService.criarFotos(avaliacaoRequestDTO.getFotos(), avaliacao);
-            avaliacao.setFotos(fotos);
+            fotoService.criar(avaliacaoRequestDTO.getFotos(), avaliacao);
         }
 
         if (avaliacaoRequestDTO.getTags() != null && !avaliacaoRequestDTO.getTags().isEmpty()) {
-            final List<Tag> tags = tagService.criarTags(avaliacaoRequestDTO.getTags(), avaliacao);
-            avaliacao.setTags(tags);
+            tagService.criar(avaliacaoRequestDTO.getTags(), avaliacao);
         }
 
-        return avaliacaoRepository.save(avaliacao);
+        avaliacaoRepository.save(avaliacao);
+        return modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
     }
 
     @Override
     public void remover(Long id) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
-
         final Usuario usuario = usuarioService.getUsuarioLogado();
         if (!avaliacao.getUsuario().getId().equals(usuario.getId())) {
             throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }
-
         avaliacaoRepository.delete(avaliacao);
     }
+
+    @Override
+    public AvaliacaoResponseDTO recuperar(Long id) {
+        usuarioService.verificaUsuarioLogado();
+        final Avaliacao avaliacao = avaliacaoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
+        final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
+        avaliacaoResponseDTO.setFotos(fotoService.recuperar(id));
+        avaliacaoResponseDTO.setTags(tagService.recuperar(id));
+        return avaliacaoResponseDTO;
+    }
+
 }
