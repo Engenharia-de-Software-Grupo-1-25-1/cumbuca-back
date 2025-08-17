@@ -38,7 +38,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioResponseDTO criar(UsuarioRequestDTO usuarioRequestDTO) {
         modelMapper.typeMap(UsuarioRequestDTO.class, Usuario.class)
                 .addMappings(mapper -> mapper.skip(Usuario::setSenha));
-        Usuario usuario = modelMapper.map(usuarioRequestDTO, Usuario.class);
+        final Usuario usuario = modelMapper.map(usuarioRequestDTO, Usuario.class);
         usuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.getSenha()));
 
         if (usuarioRequestDTO.getFoto() != null && !usuarioRequestDTO.getFoto().isEmpty()) {

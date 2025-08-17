@@ -2,7 +2,6 @@ package br.com.cumbuca.controller;
 
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
-import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
