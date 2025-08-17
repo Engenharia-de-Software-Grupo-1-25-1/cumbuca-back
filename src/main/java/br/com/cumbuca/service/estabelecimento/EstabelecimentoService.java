@@ -9,4 +9,5 @@ public interface EstabelecimentoService {
 
     Estabelecimento buscarOuCriar(EstabelecimentoRequestDTO estabelecimentoRequestDTO);
     List<EstabelecimentoResponseDTO> listar();
+    EstabelecimentoResponseDTO buscarDetalhesEstabelecimento(Long id)
 }
