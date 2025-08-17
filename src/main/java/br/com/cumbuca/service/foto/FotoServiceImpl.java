@@ -3,6 +3,7 @@ package br.com.cumbuca.service.foto;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Foto;
+import br.com.cumbuca.repository.FotoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,18 +13,26 @@ import java.util.List;
 @Service
 public class FotoServiceImpl implements FotoService {
 
-    public List<Foto> criarFotos(List<MultipartFile> arquivos, Avaliacao avaliacao) {
-        return arquivos.stream()
+    private final FotoRepository fotoRepository;
+
+    public FotoServiceImpl(FotoRepository fotoRepository) {
+        this.fotoRepository = fotoRepository;
+    }
+
+    @Override
+    public void criar(List<MultipartFile> fotos, Avaliacao avaliacao) {
+        fotos.stream()
                 .filter(f -> !f.isEmpty())
-                .map(f -> {
+                .forEach(f -> {
                     try {
-                        final Foto foto = new Foto();
+                       final Foto foto = new Foto();
                         foto.setFoto(f.getBytes());
                         foto.setAvaliacao(avaliacao);
-                        return foto;
+                        fotoRepository.save(foto);
                     } catch (IOException e) {
                         throw new CumbucaException("Erro ao processar arquivo de foto: " + f.getOriginalFilename());
                     }
-                }).toList();
+                });
     }
+
 }
