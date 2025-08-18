@@ -26,6 +26,8 @@ public class AvaliacaoResponseDTO {
     private LocalDate data;
     private List<String> fotos;
     private List<String> tags;
+    private Integer qtdCurtidas;
+    private Integer qtdComentarios;
 
     public AvaliacaoResponseDTO(Avaliacao avaliacao) {
         this.id = avaliacao.getId();
@@ -39,5 +41,7 @@ public class AvaliacaoResponseDTO {
         this.notaAtendimento = avaliacao.getNotaAtendimento();
         this.notaAmbiente = avaliacao.getNotaAmbiente();
         this.data = avaliacao.getData();
+        this.qtdCurtidas = 0;
+        this.qtdComentarios = 0;
     }
 }
