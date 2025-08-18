@@ -94,6 +94,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public UsuarioResponseDTO recuperarPorUsername(String username) {
+        verificaUsuarioLogado();
+        final Usuario usuario = usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+        return modelMapper.map(usuario, UsuarioResponseDTO.class);
+    }
+
+    @Override
     public Usuario getUsuarioLogado() {
         verificaUsuarioLogado();
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

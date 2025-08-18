@@ -13,6 +13,8 @@ public interface UsuarioService extends UserDetailsService {
 
     void remover(Long id);
 
+    UsuarioResponseDTO recuperarPorUsername(String username);
+
     UsuarioResponseDTO recuperar(Long id);
 
     Usuario getUsuarioLogado();

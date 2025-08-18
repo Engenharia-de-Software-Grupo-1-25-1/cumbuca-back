@@ -58,4 +58,10 @@ public class UsuarioController {
         return ResponseEntity.ok(usuario);
     }
 
+    @GetMapping("/recuperarPorUsername/{username}")
+    public ResponseEntity<UsuarioResponseDTO> recuperarPorUsername(@PathVariable String username) {
+        final UsuarioResponseDTO usuario = usuarioService.recuperarPorUsername(username);
+        return ResponseEntity.ok(usuario);
+    }
+
 }
