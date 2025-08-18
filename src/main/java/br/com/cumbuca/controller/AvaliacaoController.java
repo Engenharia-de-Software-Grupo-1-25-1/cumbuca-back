@@ -61,7 +61,7 @@ public class AvaliacaoController {
         return ResponseEntity.ok(avaliacao);
     }
 
-    @GetMapping("listar")
+    @GetMapping("/listar")
     public ResponseEntity<List<AvaliacaoResponseDTO>> listar(
             @RequestParam(required = false) Long idAvaliacao,
             @RequestParam(required = false) Long idEstabelecimento) {
