@@ -94,7 +94,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public UsuarioResponseDTO recuperarPorUsername(String username) {
+    public UsuarioResponseDTO recuperar(String username) {
         verificaUsuarioLogado();
         final Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
