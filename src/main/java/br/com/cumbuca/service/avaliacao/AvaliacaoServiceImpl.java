@@ -117,7 +117,12 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             avaliacoes = avaliacaoRepository.findByEstabelecimentoIdOrderByDataDesc(idEstabelecimento);
         }
         return avaliacoes.stream()
-                .map(avaliacao -> new AvaliacaoResponseDTO(avaliacao))
+                .map(avaliacao -> {
+                    AvaliacaoResponseDTO dto = new AvaliacaoResponseDTO(avaliacao);
+                    dto.setFotos(fotoService.recuperar(avaliacao.getId()));
+                    dto.setTags(tagService.recuperar(avaliacao.getId()));
+                    return dto;
+                })
                 .toList();
     }
 
