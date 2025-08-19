@@ -52,16 +52,14 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/recuperar/{id}")
-    public ResponseEntity<UsuarioResponseDTO> recuperar(@PathVariable Long id) {
-        final UsuarioResponseDTO usuario = usuarioService.recuperar(id);
-        return ResponseEntity.ok(usuario);
-    }
-
-    @GetMapping("/recuperarPorUsername/{username}")
-    public ResponseEntity<UsuarioResponseDTO> recuperarPorUsername(@PathVariable String username) {
-        final UsuarioResponseDTO usuario = usuarioService.recuperarPorUsername(username);
-        return ResponseEntity.ok(usuario);
+    @GetMapping("/recuperar/{valor}")
+    public ResponseEntity<UsuarioResponseDTO> recuperar(@PathVariable String valor) {
+        try {
+            Long id = Long.parseLong(valor);
+            return ResponseEntity.ok(usuarioService.recuperar(id));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.ok(usuarioService.recuperar(valor));
+        }
     }
 
 }
