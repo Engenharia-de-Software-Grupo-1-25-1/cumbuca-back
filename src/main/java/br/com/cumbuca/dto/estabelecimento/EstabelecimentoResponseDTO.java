@@ -6,7 +6,6 @@ import br.com.cumbuca.model.Horario;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
