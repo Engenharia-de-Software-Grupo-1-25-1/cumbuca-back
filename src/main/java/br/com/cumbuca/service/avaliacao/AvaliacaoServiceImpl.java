@@ -118,10 +118,10 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         }
         return avaliacoes.stream()
                 .map(avaliacao -> {
-                    AvaliacaoResponseDTO dto = new AvaliacaoResponseDTO(avaliacao);
-                    dto.setFotos(fotoService.recuperar(avaliacao.getId()));
-                    dto.setTags(tagService.recuperar(avaliacao.getId()));
-                    return dto;
+                    final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
+                    avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacao.getId()));
+                    avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacao.getId()));
+                    return avaliacaoResponseDTO;
                 })
                 .toList();
     }
