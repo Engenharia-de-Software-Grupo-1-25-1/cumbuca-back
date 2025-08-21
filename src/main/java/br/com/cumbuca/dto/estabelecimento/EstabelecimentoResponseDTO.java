@@ -51,9 +51,7 @@ public class EstabelecimentoResponseDTO {
     public EstabelecimentoResponseDTO(Estabelecimento estabelecimento,
                                       Double notaGeral,
                                       long quantidadeAvaliacoes,
-                                      List<AvaliacaoResponseDTO> avaliacaoResponseDTOS,
-                                      //List<String> tagsPopulares,
-                                      boolean isFavorito
+                                      List<AvaliacaoResponseDTO> avaliacaoResponseDTOS
     ) {
         this.id = estabelecimento.getId();
         this.nome = estabelecimento.getNome();
@@ -74,7 +72,5 @@ public class EstabelecimentoResponseDTO {
         this.notaGeral = notaGeral;
         this.qtdAvaliacoes = (int) quantidadeAvaliacoes;
         this.avaliacoes = avaliacaoResponseDTOS;
-//        this.tagsPopulares = tagsPopulares;
-        this.isFavorito = isFavorito;
     }
-    }
+}

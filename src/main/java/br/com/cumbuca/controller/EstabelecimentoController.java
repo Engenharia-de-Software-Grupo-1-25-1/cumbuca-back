@@ -26,9 +26,9 @@ public class EstabelecimentoController {
         return ResponseEntity.ok(estabelecimentos);
     }
 
-    @GetMapping("/detalhes/{id}")
-    public ResponseEntity<EstabelecimentoResponseDTO> buscarDetalhesEstabelecimento(@PathVariable Long id) {
-        final EstabelecimentoResponseDTO detalhes = estabelecimentoService.buscarDetalhesEstabelecimento(id);
-        return ResponseEntity.ok(detalhes);
+    @GetMapping("/recuperar/{id}")
+    public ResponseEntity<EstabelecimentoResponseDTO> recuperar(@PathVariable Long id) {
+        final EstabelecimentoResponseDTO estabelecimento = estabelecimentoService.recuperar(id);
+        return ResponseEntity.ok(estabelecimento);
     }
 }
