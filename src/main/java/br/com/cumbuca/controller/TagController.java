@@ -26,7 +26,7 @@ public class TagController {
 
     }
 
-    @GetMapping("/listar/tags-populares")
+    @GetMapping("/populares/listar")
     public ResponseEntity<List<TagResponseDTO>> listarTagsPopulares() {
         final List<TagResponseDTO> tags = tagService.listarTagsPopulares();
         return ResponseEntity.ok(tags);

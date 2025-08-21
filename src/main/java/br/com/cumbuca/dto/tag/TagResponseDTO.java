@@ -14,6 +14,6 @@ public class TagResponseDTO {
     public TagResponseDTO(Tag tag) {
         this.id = tag.getId();
         this.tag = tag.getTag();
-        this.quantidade = 0;
+        this.quantidade = 1;
     }
 }

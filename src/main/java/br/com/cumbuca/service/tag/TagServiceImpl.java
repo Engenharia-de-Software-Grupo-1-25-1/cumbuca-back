@@ -6,10 +6,11 @@ import br.com.cumbuca.model.Tag;
 import br.com.cumbuca.repository.TagRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.TagUtils;
 
 import java.text.Normalizer;
-import java.util.*;
+
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,9 +44,9 @@ public class TagServiceImpl implements TagService {
                 .toList();
     }
 
-    public static String normalizar(String tag) {
-        if (tag == null) return null;
-        String semAcento = Normalizer.normalize(tag, Normalizer.Form.NFD)
+    public static String normalizarTag(String tag) {
+        if (tag == null) { return null; }
+        final String semAcento = Normalizer.normalize(tag, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "");
         return semAcento.trim().toLowerCase();
     }
@@ -53,33 +54,32 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<TagResponseDTO> listar() {
-        List<Tag> tags = tagRepository.findAll();
+        final List<Tag> tags = tagRepository.findAll();
         return tags.stream()
                 .map(tag -> {
-                    TagResponseDTO dto = modelMapper.map(tag, TagResponseDTO.class);
-                    dto.setTag(normalizar(tag.getTag()));
-                    dto.setQuantidade(null);
-                    return dto;
+                    final TagResponseDTO tagResponseDTO = new TagResponseDTO(tag);
+                    tagResponseDTO.setTag(normalizarTag(tag.getTag()));
+                    return tagResponseDTO;
                 })
                 .toList();
     }
 
     @Override
     public List<TagResponseDTO> listarTagsPopulares() {
-        List<Tag> tags = tagRepository.findAll();
+        final List<Tag> tags = tagRepository.findAll();
 
         return tags.stream()
                 .collect(Collectors.groupingBy(
-                        tag -> normalizar(tag.getTag()),
+                        tag -> normalizarTag(tag.getTag()),
                         Collectors.counting()
                 ))
                 .entrySet().stream()
                 .map(entry -> {
-                    TagResponseDTO dto = new TagResponseDTO();
-                    dto.setId(null);
-                    dto.setTag(entry.getKey());
-                    dto.setQuantidade(entry.getValue().intValue());
-                    return dto;
+                    final TagResponseDTO tagResponseDTO = new TagResponseDTO();
+                    tagResponseDTO.setId(null);
+                    tagResponseDTO.setTag(entry.getKey());
+                    tagResponseDTO.setQuantidade(entry.getValue().intValue());
+                    return tagResponseDTO;
                 })
                 .sorted(Comparator.comparingInt(TagResponseDTO::getQuantidade).reversed())
                 .limit(5)
