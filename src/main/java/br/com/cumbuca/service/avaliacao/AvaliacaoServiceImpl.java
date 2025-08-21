@@ -117,7 +117,12 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             avaliacoes = avaliacaoRepository.findByEstabelecimentoIdOrderByDataDesc(idEstabelecimento);
         }
         return avaliacoes.stream()
-                .map(avaliacao -> modelMapper.map(avaliacao, AvaliacaoResponseDTO.class))
+                .map(avaliacao -> {
+                    final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
+                    avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacao.getId()));
+                    avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacao.getId()));
+                    return avaliacaoResponseDTO;
+                })
                 .toList();
     }
 

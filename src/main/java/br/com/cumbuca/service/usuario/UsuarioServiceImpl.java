@@ -90,7 +90,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         verificaUsuarioLogado();
         final Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
-        return modelMapper.map(usuario, UsuarioResponseDTO.class);
+        return new UsuarioResponseDTO(usuario);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         verificaUsuarioLogado();
         final Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
-        return modelMapper.map(usuario, UsuarioResponseDTO.class);
+        return new UsuarioResponseDTO(usuario);
     }
 
     @Override
