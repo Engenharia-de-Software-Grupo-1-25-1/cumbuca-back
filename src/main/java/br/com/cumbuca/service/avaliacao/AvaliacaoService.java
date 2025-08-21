@@ -15,4 +15,6 @@ public interface AvaliacaoService {
     AvaliacaoResponseDTO recuperar(Long id);
 
     List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento);
+
+    AvaliacaoResponseDTO curtir(Long id);
 }

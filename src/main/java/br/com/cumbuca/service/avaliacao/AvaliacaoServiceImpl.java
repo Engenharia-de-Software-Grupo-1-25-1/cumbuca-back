@@ -6,16 +6,21 @@ import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.model.Usuario;
+import br.com.cumbuca.model.UsuarioCurteAvaliacao;
+import br.com.cumbuca.model.UsuarioCurteAvaliacaoId;
 import br.com.cumbuca.repository.AvaliacaoRepository;
+import br.com.cumbuca.repository.UsuarioCurteAvaliacaoRepository;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import br.com.cumbuca.service.foto.FotoService;
 import br.com.cumbuca.service.tag.TagService;
 import br.com.cumbuca.service.usuario.UsuarioService;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class AvaliacaoServiceImpl implements AvaliacaoService {
@@ -26,16 +31,18 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     private final EstabelecimentoService estabelecimentoService;
     private final TagService tagService;
     private final FotoService fotoService;
+    private final UsuarioCurteAvaliacaoRepository usuarioCurteAvaliacaoRepository;
 
     public AvaliacaoServiceImpl(AvaliacaoRepository avaliacaoRepository, ModelMapper modelMapper,
                                 UsuarioService usuarioService, EstabelecimentoService estabelecimentoService, TagService tagService,
-                                FotoService fotoService) {
+                                FotoService fotoService, UsuarioCurteAvaliacaoRepository usuarioCurteAvaliacaoRepository) {
         this.avaliacaoRepository = avaliacaoRepository;
         this.modelMapper = modelMapper;
         this.usuarioService = usuarioService;
         this.estabelecimentoService = estabelecimentoService;
         this.tagService = tagService;
         this.fotoService = fotoService;
+        this.usuarioCurteAvaliacaoRepository = usuarioCurteAvaliacaoRepository;
     }
 
     @Override
@@ -117,8 +124,31 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             avaliacoes = avaliacaoRepository.findByEstabelecimentoIdOrderByDataDesc(idEstabelecimento);
         }
         return avaliacoes.stream()
-                .map(avaliacao -> modelMapper.map(avaliacao, AvaliacaoResponseDTO.class))
-                .toList();
+                .map(avaliacao -> {
+                    AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
+                    avaliacaoResponseDTO.setQtdCurtidas( usuarioCurteAvaliacaoRepository.countByAvaliacao_Id(avaliacao.getId()));
+                    return avaliacaoResponseDTO;
+                })
+                .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional
+    public AvaliacaoResponseDTO curtir(Long idAvaliacao) {
+        Usuario usuario = usuarioService.getUsuarioLogado();
+        Avaliacao avaliacao = avaliacaoRepository.findById(idAvaliacao)
+                .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
+
+        UsuarioCurteAvaliacao curtida = new UsuarioCurteAvaliacao();
+        curtida.setUsuario(usuario);
+        curtida.setAvaliacao(avaliacao);
+        UsuarioCurteAvaliacaoId id = new UsuarioCurteAvaliacaoId();
+        id.setIdUsuario(usuario.getId());
+        id.setIdAvaliacao(avaliacao.getId());
+        curtida.setId(id);
+        usuarioCurteAvaliacaoRepository.save(curtida);
+        return new AvaliacaoResponseDTO();
+    }
+
 
 }
