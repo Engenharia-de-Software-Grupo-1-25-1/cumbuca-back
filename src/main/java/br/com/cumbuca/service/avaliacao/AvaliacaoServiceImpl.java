@@ -1,28 +1,19 @@
 package br.com.cumbuca.service.avaliacao;
 
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
-
 import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
-import br.com.cumbuca.dto.avaliacao.FiltrarAvaliacaoRequestDTO;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
-import br.com.cumbuca.model.Foto;
 import br.com.cumbuca.model.Usuario;
-import br.com.cumbuca.model.Tag;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import br.com.cumbuca.service.foto.FotoService;
 import br.com.cumbuca.service.tag.TagService;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -48,125 +39,94 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    @Transactional
-    public Avaliacao criar(AvaliacaoRequestDTO avaliacaoRequestDTO) {
+    public AvaliacaoResponseDTO criar(AvaliacaoRequestDTO avaliacaoRequestDTO) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
-
-        modelMapper.typeMap(AvaliacaoRequestDTO.class, Avaliacao.class)
-                .addMappings(mapper -> {
-                    mapper.skip(Avaliacao::setUsuario);
-                    mapper.skip(Avaliacao::setEstabelecimento);
-                    mapper.skip(Avaliacao::setFotos);
-                    mapper.skip(Avaliacao::setTags);
-                });
 
         final Avaliacao avaliacao = modelMapper.map(avaliacaoRequestDTO, Avaliacao.class);
         final Estabelecimento estabelecimento = estabelecimentoService
                 .buscarOuCriar(avaliacaoRequestDTO.getEstabelecimento());
         avaliacao.setUsuario(usuario);
         avaliacao.setEstabelecimento(estabelecimento);
+        avaliacaoRepository.save(avaliacao);
 
         if (avaliacaoRequestDTO.getFotos() != null && !avaliacaoRequestDTO.getFotos().isEmpty()) {
-            final List<Foto> fotos = fotoService.criarFotos(avaliacaoRequestDTO.getFotos(), avaliacao);
-            avaliacao.setFotos(fotos);
+            fotoService.criar(avaliacaoRequestDTO.getFotos(), avaliacao);
         }
 
         if (avaliacaoRequestDTO.getTags() != null && !avaliacaoRequestDTO.getTags().isEmpty()) {
-            final List<Tag> tags = tagService.criarTags(avaliacaoRequestDTO.getTags(), avaliacao);
-            avaliacao.setTags(tags);
+            tagService.criar(avaliacaoRequestDTO.getTags(), avaliacao);
         }
 
-        return avaliacaoRepository.save(avaliacao);
+        return modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
     }
 
     @Override
-    public Avaliacao atualizar(Long id, AvaliacaoRequestDTO dto) {
+    public AvaliacaoResponseDTO atualizar(Long id, AvaliacaoRequestDTO avaliacaoRequestDTO) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
 
-        final Usuario usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!avaliacao.getUsuario().getId().equals(usuarioLogado.getId())) {
-            throw new CumbucaException("Você não tem permissão para editar esta avaliação.");
+        final Usuario usuario = usuarioService.getUsuarioLogado();
+        if (!avaliacao.getUsuario().getId().equals(usuario.getId())) {
+            throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }
 
-        avaliacao.setItemConsumido(dto.getItemConsumido());
-        avaliacao.setDescricao(dto.getDescricao());
-        avaliacao.setPreco(dto.getPreco());
-        avaliacao.setNotaGeral(dto.getNotaGeral());
-        avaliacao.setNotaComida(dto.getNotaComida());
-        avaliacao.setNotaAtendimento(dto.getNotaAtendimento());
-        avaliacao.setNotaAmbiente(dto.getNotaAmbiente());
+        modelMapper.map(avaliacaoRequestDTO, avaliacao);
 
-        return avaliacaoRepository.save(avaliacao);
+        fotoService.remover(id);
+        tagService.remover(id);
+
+        if (avaliacaoRequestDTO.getFotos() != null) {
+            fotoService.criar(avaliacaoRequestDTO.getFotos(), avaliacao);
+        }
+
+        if (avaliacaoRequestDTO.getTags() != null) {
+            tagService.criar(avaliacaoRequestDTO.getTags(), avaliacao);
+        }
+
+        avaliacaoRepository.save(avaliacao);
+        return modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
     }
 
     @Override
     public void remover(Long id) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
-
-        final Usuario usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!avaliacao.getUsuario().getId().equals(usuarioLogado.getId())) {
-            throw new CumbucaException("Você não tem permissão para remover esta avaliação.");
+        final Usuario usuario = usuarioService.getUsuarioLogado();
+        if (!avaliacao.getUsuario().getId().equals(usuario.getId())) {
+            throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }
-
         avaliacaoRepository.delete(avaliacao);
     }
 
-    public List<AvaliacaoResponseDTO> filtrar(FiltrarAvaliacaoRequestDTO filtrarAvaliacaoRequestDTO) {
-        Specification<Avaliacao> spec = Specification.where(null);
+    @Override
+    public AvaliacaoResponseDTO recuperar(Long id) {
+        usuarioService.verificaUsuarioLogado();
+        final Avaliacao avaliacao = avaliacaoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
+        final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
+        avaliacaoResponseDTO.setFotos(fotoService.recuperar(id));
+        avaliacaoResponseDTO.setTags(tagService.recuperar(id));
+        return avaliacaoResponseDTO;
+    }
 
-        if (filtrarAvaliacaoRequestDTO.getFiltrarAvaliacao() != null && filtrarAvaliacaoRequestDTO.getFiltro() != null && !filtrarAvaliacaoRequestDTO.getFiltro().isBlank()) {
-            spec = spec.and((root, query, cb) -> {
-                switch (filtrarAvaliacaoRequestDTO.getFiltrarAvaliacao()) {
-                    case USUARIO:
-                        return cb.equal(root.get("usuario").get("nome"), filtrarAvaliacaoRequestDTO.getFiltro());
-                    case ESTABELECIMENTO:
-                        return cb.equal(root.get("estabelecimento").get("nome"), filtrarAvaliacaoRequestDTO.getFiltro());
-                    case ITEM_CONSUMIDO:
-                        return cb.equal(root.get("itemConsumido"), filtrarAvaliacaoRequestDTO.getFiltro());
-                    case TAGS:
-                        return cb.isMember(filtrarAvaliacaoRequestDTO.getFiltro(), root.get("tags"));
-                    case PRECO:
-                        return cb.equal(root.get("preco"), new BigDecimal(filtrarAvaliacaoRequestDTO.getFiltro()));
-                    case NOTA_GERAL:
-                        return cb.equal(root.get("notaGeral"), Integer.valueOf(filtrarAvaliacaoRequestDTO.getFiltro()));
-                    case NOTA_COMIDA:
-                        return cb.equal(root.get("notaComida"), Integer.valueOf(filtrarAvaliacaoRequestDTO.getFiltro()));
-                    case NOTA_AMBIENTE:
-                        return cb.equal(root.get("notaAmbiente"), Integer.valueOf(filtrarAvaliacaoRequestDTO.getFiltro()));
-                    case NOTA_ATENDIMENTO:
-                        return cb.equal(root.get("notaAtendimento"), Integer.valueOf(filtrarAvaliacaoRequestDTO.getFiltro()));
-                    default:
-                        return cb.conjunction();
-                }
-            });
+    @Override
+    public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento) {
+        usuarioService.verificaUsuarioLogado();
+        List<Avaliacao> avaliacoes = avaliacaoRepository.findAllByOrderByDataDesc();
+        if (idUsuario != null) {
+            avaliacoes = avaliacaoRepository.findByUsuarioIdOrderByDataDesc(idUsuario);
         }
-
-        Sort sort = Sort.unsorted();
-        if (filtrarAvaliacaoRequestDTO.getOrdenacao() != null) {
-            switch (filtrarAvaliacaoRequestDTO.getOrdenacao()) {
-                case POPULARIDADE:
-                    return avaliacaoRepository.findAllOrderByPopularidade()
-                        .stream()
-                        .map(AvaliacaoResponseDTO::new)
-                        .toList();
-                case PRECO:
-                    sort = Sort.by(Sort.Direction.DESC, "preco");
-                    break;
-                case MAIS_RECENTE:
-                    sort = Sort.by(Sort.Direction.DESC, "data");
-                    break;
-                case NOTA_GERAL:
-                    sort = Sort.by(Sort.Direction.DESC, "notaGeral");
-                    break;
-            }
+        if (idEstabelecimento != null) {
+            avaliacoes = avaliacaoRepository.findByEstabelecimentoIdOrderByDataDesc(idEstabelecimento);
         }
-
-        List<Avaliacao> avaliacoes = avaliacaoRepository.findAll(spec, sort);
-
         return avaliacoes.stream()
-                .map(AvaliacaoResponseDTO::new)
+                .map(avaliacao -> {
+                    final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
+                    avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacao.getId()));
+                    avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacao.getId()));
+                    return avaliacaoResponseDTO;
+                })
                 .toList();
     }
+
 }

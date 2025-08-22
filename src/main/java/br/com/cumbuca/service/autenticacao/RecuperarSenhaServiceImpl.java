@@ -4,6 +4,7 @@ import br.com.cumbuca.dto.recuperarSenha.EmailRequestDTO;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,7 +29,7 @@ public class RecuperarSenhaServiceImpl implements RecuperarSenhaService {
     @Override
     public void recuperarSenha(String email) {
         final Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+                .orElseThrow(EntityNotFoundException::new);
 
         final String token = tokenService.gerarToken(usuario);
         final String link = "http://localhost:3000/alterar-senha?token=" + token;

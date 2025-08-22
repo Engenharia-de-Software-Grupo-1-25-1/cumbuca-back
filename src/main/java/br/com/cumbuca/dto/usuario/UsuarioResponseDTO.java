@@ -2,11 +2,13 @@ package br.com.cumbuca.dto.usuario;
 
 import br.com.cumbuca.model.Usuario;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.Base64;
 
 @Data
+@NoArgsConstructor
 public class UsuarioResponseDTO {
     private Long id;
     private String email;
