@@ -9,6 +9,8 @@ public interface FotoService {
     void criar(List<MultipartFile> fotos, Avaliacao avaliacao);
 
     List<String> recuperar(Long avaliacaoId);
+
+    void remover(Long avaliacaoId);
 }
 
 

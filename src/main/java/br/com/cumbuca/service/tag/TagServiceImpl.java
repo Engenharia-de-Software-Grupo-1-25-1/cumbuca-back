@@ -36,4 +36,10 @@ public class TagServiceImpl implements TagService {
                 .toList();
     }
 
+        @Override
+    public void remover(Long avaliacaoId) {
+        final List<Tag> tags = tagRepository.findByAvaliacaoId(avaliacaoId);
+        tagRepository.deleteAll(tags);
+    }
+
 }
