@@ -6,7 +6,9 @@ import br.com.cumbuca.model.Estabelecimento;
 import java.util.List;
 
 public interface EstabelecimentoService {
-
     Estabelecimento buscarOuCriar(EstabelecimentoRequestDTO estabelecimentoRequestDTO);
+
     List<EstabelecimentoResponseDTO> listar();
+
+    EstabelecimentoResponseDTO recuperar(Long id);
 }
