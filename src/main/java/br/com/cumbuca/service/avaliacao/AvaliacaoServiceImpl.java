@@ -72,13 +72,16 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
         modelMapper.map(avaliacaoRequestDTO, avaliacao);
 
-        if (avaliacaoRequestDTO.getFotos() != null && !avaliacaoRequestDTO.getFotos().isEmpty()) {
+        fotoService.remover(id);
+        tagService.remover(id);
+
+        if (avaliacaoRequestDTO.getFotos() != null) {
             fotoService.criar(avaliacaoRequestDTO.getFotos(), avaliacao);
         }
-
-        if (avaliacaoRequestDTO.getTags() != null && !avaliacaoRequestDTO.getTags().isEmpty()) {
+        
+        if (avaliacaoRequestDTO.getTags() != null) {
             tagService.criar(avaliacaoRequestDTO.getTags(), avaliacao);
-        }
+        }        
 
         avaliacaoRepository.save(avaliacao);
         return modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);

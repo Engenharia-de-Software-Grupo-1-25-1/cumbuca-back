@@ -10,6 +10,8 @@ public interface TagService {
 
     List<String> recuperar(Long avaliacaoId);
 
+    void remover(Long AvaliacaoId);
+
     List<TagResponseDTO> listar();
 
     List<TagResponseDTO> listarTagsPopulares();

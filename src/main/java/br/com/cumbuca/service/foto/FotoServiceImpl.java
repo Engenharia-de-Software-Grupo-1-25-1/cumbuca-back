@@ -44,4 +44,10 @@ public class FotoServiceImpl implements FotoService {
                 .toList();
     }
 
+    @Override
+    public void remover(Long avaliacaoId) {
+        final List<Foto> fotos = fotoRepository.findByAvaliacaoId(avaliacaoId);
+        fotoRepository.deleteAll(fotos);
+    }
+
 }

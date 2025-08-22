@@ -44,13 +44,11 @@ public class TagServiceImpl implements TagService {
                 .toList();
     }
 
-    public static String normalizarTag(String tag) {
-        if (tag == null) { return null; }
-        final String semAcento = Normalizer.normalize(tag, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "");
-        return semAcento.trim().toLowerCase();
+    @Override
+    public void remover(Long avaliacaoId) {
+        final List<Tag> tags = tagRepository.findByAvaliacaoId(avaliacaoId);
+        tagRepository.deleteAll(tags);
     }
-
 
     @Override
     public List<TagResponseDTO> listar() {
@@ -86,6 +84,11 @@ public class TagServiceImpl implements TagService {
                 .toList();
     }
 
+    public static String normalizarTag(String tag) {
+        if (tag == null) { return null; }
+        final String semAcento = Normalizer.normalize(tag, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+        return semAcento.trim().toLowerCase();
+    }
+
 }
-
-
