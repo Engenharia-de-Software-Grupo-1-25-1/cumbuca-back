@@ -1,11 +1,15 @@
 package br.com.cumbuca.service.estabelecimento;
 
+import br.com.cumbuca.dto.Favorito.FavoritoResponseDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoRequestDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
+import br.com.cumbuca.model.favorito.Favorito;
+import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.EstabelecimentoRepository;
+import br.com.cumbuca.repository.FavoritoRespository;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -19,12 +23,14 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
     private final EstabelecimentoRepository estabelecimentoRepository;
     private final AvaliacaoRepository avaliacaoRepository;
+    private final FavoritoRespository favoritoRespository;
     private final UsuarioService usuarioService;
     private final ModelMapper modelMapper;
 
-    public EstabelecimentoServiceImpl(EstabelecimentoRepository estabelecimentoRepository, AvaliacaoRepository avaliacaoRepository, UsuarioService usuarioService, ModelMapper modelMapper) {
+    public EstabelecimentoServiceImpl(EstabelecimentoRepository estabelecimentoRepository, AvaliacaoRepository avaliacaoRepository, FavoritoRespository favoritoRespository, UsuarioService usuarioService, ModelMapper modelMapper) {
         this.estabelecimentoRepository = estabelecimentoRepository;
         this.avaliacaoRepository = avaliacaoRepository;
+        this.favoritoRespository = favoritoRespository;
         this.usuarioService = usuarioService;
         this.modelMapper = modelMapper;
     }
@@ -74,4 +80,29 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                 .average()
                 .orElse(0.0);
     }
+
+    @Override
+    public FavoritoResponseDTO favoritar(Long id) {
+        final Usuario usuario = usuarioService.getUsuarioLogado();
+        final Estabelecimento estabelecimento = estabelecimentoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Estabelecimento não encontrado."));
+        Favorito favorito = favoritoRespository.findByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId());
+
+        if (favorito != null) {
+            favoritoRespository.delete(favorito);
+            final FavoritoResponseDTO favoritoResponseDTO = new FavoritoResponseDTO(favorito);
+            favoritoResponseDTO.setFavoritado(false);
+            return favoritoResponseDTO;
+        }
+
+        favorito = new Favorito();
+        favorito.setUsuario(usuario);
+        favorito.setEstabelecimento(estabelecimento);
+
+        final FavoritoResponseDTO favoritoResponseDTO = modelMapper.map(favorito, FavoritoResponseDTO.class);
+        favoritoResponseDTO.setFavoritado(true);
+        favoritoRespository.save(favorito);
+        return favoritoResponseDTO;
+    }
+
 }

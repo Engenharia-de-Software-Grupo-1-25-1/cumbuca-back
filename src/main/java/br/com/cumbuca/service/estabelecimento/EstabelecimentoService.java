@@ -1,5 +1,6 @@
 package br.com.cumbuca.service.estabelecimento;
 
+import br.com.cumbuca.dto.Favorito.FavoritoResponseDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoRequestDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.model.Estabelecimento;
@@ -11,4 +12,6 @@ public interface EstabelecimentoService {
     List<EstabelecimentoResponseDTO> listar();
 
     EstabelecimentoResponseDTO recuperar(Long id);
+
+    FavoritoResponseDTO favoritar(Long id);
 }
