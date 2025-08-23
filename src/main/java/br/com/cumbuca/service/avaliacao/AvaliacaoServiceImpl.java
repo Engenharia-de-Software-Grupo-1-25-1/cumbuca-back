@@ -2,19 +2,22 @@ package br.com.cumbuca.service.avaliacao;
 
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
+import br.com.cumbuca.dto.comentario.ComentarioResponseDTO;
+import br.com.cumbuca.dto.curtida.CurtidaResponseDTO;
 import br.com.cumbuca.exception.CumbucaException;
+
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.model.Usuario;
-import br.com.cumbuca.model.UsuarioCurteAvaliacao;
-import br.com.cumbuca.model.UsuarioCurteAvaliacaoId;
+import br.com.cumbuca.model.Curtida;
+import br.com.cumbuca.model.Comentario;
 import br.com.cumbuca.repository.AvaliacaoRepository;
-import br.com.cumbuca.repository.UsuarioCurteAvaliacaoRepository;
+import br.com.cumbuca.repository.CurtidaRepository;
+import br.com.cumbuca.repository.ComentarioRepository;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import br.com.cumbuca.service.foto.FotoService;
 import br.com.cumbuca.service.tag.TagService;
 import br.com.cumbuca.service.usuario.UsuarioService;
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -24,25 +27,26 @@ import java.util.stream.Collectors;
 
 @Service
 public class AvaliacaoServiceImpl implements AvaliacaoService {
-
     private final AvaliacaoRepository avaliacaoRepository;
     private final ModelMapper modelMapper;
     private final UsuarioService usuarioService;
     private final EstabelecimentoService estabelecimentoService;
     private final TagService tagService;
     private final FotoService fotoService;
-    private final UsuarioCurteAvaliacaoRepository usuarioCurteAvaliacaoRepository;
+    private final ComentarioRepository comentarioRepository;
+    private final CurtidaRepository curtidaRepository;
 
     public AvaliacaoServiceImpl(AvaliacaoRepository avaliacaoRepository, ModelMapper modelMapper,
                                 UsuarioService usuarioService, EstabelecimentoService estabelecimentoService, TagService tagService,
-                                FotoService fotoService, UsuarioCurteAvaliacaoRepository usuarioCurteAvaliacaoRepository) {
+                                FotoService fotoService, ComentarioRepository comentarioRepository, CurtidaRepository curtidaRepository) {
         this.avaliacaoRepository = avaliacaoRepository;
         this.modelMapper = modelMapper;
         this.usuarioService = usuarioService;
         this.estabelecimentoService = estabelecimentoService;
         this.tagService = tagService;
         this.fotoService = fotoService;
-        this.usuarioCurteAvaliacaoRepository = usuarioCurteAvaliacaoRepository;
+        this.comentarioRepository = comentarioRepository;
+        this.curtidaRepository = curtidaRepository;
     }
 
     @Override
@@ -110,6 +114,8 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
         avaliacaoResponseDTO.setFotos(fotoService.recuperar(id));
         avaliacaoResponseDTO.setTags(tagService.recuperar(id));
+        avaliacaoResponseDTO.setQtdCurtidas( curtidaRepository.countByAvaliacao_Id(avaliacao.getId()));
+        avaliacaoResponseDTO.setQtdComentarios(comentarioRepository.countByAvaliacao_Id(avaliacao.getId()));
         return avaliacaoResponseDTO;
     }
 
@@ -125,30 +131,61 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         }
         return avaliacoes.stream()
                 .map(avaliacao -> {
-                    AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
-                    avaliacaoResponseDTO.setQtdCurtidas( usuarioCurteAvaliacaoRepository.countByAvaliacao_Id(avaliacao.getId()));
+                    final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
+                    avaliacaoResponseDTO.setQtdCurtidas( curtidaRepository.countByAvaliacao_Id(avaliacao.getId()));
+                    avaliacaoResponseDTO.setQtdComentarios(comentarioRepository.countByAvaliacao_Id(avaliacao.getId()));
                     return avaliacaoResponseDTO;
                 })
                 .collect(Collectors.toList());
     }
 
     @Override
-    @Transactional
-    public AvaliacaoResponseDTO curtir(Long idAvaliacao) {
-        Usuario usuario = usuarioService.getUsuarioLogado();
-        Avaliacao avaliacao = avaliacaoRepository.findById(idAvaliacao)
+    public CurtidaResponseDTO curtir(Long id) {
+        final Usuario usuario = usuarioService.getUsuarioLogado();
+        final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
 
-        UsuarioCurteAvaliacao curtida = new UsuarioCurteAvaliacao();
+        Curtida curtida = curtidaRepository.findByUsuarioIdAndAvaliacaoId(usuario.getId(), avaliacao.getId());
+
+        if (curtida != null) {
+            curtidaRepository.delete(curtida);
+            final CurtidaResponseDTO curtidaResposeDTO = new CurtidaResponseDTO(curtida);
+            curtidaResposeDTO.setCurtido(false);
+            return curtidaResposeDTO;
+        }
+
+        curtida = new Curtida();
         curtida.setUsuario(usuario);
         curtida.setAvaliacao(avaliacao);
-        UsuarioCurteAvaliacaoId id = new UsuarioCurteAvaliacaoId();
-        id.setIdUsuario(usuario.getId());
-        id.setIdAvaliacao(avaliacao.getId());
-        curtida.setId(id);
-        usuarioCurteAvaliacaoRepository.save(curtida);
-        return new AvaliacaoResponseDTO();
+
+        final CurtidaResponseDTO curtidaResponseDTO = modelMapper.map(curtida, CurtidaResponseDTO.class);
+        curtidaResponseDTO.setCurtido(true);
+        curtidaRepository.save(curtida);
+        return curtidaResponseDTO;
     }
 
+    @Override
+    public ComentarioResponseDTO comentar(Long id, String texto) {
+        final Usuario usuario = usuarioService.getUsuarioLogado();
+        final Avaliacao avaliacao = avaliacaoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
 
+        final Comentario comentario = new Comentario();
+        comentario.setAvaliacao(avaliacao);
+        comentario.setUsuario(usuario);
+        comentario.setComentario(texto);
+        comentarioRepository.save(comentario);
+
+        return modelMapper.map(comentario, ComentarioResponseDTO.class);
+    }
+
+    @Override
+    public void removerComentario(Long id) {
+        final Usuario usuario = usuarioService.getUsuarioLogado();
+        final Avaliacao avaliacao = avaliacaoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
+
+        final Comentario comentario = comentarioRepository.findByUsuarioIdAndAvaliacaoId(usuario.getId(), avaliacao.getId());
+        comentarioRepository.delete(comentario);
+    }
 }

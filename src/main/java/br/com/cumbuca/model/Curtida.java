@@ -1,30 +1,29 @@
 package br.com.cumbuca.model;
 
-import br.com.cumbuca.service.usuario.UsuarioService;
-import jakarta.persistence.EmbeddedId;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+
 import lombok.Data;
 
 @Data
 @Entity
+@IdClass(CurtidaId.class)
 @Table (name = "USUARIO_CURTE_AVALIACAO")
-public class UsuarioCurteAvaliacao {
+public class Curtida {
 
-    @EmbeddedId
-    private UsuarioCurteAvaliacaoId id;
-
+    @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("idUsuario")
-    @JoinColumn(name = "ID_USUARIO")
+    @JoinColumn(name = "ID_USUARIO", nullable = false)
     private Usuario usuario;
 
+    @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("idAvaliacao")
-    @JoinColumn(name = "ID_AVALIACAO")
+    @JoinColumn(name = "ID_AVALIACAO", nullable = false)
     private Avaliacao avaliacao;
 }
