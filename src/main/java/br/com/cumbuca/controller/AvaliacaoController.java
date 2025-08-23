@@ -6,20 +6,15 @@ import br.com.cumbuca.service.avaliacao.AvaliacaoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/avaliacao")
@@ -64,8 +59,22 @@ public class AvaliacaoController {
     @GetMapping("/listar")
     public ResponseEntity<List<AvaliacaoResponseDTO>> listar(
             @RequestParam(required = false) Long idUsuario,
-            @RequestParam(required = false) Long idEstabelecimento) {
-        final List<AvaliacaoResponseDTO> avaliacoes = avaliacaoService.listar(idUsuario, idEstabelecimento);
+            @RequestParam(required = false) Long idEstabelecimento,
+            @RequestParam(required = false) String usuario,
+            @RequestParam(required = false) String estabelecimento,
+            @RequestParam(required = false) String itemConsumido,
+            @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) BigDecimal preco,
+            @RequestParam(required = false, defaultValue = "-1") int notaGeral,
+            @RequestParam(required = false, defaultValue = "-1") int notaComida,
+            @RequestParam(required = false, defaultValue = "-1") int notaAmbiente,
+            @RequestParam(required = false, defaultValue = "-1") int notaAtendimento) {
+
+        final List<AvaliacaoResponseDTO> avaliacoes = avaliacaoService.listar(
+                idUsuario, idEstabelecimento, usuario, estabelecimento,
+                itemConsumido, tags, preco, notaGeral, notaComida,
+                notaAmbiente, notaAtendimento
+        );
         return ResponseEntity.ok(avaliacoes);
     }
 

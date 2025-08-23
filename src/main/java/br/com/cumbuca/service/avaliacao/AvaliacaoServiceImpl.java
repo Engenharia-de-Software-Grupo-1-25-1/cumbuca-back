@@ -14,8 +14,14 @@ import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.function.Function;
+import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class AvaliacaoServiceImpl implements AvaliacaoService {
@@ -110,7 +116,9 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento) {
+    public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, String usuario, String estabelecimento,
+                                             String itemConsumido, List<String> tags, BigDecimal preco, int notaGeral,
+                                             int notaComida, int notaAmbiente, int notaAtendimento) {
         usuarioService.verificaUsuarioLogado();
         List<Avaliacao> avaliacoes = avaliacaoRepository.findAllByOrderByDataDesc();
         if (idUsuario != null) {
@@ -119,6 +127,21 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         if (idEstabelecimento != null) {
             avaliacoes = avaliacaoRepository.findByEstabelecimentoIdOrderByDataDesc(idEstabelecimento);
         }
+
+        avaliacoes = avaliacoes.stream()
+                .filter(avaliacao -> filtrarPorTexto(usuario, avaliacao.getUsuario().getNome()))
+                .filter(avaliacao -> filtrarPorTexto(estabelecimento, avaliacao.getEstabelecimento().getNome()))
+                .filter(avaliacao -> filtrarPorTexto(itemConsumido, avaliacao.getItemConsumido()))
+                .filter(avaliacao -> filtrarPorTags(tags, avaliacao.getId()))
+                .filter(avaliacao -> filtrarPorPreco(preco, avaliacao.getPreco()))
+                .filter(avaliacao -> filtrarPorNota(notaGeral, avaliacao.getNotaGeral()))
+                .filter(avaliacao -> filtrarPorNota(notaComida, avaliacao.getNotaComida()))
+                .filter(avaliacao -> filtrarPorNota(notaAmbiente, avaliacao.getNotaAmbiente()))
+                .filter(avaliacao -> filtrarPorNota(notaAtendimento, avaliacao.getNotaAtendimento()))
+                .toList();
+
+
+
         return avaliacoes.stream()
                 .map(avaliacao -> {
                     final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
@@ -129,4 +152,27 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
                 .toList();
     }
 
+    private boolean filtrarPorTexto(String filtro, String valor) {
+        return filtro == null || filtro.isBlank() ||
+                (valor != null && valor.toLowerCase().contains(filtro.toLowerCase()));
+    }
+
+    private boolean filtrarPorTags(List<String> tagsFiltro, Long avaliacaoId) {
+        if (tagsFiltro == null || tagsFiltro.isEmpty()) {
+            return true;
+        }
+        List<String> tagsAvaliacao = tagService.recuperar(avaliacaoId);
+        return tagsAvaliacao.stream()
+                .anyMatch(tagAvaliacao -> tagsFiltro.stream()
+                        .anyMatch(tagFiltro -> tagFiltro.equalsIgnoreCase(tagAvaliacao)));
+    }
+
+    private boolean filtrarPorPreco(BigDecimal precoFiltro, BigDecimal precoAvaliacao) {
+        return precoFiltro == null ||
+                (precoAvaliacao != null && precoAvaliacao.compareTo(precoFiltro) == 0);
+    }
+
+    private boolean filtrarPorNota(int notaFiltro, int notaAvaliacao) {
+        return notaFiltro == -1 || notaAvaliacao == notaFiltro;
+    }
 }
