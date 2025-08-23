@@ -8,8 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
 
-    Comentario findByUsuarioIdAndAvaliacaoId(Long usuarioId, Long avaliacaoId);
-
     Integer countByAvaliacao_Id(Long avaliacaoId);
 
 }

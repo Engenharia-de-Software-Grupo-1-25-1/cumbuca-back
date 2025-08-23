@@ -10,11 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CurtidaResponseDTO {
 
+    private Long id;
     private UsuarioResponseDTO usuario;
     private AvaliacaoResponseDTO avaliacao;
     private boolean curtido;
 
     public CurtidaResponseDTO(Curtida curtida) {
+        this.id = curtida.getId();
         this.usuario = new UsuarioResponseDTO(curtida.getUsuario());
         this.avaliacao = new AvaliacaoResponseDTO(curtida.getAvaliacao());
     }

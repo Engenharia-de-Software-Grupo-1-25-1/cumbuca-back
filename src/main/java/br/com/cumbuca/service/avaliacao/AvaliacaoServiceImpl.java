@@ -149,9 +149,9 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
         if (curtida != null) {
             curtidaRepository.delete(curtida);
-            final CurtidaResponseDTO curtidaResposeDTO = new CurtidaResponseDTO(curtida);
-            curtidaResposeDTO.setCurtido(false);
-            return curtidaResposeDTO;
+            final CurtidaResponseDTO curtidaResponseDTO = new CurtidaResponseDTO(curtida);
+            curtidaResponseDTO.setCurtido(false);
+            return curtidaResponseDTO;
         }
 
         curtida = new Curtida();
@@ -175,17 +175,21 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         comentario.setUsuario(usuario);
         comentario.setComentario(texto);
         comentarioRepository.save(comentario);
-
         return modelMapper.map(comentario, ComentarioResponseDTO.class);
     }
 
     @Override
-    public void removerComentario(Long id) {
+    public void removerComentario(Long id, Long comentarioId) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
 
-        final Comentario comentario = comentarioRepository.findByUsuarioIdAndAvaliacaoId(usuario.getId(), avaliacao.getId());
+        final Comentario comentario = comentarioRepository.findById(comentarioId)
+                .orElseThrow(() -> new NoSuchElementException("Comentário não encontrado"));
+
+        if (!comentario.getUsuario().getId().equals(usuario.getId())) {
+            throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
+        }
         comentarioRepository.delete(comentario);
     }
 }

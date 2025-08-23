@@ -86,9 +86,9 @@ public class AvaliacaoController {
         return ResponseEntity.ok(comentario);
     }
 
-    @DeleteMapping("/removerComentario/{id}")
-    public ResponseEntity<Void> removerComentario(@PathVariable Long id) {
-        avaliacaoService.removerComentario(id);
+    @DeleteMapping("{id}/remover/{idComentario}")
+    public ResponseEntity<Void> removerComentario(@PathVariable Long id, @PathVariable Long idComentario) {
+        avaliacaoService.removerComentario(id, idComentario);
         return ResponseEntity.noContent().build();
     }
 }
