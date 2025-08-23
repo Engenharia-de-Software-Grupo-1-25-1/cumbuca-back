@@ -16,12 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class AvaliacaoServiceImpl implements AvaliacaoService {
@@ -161,7 +156,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         if (tagsFiltro == null || tagsFiltro.isEmpty()) {
             return true;
         }
-        List<String> tagsAvaliacao = tagService.recuperar(avaliacaoId);
+        final List<String> tagsAvaliacao = tagService.recuperar(avaliacaoId);
         return tagsAvaliacao.stream()
                 .anyMatch(tagAvaliacao -> tagsFiltro.stream()
                         .anyMatch(tagFiltro -> tagFiltro.equalsIgnoreCase(tagAvaliacao)));
