@@ -58,6 +58,8 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                 .filter(estabelecimento -> filtrarPorTexto(filtros.getNome(), estabelecimento.getNome()))
                 .filter(estabelecimento -> filtrarPorTexto(filtros.getCategoria(), estabelecimento.getCategoria()))
                 .filter(estabelecimento -> filtrarPorLocal(filtros.getLocal(), estabelecimento))
+                .filter(estabelecimento -> filtrarPorHorario(filtros.getHorarioInicio(), filtros.getHorarioFim(), estabelecimento))
+                .filter(estabelecimento -> filtrarPorFavorito(filtros.getFavoritos(), estabelecimento))
                 .filter(estabelecimento -> {
                     final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
                     final double notaGeral = calculaNotaGeral(avaliacoes);
@@ -96,6 +98,62 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         }
 
         return avaliacoesMap;
+    }
+
+    private boolean filtrarPorTexto(String filtro, String valor) {
+        return filtro == null || filtro.isBlank() ||
+                (valor != null && valor.toLowerCase().contains(filtro.toLowerCase()));
+    }
+
+    private boolean filtrarPorNota(Double notaFiltro, Double nota) {
+        return notaFiltro == null || nota.equals(notaFiltro);
+    }
+
+    private boolean filtrarPorLocal(String filtro, Estabelecimento estabelecimento) {
+        if (filtro == null || filtro.isBlank()) {
+            return true;
+        }
+        return (estabelecimento.getRua() != null && estabelecimento.getRua().toLowerCase().contains(filtro.toLowerCase()) ||
+                estabelecimento.getBairro() != null && estabelecimento.getBairro().toLowerCase().contains(filtro.toLowerCase())) ||
+                (estabelecimento.getCidade() != null && estabelecimento.getCidade().toLowerCase().contains(filtro.toLowerCase())) ||
+                (estabelecimento.getEstado() != null && estabelecimento.getEstado().toLowerCase().contains(filtro.toLowerCase()));
+    }
+
+    private boolean filtrarPorHorario(String horarioInicioFiltro, String horarioFimFiltro, Estabelecimento estabelecimento) {
+        if ((horarioInicioFiltro == null || horarioInicioFiltro.isBlank()) &&
+                (horarioFimFiltro == null || horarioFimFiltro.isBlank())) {
+            return true;
+        }
+
+        return estabelecimento.getHorarios().stream().anyMatch(horario -> {
+            if (horario.getHorario() == null || horario.getHorario().isBlank()) {
+                return false;
+            }
+
+            final String[] partes = horario.getHorario().split("-");
+            if (partes.length != 2) {
+                return false;
+            }
+
+            final String inicio = partes[0].trim();
+            final String fim = partes[1].trim();
+
+            final boolean inicioValido = horarioInicioFiltro == null || inicio.compareTo(horarioInicioFiltro) >= 0;
+            final boolean fimValido = horarioFimFiltro == null || fim.compareTo(horarioFimFiltro) <= 0;
+
+            return inicioValido && fimValido;
+        });
+    }
+
+    private boolean filtrarPorFavorito(String favoritoFiltro, Estabelecimento estabelecimento) {
+        if (favoritoFiltro == null || favoritoFiltro.isBlank()) {
+            return true;
+        }
+
+        final Usuario usuario = usuarioService.getUsuarioLogado();
+        final Favorito favorito = favoritoRespository.findByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId());
+
+        return favorito != null;
     }
 
     @Override
@@ -142,24 +200,4 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         favoritoRespository.save(favorito);
         return favoritoResponseDTO;
     }
-
-    private boolean filtrarPorTexto(String filtro, String valor) {
-        return filtro == null || filtro.isBlank() ||
-                (valor != null && valor.toLowerCase().contains(filtro.toLowerCase()));
-    }
-
-    private boolean filtrarPorNota(Double notaFiltro, Double nota) {
-        return notaFiltro == null || nota.equals(notaFiltro);
-    }
-
-    private boolean filtrarPorLocal(String filtro, Estabelecimento estabelecimento) {
-        if (filtro == null || filtro.isBlank()) {
-            return true;
-        }
-        return (estabelecimento.getRua() != null && estabelecimento.getRua().toLowerCase().contains(filtro.toLowerCase()) ||
-                estabelecimento.getBairro() != null && estabelecimento.getBairro().toLowerCase().contains(filtro.toLowerCase())) ||
-                (estabelecimento.getCidade() != null && estabelecimento.getCidade().toLowerCase().contains(filtro.toLowerCase())) ||
-                (estabelecimento.getEstado() != null && estabelecimento.getEstado().toLowerCase().contains(filtro.toLowerCase()));
-    }
-
 }
