@@ -5,8 +5,8 @@ import br.com.cumbuca.dto.estabelecimento.EstabelecimentoRequestDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
-import br.com.cumbuca.model.favorito.Favorito;
 import br.com.cumbuca.model.Usuario;
+import br.com.cumbuca.model.favorito.Favorito;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.EstabelecimentoRepository;
 import br.com.cumbuca.repository.FavoritoRespository;
@@ -105,4 +105,16 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         return favoritoResponseDTO;
     }
 
+    @Override
+    public List<EstabelecimentoResponseDTO> pesquisar(String nome) {
+        if (nome == null || nome.isBlank()) {
+            return estabelecimentoRepository.findAll().stream()
+                    .map(EstabelecimentoResponseDTO::new)
+                    .toList();
+        }
+
+        return estabelecimentoRepository.findByNomeContainingIgnoreCase(nome).stream()
+                .map(EstabelecimentoResponseDTO::new)
+                .toList();
+    }
 }
