@@ -1,5 +1,6 @@
 package br.com.cumbuca.controller;
 
+import br.com.cumbuca.dto.avaliacao.AvaliacaoFiltroRequestDTO;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
 import br.com.cumbuca.service.avaliacao.AvaliacaoService;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 
@@ -64,22 +64,9 @@ public class AvaliacaoController {
     public ResponseEntity<List<AvaliacaoResponseDTO>> listar(
             @RequestParam(required = false) Long idUsuario,
             @RequestParam(required = false) Long idEstabelecimento,
-            @RequestParam(required = false) String usuario,
-            @RequestParam(required = false) String estabelecimento,
-            @RequestParam(required = false) String itemConsumido,
-            @RequestParam(required = false) List<String> tags,
-            @RequestParam(required = false) BigDecimal preco,
-            @RequestParam(required = false, defaultValue = "-1") int notaGeral,
-            @RequestParam(required = false, defaultValue = "-1") int notaComida,
-            @RequestParam(required = false, defaultValue = "-1") int notaAmbiente,
-            @RequestParam(required = false, defaultValue = "-1") int notaAtendimento) {
+            @ModelAttribute AvaliacaoFiltroRequestDTO filtros) {
 
-        final List<AvaliacaoResponseDTO> avaliacoes = avaliacaoService.listar(
-                idUsuario, idEstabelecimento, usuario, estabelecimento,
-                itemConsumido, tags, preco, notaGeral, notaComida,
-                notaAmbiente, notaAtendimento
-        );
+        final List<AvaliacaoResponseDTO> avaliacoes = avaliacaoService.listar(idUsuario, idEstabelecimento, filtros);
         return ResponseEntity.ok(avaliacoes);
     }
-
 }
