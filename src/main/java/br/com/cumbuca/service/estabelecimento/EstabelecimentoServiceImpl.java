@@ -49,10 +49,10 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
     @Override
     public List<EstabelecimentoResponseDTO> listar(EstabelecimentoFiltroRequestDTO filtros, boolean ordenar) {
-        //usuarioService.verificaUsuarioLogado();
+        usuarioService.verificaUsuarioLogado();
         List<Estabelecimento> estabelecimentos = estabelecimentoRepository.findAll();
 
-        final Map<Long, List<Avaliacao>> avaliacoesMap = carregarAvaliacoes(estabelecimentos);
+        final Map<Long, List<Avaliacao>> avaliacoesMap = verificarAvaliacoes(estabelecimentos);
 
         estabelecimentos = estabelecimentos.stream()
                 .filter(estabelecimento -> filtrarPorTexto(filtros.getNome(), estabelecimento.getNome()))
@@ -82,7 +82,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         }).toList();
     }
 
-    private Map<Long, List<Avaliacao>> carregarAvaliacoes(List<Estabelecimento> estabelecimentos) {
+    private Map<Long, List<Avaliacao>> verificarAvaliacoes(List<Estabelecimento> estabelecimentos) {
         final Map<Long, List<Avaliacao>> avaliacoesMap = estabelecimentos.stream()
                 .collect(Collectors.toMap(
                         Estabelecimento::getId,
