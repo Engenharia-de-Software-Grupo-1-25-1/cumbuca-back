@@ -72,7 +72,6 @@ public class AvaliacaoController {
         return ResponseEntity.ok(avaliacoes);
     }
 
-
     @PostMapping("/curtir/{id}/")
     public ResponseEntity<CurtidaResponseDTO> curtir(@PathVariable Long id) {
         final CurtidaResponseDTO curtida = avaliacaoService.curtir(id);

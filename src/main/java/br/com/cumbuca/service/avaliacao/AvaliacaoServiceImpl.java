@@ -131,12 +131,12 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         }
         return avaliacoes.stream()
                 .map(avaliacao -> {
-                    final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
-                    avaliacaoResponseDTO.setQtdCurtidas( curtidaRepository.countByAvaliacao_Id(avaliacao.getId()));
-                    avaliacaoResponseDTO.setQtdComentarios(comentarioRepository.countByAvaliacao_Id(avaliacao.getId()));
+                    final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
+                    avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacao.getId()));
+                    avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacao.getId()));
                     return avaliacaoResponseDTO;
                 })
-                .collect(Collectors.toList());
+            .toList();
     }
 
     @Override
@@ -148,6 +148,9 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         Curtida curtida = curtidaRepository.findByUsuarioIdAndAvaliacaoId(usuario.getId(), avaliacao.getId());
 
         if (curtida != null) {
+            if (!curtida.getUsuario().getId().equals(usuario.getId())) {
+                throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
+            }
             curtidaRepository.delete(curtida);
             final CurtidaResponseDTO curtidaResponseDTO = new CurtidaResponseDTO(curtida);
             curtidaResponseDTO.setCurtido(false);
