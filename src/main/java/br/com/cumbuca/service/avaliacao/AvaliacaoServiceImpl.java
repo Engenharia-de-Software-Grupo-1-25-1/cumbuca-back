@@ -23,8 +23,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+
 
 @Service
 public class AvaliacaoServiceImpl implements AvaliacaoService {
@@ -124,8 +127,8 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros) {
-        usuarioService.verificaUsuarioLogado();
+    public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros, String ordenacao) {
+        //usuarioService.verificaUsuarioLogado();
         List<Avaliacao> avaliacoes = avaliacaoRepository.findAllByOrderByDataDesc();
         if (idUsuario != null) {
             avaliacoes = avaliacaoRepository.findByUsuarioIdOrderByDataDesc(idUsuario);
@@ -146,6 +149,8 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
                 .filter(avaliacao -> filtrarPorNota(filtros.getNotaAmbiente(), avaliacao.getNotaAmbiente()))
                 .filter(avaliacao -> filtrarPorNota(filtros.getNotaAtendimento(), avaliacao.getNotaAtendimento()))
                 .toList();
+
+        avaliacoes = ordenaAvaliacoes(avaliacoes, ordenacao);
 
         return avaliacoes.stream()
                 .map(avaliacao -> {
@@ -243,4 +248,26 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
                 .anyMatch(tagAvaliacao -> tagsFiltro.stream()
                         .anyMatch(tagFiltro -> tagFiltro.equalsIgnoreCase(tagAvaliacao)));
     }
+
+    private List<Avaliacao> ordenaAvaliacoes(List<Avaliacao> avaliacoes, String ordenacao) {
+        if (ordenacao == null || avaliacoes == null || avaliacoes.isEmpty()) {
+            return avaliacoes;
+        }
+
+        final Map<String, Comparator<Avaliacao>> criterios = Map.of(
+                "data", Comparator.comparing(Avaliacao::getData, Comparator.nullsLast(Comparator.reverseOrder())),
+                "notageral", Comparator.comparing(Avaliacao::getNotaGeral, Comparator.nullsLast(Comparator.reverseOrder()))
+        );
+
+        final Comparator<Avaliacao> comparator = criterios.get(ordenacao.toLowerCase());
+
+        if (comparator == null) {
+            return avaliacoes;
+        }
+
+        return avaliacoes.stream()
+                .sorted(comparator)
+                .toList();
+    }
+
 }
