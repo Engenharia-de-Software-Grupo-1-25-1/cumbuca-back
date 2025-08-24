@@ -159,38 +159,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
                 .toList();
     }
 
-    private boolean filtrarPorTexto(String filtro, String valor) {
-        return filtro == null || filtro.isBlank() ||
-                (valor != null && valor.toLowerCase().contains(filtro.toLowerCase()));
-    }
-
-    private boolean filtrarPorPreco(BigDecimal inicio, BigDecimal fim, BigDecimal preco) {
-        if (inicio == null && fim == null) {
-            return true;
-        }
-
-        final boolean inicioValido = inicio == null || preco.compareTo(inicio) >= 0;
-        final boolean fimValido = fim == null || preco.compareTo(fim) <= 0;
-
-        return inicioValido && fimValido;
-    }
-
-    private boolean filtrarPorNota(Integer notaFiltro, Integer nota) {
-        return notaFiltro == null || nota.equals(notaFiltro);
-    }
-
-    private boolean filtrarPorTags(List<String> tagsFiltro, Long avaliacaoId) {
-        if (tagsFiltro == null || tagsFiltro.isEmpty()) {
-            return true;
-        }
-
-        final List<String> tagsAvaliacao = tagService.recuperar(avaliacaoId);
-
-        return tagsAvaliacao.stream()
-                .anyMatch(tagAvaliacao -> tagsFiltro.stream()
-                        .anyMatch(tagFiltro -> tagFiltro.equalsIgnoreCase(tagAvaliacao)));
-    }
-
     @Override
     public CurtidaResponseDTO curtir(Long id) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
@@ -242,5 +210,37 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }
         comentarioRepository.delete(comentario);
+    }
+
+    private boolean filtrarPorTexto(String filtro, String valor) {
+        return filtro == null || filtro.isBlank() ||
+                (valor != null && valor.toLowerCase().contains(filtro.toLowerCase()));
+    }
+
+    private boolean filtrarPorPreco(BigDecimal inicio, BigDecimal fim, BigDecimal preco) {
+        if (inicio == null && fim == null) {
+            return true;
+        }
+
+        final boolean inicioValido = inicio == null || preco.compareTo(inicio) >= 0;
+        final boolean fimValido = fim == null || preco.compareTo(fim) <= 0;
+
+        return inicioValido && fimValido;
+    }
+
+    private boolean filtrarPorNota(Integer notaFiltro, Integer nota) {
+        return notaFiltro == null || nota.equals(notaFiltro);
+    }
+
+    private boolean filtrarPorTags(List<String> tagsFiltro, Long avaliacaoId) {
+        if (tagsFiltro == null || tagsFiltro.isEmpty()) {
+            return true;
+        }
+
+        final List<String> tagsAvaliacao = tagService.recuperar(avaliacaoId);
+
+        return tagsAvaliacao.stream()
+                .anyMatch(tagAvaliacao -> tagsFiltro.stream()
+                        .anyMatch(tagFiltro -> tagFiltro.equalsIgnoreCase(tagAvaliacao)));
     }
 }

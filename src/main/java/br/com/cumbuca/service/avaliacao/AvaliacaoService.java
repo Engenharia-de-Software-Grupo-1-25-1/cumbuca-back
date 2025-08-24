@@ -19,8 +19,6 @@ public interface AvaliacaoService {
 
     List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros);
 
-    List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento);
-
     CurtidaResponseDTO curtir(Long id);
 
     ComentarioResponseDTO comentar(Long id, String comentario);
