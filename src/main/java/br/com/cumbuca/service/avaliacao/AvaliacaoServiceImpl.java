@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -254,9 +255,24 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             return avaliacoes;
         }
 
+        final Map<Long, Integer> popularidadeMap = avaliacoes.stream()
+                .filter(a -> a != null && a.getId() != null)
+                .collect(Collectors.toMap(
+                        Avaliacao::getId,
+                        a -> {
+                            final int curtidas = curtidaRepository.countByAvaliacaoId(a.getId());
+                            final int comentarios = comentarioRepository.countByAvaliacaoId(a.getId());
+                            return curtidas + comentarios;
+                        }
+                ));
+
         final Map<String, Comparator<Avaliacao>> criterios = Map.of(
                 "data", Comparator.comparing(Avaliacao::getData, Comparator.nullsLast(Comparator.reverseOrder())),
-                "notageral", Comparator.comparing(Avaliacao::getNotaGeral, Comparator.nullsLast(Comparator.reverseOrder()))
+                "notageral", Comparator.comparing(Avaliacao::getNotaGeral, Comparator.nullsLast(Comparator.reverseOrder())),
+                "popularidade", Comparator.comparing(
+                        a -> popularidadeMap.getOrDefault(a.getId(), 0),
+                        Comparator.reverseOrder()
+                )
         );
 
         final Comparator<Avaliacao> comparator = criterios.get(ordenacao.toLowerCase());
