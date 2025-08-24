@@ -137,6 +137,8 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
                     final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
                     avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacao.getId()));
                     avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacao.getId()));
+                    avaliacaoResponseDTO.setQtdCurtidas( curtidaRepository.countByAvaliacao_Id(avaliacao.getId()));
+                    avaliacaoResponseDTO.setQtdComentarios(comentarioRepository.countByAvaliacao_Id(avaliacao.getId()));
                     return avaliacaoResponseDTO;
                 })
                 .toList();
