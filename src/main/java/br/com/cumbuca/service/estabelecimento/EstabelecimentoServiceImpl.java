@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,15 +43,26 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         usuarioService.verificaUsuarioLogado();
         final List<Estabelecimento> estabelecimentos = estabelecimentoRepository.findAll();
 
-        return estabelecimentos.stream().map(estab -> {
-            final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estab.getId());
+        return estabelecimentos.stream().map(estabelecimento -> {
+            final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
 
-            final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estab);
+            final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
             estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
             estabelecimentoResponseDTO.setNotaGeral(calculaNotaGeral(avaliacoes));
 
             return estabelecimentoResponseDTO;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public EstabelecimentoResponseDTO recuperar(Long id) {
+        final Estabelecimento estabelecimento = estabelecimentoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Estabelecimento não encontrado."));
+        final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
+        final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
+        estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
+        estabelecimentoResponseDTO.setNotaGeral(calculaNotaGeral(avaliacoes));
+        return estabelecimentoResponseDTO;
     }
 
     private double calculaNotaGeral(List<Avaliacao> avaliacoes) {
@@ -62,5 +74,4 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                 .average()
                 .orElse(0.0);
     }
-
 }
