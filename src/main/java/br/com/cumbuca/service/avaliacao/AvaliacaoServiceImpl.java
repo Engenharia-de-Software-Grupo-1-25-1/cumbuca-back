@@ -116,8 +116,8 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
         avaliacaoResponseDTO.setFotos(fotoService.recuperar(id));
         avaliacaoResponseDTO.setTags(tagService.recuperar(id));
-        avaliacaoResponseDTO.setQtdCurtidas( curtidaRepository.countByAvaliacao_Id(avaliacao.getId()));
-        avaliacaoResponseDTO.setQtdComentarios(comentarioRepository.countByAvaliacao_Id(avaliacao.getId()));
+        avaliacaoResponseDTO.setQtdCurtidas( curtidaRepository.countByAvaliacaoId(avaliacao.getId()));
+        avaliacaoResponseDTO.setQtdComentarios(comentarioRepository.countByAvaliacaoId(avaliacao.getId()));
         return avaliacaoResponseDTO;
     }
 
@@ -136,8 +136,8 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
                     final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
                     avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacao.getId()));
                     avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacao.getId()));
-                    avaliacaoResponseDTO.setQtdCurtidas( curtidaRepository.countByAvaliacao_Id(avaliacao.getId()));
-                    avaliacaoResponseDTO.setQtdComentarios(comentarioRepository.countByAvaliacao_Id(avaliacao.getId()));
+                    avaliacaoResponseDTO.setQtdCurtidas( curtidaRepository.countByAvaliacaoId(avaliacao.getId()));
+                    avaliacaoResponseDTO.setQtdComentarios(comentarioRepository.countByAvaliacaoId(avaliacao.getId()));
                     return avaliacaoResponseDTO;
                 })
                 .toList();
@@ -186,14 +186,10 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    public void removerComentario(Long id, Long comentarioId) {
+    public void removerComentario(Long id) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
-        final Avaliacao avaliacao = avaliacaoRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
-
-        final Comentario comentario = comentarioRepository.findById(comentarioId)
+        final Comentario comentario = comentarioRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Comentário não encontrado"));
-
         if (!comentario.getUsuario().getId().equals(usuario.getId())) {
             throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }

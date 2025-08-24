@@ -72,7 +72,7 @@ public class AvaliacaoController {
         return ResponseEntity.ok(avaliacoes);
     }
 
-    @PostMapping("/curtir/{id}/")
+    @PostMapping("/curtir/{id}")
     public ResponseEntity<CurtidaResponseDTO> curtir(@PathVariable Long id) {
         final CurtidaResponseDTO curtida = avaliacaoService.curtir(id);
         return ResponseEntity.ok(curtida);
@@ -85,9 +85,9 @@ public class AvaliacaoController {
         return ResponseEntity.ok(comentario);
     }
 
-    @DeleteMapping("{id}/remover/{idComentario}")
-    public ResponseEntity<Void> removerComentario(@PathVariable Long id, @PathVariable Long idComentario) {
-        avaliacaoService.removerComentario(id, idComentario);
+    @DeleteMapping("/removerComentario/{id}")
+    public ResponseEntity<Void> removerComentario(@PathVariable Long id) {
+        avaliacaoService.removerComentario(id);
         return ResponseEntity.noContent().build();
     }
 }
