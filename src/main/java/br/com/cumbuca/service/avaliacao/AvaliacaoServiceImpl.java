@@ -128,7 +128,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
     @Override
     public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros, String ordenacao) {
-        //usuarioService.verificaUsuarioLogado();
+        usuarioService.verificaUsuarioLogado();
         List<Avaliacao> avaliacoes = avaliacaoRepository.findAllByOrderByDataDesc();
         if (idUsuario != null) {
             avaliacoes = avaliacaoRepository.findByUsuarioIdOrderByDataDesc(idUsuario);
