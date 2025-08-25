@@ -57,4 +57,10 @@ public class Avaliacao {
 
     @Column(name = "DATA")
     private LocalDate data =  LocalDate.now();
+
+    @Column(name = "CURTIDAS")
+    private Integer qtdCurtidas;
+
+    @Column(name = "COMENTARIOS")
+    private Integer qtdComentarios;
 }

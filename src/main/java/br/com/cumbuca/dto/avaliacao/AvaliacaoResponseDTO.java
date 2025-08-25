@@ -28,6 +28,7 @@ public class AvaliacaoResponseDTO {
     private List<String> tags;
     private Integer qtdCurtidas;
     private Integer qtdComentarios;
+    private boolean curtida;
 
     public AvaliacaoResponseDTO(Avaliacao avaliacao) {
         this.id = avaliacao.getId();
@@ -41,7 +42,7 @@ public class AvaliacaoResponseDTO {
         this.notaAtendimento = avaliacao.getNotaAtendimento();
         this.notaAmbiente = avaliacao.getNotaAmbiente();
         this.data = avaliacao.getData();
-        this.qtdCurtidas = 0;
-        this.qtdComentarios = 0;
+        this.qtdCurtidas = avaliacao.getQtdCurtidas();
+        this.qtdComentarios = avaliacao.getQtdComentarios();
     }
 }

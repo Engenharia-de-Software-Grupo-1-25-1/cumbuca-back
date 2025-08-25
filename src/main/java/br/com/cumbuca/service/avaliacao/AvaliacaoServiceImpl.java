@@ -20,14 +20,15 @@ import br.com.cumbuca.service.foto.FotoService;
 import br.com.cumbuca.service.tag.TagService;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
+
 
 
 @Service
@@ -116,21 +117,21 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
     @Override
     public AvaliacaoResponseDTO recuperar(Long id) {
-        usuarioService.verificaUsuarioLogado();
+        final Usuario usuario = usuarioService.getUsuarioLogado();
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
         final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
         avaliacaoResponseDTO.setFotos(fotoService.recuperar(id));
         avaliacaoResponseDTO.setTags(tagService.recuperar(id));
-        avaliacaoResponseDTO.setQtdCurtidas( curtidaRepository.countByAvaliacaoId(avaliacao.getId()));
-        avaliacaoResponseDTO.setQtdComentarios(comentarioRepository.countByAvaliacaoId(avaliacao.getId()));
+        avaliacaoResponseDTO.setCurtida(curtidaRepository.existsByUsuarioIdAndAvaliacaoId(usuario.getId(), avaliacao.getId()));
         return avaliacaoResponseDTO;
     }
 
     @Override
     public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros, String ordenacao) {
-        usuarioService.verificaUsuarioLogado();
-        List<Avaliacao> avaliacoes = avaliacaoRepository.findAllByOrderByDataDesc();
+        final Usuario usuario = usuarioService.getUsuarioLogado();
+        List<Avaliacao> avaliacoes = avaliacaoRepository.findAll(Sort.by(criteriosOrdenacao(ordenacao)));
+
         if (idUsuario != null) {
             avaliacoes = avaliacaoRepository.findByUsuarioIdOrderByDataDesc(idUsuario);
         }
@@ -138,28 +139,24 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             avaliacoes = avaliacaoRepository.findByEstabelecimentoIdOrderByDataDesc(idEstabelecimento);
         }
 
-        filtros.validarIntervaloPreco();
-
         avaliacoes = avaliacoes.stream()
                 .filter(avaliacao -> filtrarPorTexto(filtros.getUsuario(), avaliacao.getUsuario().getNome()))
                 .filter(avaliacao -> filtrarPorTexto(filtros.getEstabelecimento(), avaliacao.getEstabelecimento().getNome()))
                 .filter(avaliacao -> filtrarPorTexto(filtros.getItemConsumido(), avaliacao.getItemConsumido()))
                 .filter(avaliacao -> filtrarPorTags(filtros.getTags(), avaliacao.getId()))
-                .filter(avaliacao -> filtrarPorPreco(filtros.getPrecoInicio(), filtros.getPrecoFim(), avaliacao.getPreco()))                .filter(avaliacao -> filtrarPorNota(filtros.getNotaGeral(), avaliacao.getNotaGeral()))
+                .filter(avaliacao -> filtrarPorPreco(filtros.getPrecoInicio(), filtros.getPrecoFim(), avaliacao.getPreco()))
+                .filter(avaliacao -> filtrarPorNota(filtros.getNotaGeral(), avaliacao.getNotaGeral()))
                 .filter(avaliacao -> filtrarPorNota(filtros.getNotaComida(), avaliacao.getNotaComida()))
                 .filter(avaliacao -> filtrarPorNota(filtros.getNotaAmbiente(), avaliacao.getNotaAmbiente()))
                 .filter(avaliacao -> filtrarPorNota(filtros.getNotaAtendimento(), avaliacao.getNotaAtendimento()))
                 .toList();
-
-        avaliacoes = ordenaAvaliacoes(avaliacoes, ordenacao);
 
         return avaliacoes.stream()
                 .map(avaliacao -> {
                     final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
                     avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacao.getId()));
                     avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacao.getId()));
-                    avaliacaoResponseDTO.setQtdCurtidas( curtidaRepository.countByAvaliacaoId(avaliacao.getId()));
-                    avaliacaoResponseDTO.setQtdComentarios(comentarioRepository.countByAvaliacaoId(avaliacao.getId()));
+                    avaliacaoResponseDTO.setCurtida(curtidaRepository.existsByUsuarioIdAndAvaliacaoId(usuario.getId(), avaliacao.getId()));
                     return avaliacaoResponseDTO;
                 })
                 .toList();
@@ -174,14 +171,16 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         Curtida curtida = curtidaRepository.findByUsuarioIdAndAvaliacaoId(usuario.getId(), avaliacao.getId());
 
         if (curtida != null) {
-            if (!curtida.getUsuario().getId().equals(usuario.getId())) {
-                throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
-            }
             curtidaRepository.delete(curtida);
-            final CurtidaResponseDTO curtidaResponseDTO = new CurtidaResponseDTO(curtida);
+            avaliacao.setQtdCurtidas(avaliacao.getQtdCurtidas() - 1);
+            avaliacaoRepository.save(avaliacao);
+            final CurtidaResponseDTO curtidaResponseDTO = modelMapper.map(curtida, CurtidaResponseDTO.class);
             curtidaResponseDTO.setCurtido(false);
             return curtidaResponseDTO;
         }
+
+        avaliacao.setQtdCurtidas(avaliacao.getQtdCurtidas() + 1);
+        avaliacaoRepository.save(avaliacao);
 
         curtida = new Curtida();
         curtida.setUsuario(usuario);
@@ -198,7 +197,8 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
-
+        avaliacao.setQtdComentarios(avaliacao.getQtdComentarios() + 1);
+        avaliacaoRepository.save(avaliacao);
         final Comentario comentario = new Comentario();
         comentario.setAvaliacao(avaliacao);
         comentario.setUsuario(usuario);
@@ -215,7 +215,23 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         if (!comentario.getUsuario().getId().equals(usuario.getId())) {
             throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }
+        final Avaliacao avaliacao = avaliacaoRepository.findById(comentario.getAvaliacao().getId())
+                .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
+        avaliacao.setQtdComentarios(avaliacao.getQtdComentarios() - 1);
+        avaliacaoRepository.save(avaliacao);
         comentarioRepository.delete(comentario);
+    }
+
+    private List<Order> criteriosOrdenacao(String ordenacao) {
+        final List<Order> orders = new ArrayList<>();
+        if ("popularidade".equalsIgnoreCase(ordenacao)) {
+            orders.add(Order.desc("curtidas"));
+            orders.add(Order.desc("avaliacao"));
+        } else {
+            orders.add(Order.desc(ordenacao != null ? ordenacao : "data"));
+        }
+
+        return orders;
     }
 
     private boolean filtrarPorTexto(String filtro, String valor) {
@@ -248,42 +264,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         return tagsAvaliacao.stream()
                 .anyMatch(tagAvaliacao -> tagsFiltro.stream()
                         .anyMatch(tagFiltro -> tagFiltro.equalsIgnoreCase(tagAvaliacao)));
-    }
-
-    private List<Avaliacao> ordenaAvaliacoes(List<Avaliacao> avaliacoes, String ordenacao) {
-        if (ordenacao == null || avaliacoes == null || avaliacoes.isEmpty()) {
-            return avaliacoes;
-        }
-
-        final Map<Long, Integer> popularidadeMap = avaliacoes.stream()
-                .filter(a -> a != null && a.getId() != null)
-                .collect(Collectors.toMap(
-                        Avaliacao::getId,
-                        a -> {
-                            final int curtidas = curtidaRepository.countByAvaliacaoId(a.getId());
-                            final int comentarios = comentarioRepository.countByAvaliacaoId(a.getId());
-                            return curtidas + comentarios;
-                        }
-                ));
-
-        final Map<String, Comparator<Avaliacao>> criterios = Map.of(
-                "data", Comparator.comparing(Avaliacao::getData, Comparator.nullsLast(Comparator.reverseOrder())),
-                "notageral", Comparator.comparing(Avaliacao::getNotaGeral, Comparator.nullsLast(Comparator.reverseOrder())),
-                "popularidade", Comparator.comparing(
-                        a -> popularidadeMap.getOrDefault(a.getId(), 0),
-                        Comparator.reverseOrder()
-                )
-        );
-
-        final Comparator<Avaliacao> comparator = criterios.get(ordenacao.toLowerCase());
-
-        if (comparator == null) {
-            return avaliacoes;
-        }
-
-        return avaliacoes.stream()
-                .sorted(comparator)
-                .toList();
     }
 
 }
