@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CurtidaRepository extends JpaRepository<Curtida, Long> {
 
-    Integer countByAvaliacaoId(Long avaliacaoId);
-
     Curtida findByUsuarioIdAndAvaliacaoId(Long usuarioId, Long avaliacaoId);
+
+    boolean existsByUsuarioIdAndAvaliacaoId(Long usuarioId, Long avaliacaoId);
 
 }
