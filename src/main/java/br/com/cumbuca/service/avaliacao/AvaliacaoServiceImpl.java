@@ -171,8 +171,8 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         Curtida curtida = curtidaRepository.findByUsuarioIdAndAvaliacaoId(usuario.getId(), avaliacao.getId());
 
         if (curtida != null) {
-            curtidaRepository.delete(curtida);
             avaliacao.setQtdCurtidas(avaliacao.getQtdCurtidas() - 1);
+            curtidaRepository.delete(curtida);
             avaliacaoRepository.save(avaliacao);
             final CurtidaResponseDTO curtidaResponseDTO = modelMapper.map(curtida, CurtidaResponseDTO.class);
             curtidaResponseDTO.setCurtido(false);
@@ -180,8 +180,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         }
 
         avaliacao.setQtdCurtidas(avaliacao.getQtdCurtidas() + 1);
-        avaliacaoRepository.save(avaliacao);
-
         curtida = new Curtida();
         curtida.setUsuario(usuario);
         curtida.setAvaliacao(avaliacao);
@@ -189,6 +187,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         final CurtidaResponseDTO curtidaResponseDTO = modelMapper.map(curtida, CurtidaResponseDTO.class);
         curtidaResponseDTO.setCurtido(true);
         curtidaRepository.save(curtida);
+        avaliacaoRepository.save(avaliacao);
         return curtidaResponseDTO;
     }
 
