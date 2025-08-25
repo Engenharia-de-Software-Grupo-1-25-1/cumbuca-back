@@ -24,6 +24,7 @@ public class EstabelecimentoResponseDTO {
     private List<String> horarios;
     private int qtdAvaliacoes;
     private Double notaGeral;
+    private boolean favoritado;
 
     public EstabelecimentoResponseDTO(Estabelecimento estabelecimento) {
         this.id = estabelecimento.getId();
@@ -42,6 +43,7 @@ public class EstabelecimentoResponseDTO {
         } else {
             this.horarios = List.of();
         }
+        this.favoritado = false;
     }
 }
 

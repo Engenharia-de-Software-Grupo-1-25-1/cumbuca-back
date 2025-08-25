@@ -46,28 +46,29 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
     @Override
     public List<EstabelecimentoResponseDTO> listar() {
-        usuarioService.verificaUsuarioLogado();
+        final Usuario usuario = usuarioService.getUsuarioLogado();
         final List<Estabelecimento> estabelecimentos = estabelecimentoRepository.findAll();
 
         return estabelecimentos.stream().map(estabelecimento -> {
             final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
-
             final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
             estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
             estabelecimentoResponseDTO.setNotaGeral(calculaNotaGeral(avaliacoes));
-
+            estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
             return estabelecimentoResponseDTO;
         }).collect(Collectors.toList());
     }
 
     @Override
     public EstabelecimentoResponseDTO recuperar(Long id) {
+        final Usuario usuario = usuarioService.getUsuarioLogado();
         final Estabelecimento estabelecimento = estabelecimentoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Estabelecimento não encontrado."));
         final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
         final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
         estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
         estabelecimentoResponseDTO.setNotaGeral(calculaNotaGeral(avaliacoes));
+        estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
         return estabelecimentoResponseDTO;
     }
 
