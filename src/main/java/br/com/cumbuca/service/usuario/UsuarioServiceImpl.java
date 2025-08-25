@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
@@ -115,6 +116,19 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (!authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
             throw new UsernameNotFoundException("Usuário não autenticado");
         }
+    }
+
+    @Override
+    public List<UsuarioResponseDTO> pesquisar(String nome) {
+        if (nome == null || nome.isBlank()) {
+            return usuarioRepository.findAll().stream()
+                    .map(UsuarioResponseDTO::new)
+                    .toList();
+        }
+
+        return usuarioRepository.findByNomeContainingIgnoreCase(nome).stream()
+                .map(UsuarioResponseDTO::new)
+                .toList();
     }
 
 }

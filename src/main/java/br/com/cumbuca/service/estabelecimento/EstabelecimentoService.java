@@ -4,6 +4,7 @@ import br.com.cumbuca.dto.Favorito.FavoritoResponseDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoRequestDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.model.Estabelecimento;
+
 import java.util.List;
 
 public interface EstabelecimentoService {
@@ -14,4 +15,7 @@ public interface EstabelecimentoService {
     EstabelecimentoResponseDTO recuperar(Long id);
 
     FavoritoResponseDTO favoritar(Long id);
+
+    List<EstabelecimentoResponseDTO> pesquisar(String nome);
+
 }
