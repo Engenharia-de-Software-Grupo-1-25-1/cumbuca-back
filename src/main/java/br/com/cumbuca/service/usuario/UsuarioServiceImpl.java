@@ -119,14 +119,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public List<UsuarioResponseDTO> pesquisar(String nome) {
-        if (nome == null || nome.isBlank()) {
+    public List<UsuarioResponseDTO> pesquisar(String termo) {
+        if (termo == null || termo.isBlank()) {
             return usuarioRepository.findAll().stream()
                     .map(UsuarioResponseDTO::new)
                     .toList();
         }
 
-        return usuarioRepository.findByNomeContainingIgnoreCase(nome).stream()
+        return usuarioRepository.findByNomeContainingIgnoreCaseOrUsernameContainingIgnoreCase(termo, termo).stream()
                 .map(UsuarioResponseDTO::new)
                 .toList();
     }
