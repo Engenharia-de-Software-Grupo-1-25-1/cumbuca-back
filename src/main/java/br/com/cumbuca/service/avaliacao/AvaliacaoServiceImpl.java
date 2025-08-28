@@ -20,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -141,6 +142,10 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
                 .filter(avaliacao -> filtrarPorNota(filtros.getNotaAtendimento(), avaliacao.getNotaAtendimento()))
                 .toList();
 
+        if (ordenacao != null && !ordenacao.isBlank()) {
+            avaliacoes = criteriosOrdenacao(avaliacoes, ordenacao);
+        }
+
         return avaliacoes.stream()
                 .map(avaliacao -> {
                     final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
@@ -149,6 +154,25 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
                     return avaliacaoResponseDTO;
                 })
                 .toList();
+    }
+
+    private List<AvaliacaoView> criteriosOrdenacao(List<AvaliacaoView> avaliacoes, String ordenacao) {
+        if ("popularidade".equalsIgnoreCase(ordenacao)) {
+            return avaliacoes.stream()
+                    .sorted(Comparator.comparingInt((AvaliacaoView av) ->
+                            (av.getQtdCurtidas() == null ? 0 : av.getQtdCurtidas()) +
+                                    (av.getQtdComentarios() == null ? 0 : av.getQtdComentarios())
+                    ).reversed())
+                    .toList();
+        } else if ("notageral".equalsIgnoreCase(ordenacao)) {
+            return avaliacoes.stream()
+                    .sorted(Comparator.comparing(AvaliacaoView::getNotaGeral).reversed())
+                    .toList();
+        } else {
+            return avaliacoes.stream()
+                    .sorted(Comparator.comparing(AvaliacaoView::getData).reversed())
+                    .toList();
+        }
     }
 
     private boolean filtrarPorTexto(String filtro, String valor) {

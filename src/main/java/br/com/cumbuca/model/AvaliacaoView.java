@@ -1,6 +1,13 @@
 package br.com.cumbuca.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.Getter;
 import org.hibernate.annotations.Immutable;
