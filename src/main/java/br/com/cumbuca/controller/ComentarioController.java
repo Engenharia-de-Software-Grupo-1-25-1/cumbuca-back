@@ -30,7 +30,7 @@ public class ComentarioController {
 
     @DeleteMapping("comentario/remover/{id}")
     public ResponseEntity<Void> removerComentario(@PathVariable Long id) {
-        comentarioService.removerComentario(id);
+        comentarioService.remover(id);
         return ResponseEntity.noContent().build();
     }
 

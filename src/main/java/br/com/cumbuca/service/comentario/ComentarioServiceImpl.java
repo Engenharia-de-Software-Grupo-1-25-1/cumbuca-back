@@ -42,7 +42,6 @@ public class ComentarioServiceImpl implements ComentarioService {
         return comentarios.stream()
                 .map(ComentarioResponseDTO::new)
                 .collect(Collectors.toList());
-
     }
 
     @Override
@@ -60,7 +59,7 @@ public class ComentarioServiceImpl implements ComentarioService {
     }
 
     @Override
-    public void removerComentario(Long id) {
+    public void remover(Long id) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Comentario comentario = comentarioRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Comentário não encontrado"));

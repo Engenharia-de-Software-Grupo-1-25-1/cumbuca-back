@@ -12,5 +12,5 @@ public interface ComentarioService {
 
     ComentarioResponseDTO comentar(Long id, String texto);
 
-    void removerComentario(Long id);
+    void remover(Long id);
 }
