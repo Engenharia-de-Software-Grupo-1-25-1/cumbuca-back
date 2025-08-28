@@ -5,13 +5,12 @@ import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
 import br.com.cumbuca.exception.CumbucaException;
 
 import br.com.cumbuca.model.Avaliacao;
+import br.com.cumbuca.model.AvaliacaoView;
 import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.AvaliacaoRepository;
-import br.com.cumbuca.repository.CurtidaRepository;
-import br.com.cumbuca.repository.ComentarioRepository;
+import br.com.cumbuca.repository.AvaliacaoViewRepository;
 import br.com.cumbuca.service.comentario.ComentarioService;
-import br.com.cumbuca.service.curtida.CurtidaService;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import br.com.cumbuca.service.foto.FotoService;
 import br.com.cumbuca.service.tag.TagService;
@@ -25,25 +24,24 @@ import java.util.NoSuchElementException;
 @Service
 public class AvaliacaoServiceImpl implements AvaliacaoService {
     private final AvaliacaoRepository avaliacaoRepository;
+    private final AvaliacaoViewRepository avaliacaoViewRepository;
     private final ModelMapper modelMapper;
     private final UsuarioService usuarioService;
     private final EstabelecimentoService estabelecimentoService;
     private final TagService tagService;
     private final FotoService fotoService;
     private final ComentarioService comentarioService;
-    private final CurtidaService curtidaService;
-
-    public AvaliacaoServiceImpl(AvaliacaoRepository avaliacaoRepository, ModelMapper modelMapper,
-                                UsuarioService usuarioService, EstabelecimentoService estabelecimentoService, TagService tagService,
-                                FotoService fotoService, ComentarioRepository comentarioRepository, CurtidaRepository curtidaRepository, ComentarioService comentarioService, CurtidaService curtidaService) {
+    public AvaliacaoServiceImpl(AvaliacaoRepository avaliacaoRepository, AvaliacaoViewRepository avaliacaoViewRepository,
+                                ModelMapper modelMapper, UsuarioService usuarioService, EstabelecimentoService estabelecimentoService,
+                                TagService tagService, FotoService fotoService, ComentarioService comentarioService) {
         this.avaliacaoRepository = avaliacaoRepository;
+        this.avaliacaoViewRepository = avaliacaoViewRepository;
         this.modelMapper = modelMapper;
         this.usuarioService = usuarioService;
         this.estabelecimentoService = estabelecimentoService;
         this.tagService = tagService;
         this.fotoService = fotoService;
         this.comentarioService = comentarioService;
-        this.curtidaService = curtidaService;
     }
 
     @Override
@@ -109,13 +107,11 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     @Override
     public AvaliacaoResponseDTO recuperar(Long id) {
         usuarioService.verificaUsuarioLogado();
-        final Avaliacao avaliacao = avaliacaoRepository.findById(id)
+        final AvaliacaoView avaliacao = avaliacaoViewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
         final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
         avaliacaoResponseDTO.setFotos(fotoService.recuperar(id));
         avaliacaoResponseDTO.setTags(tagService.recuperar(id));
-        avaliacaoResponseDTO.setQtdCurtidas(curtidaService.qtdCurtidas(avaliacao.getId()));
-        avaliacaoResponseDTO.setQtdComentarios(comentarioService.qtdComentarios(avaliacao.getId()));
         avaliacaoResponseDTO.setComentarios(comentarioService.recuperar(id));
         return avaliacaoResponseDTO;
     }
@@ -123,20 +119,18 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     @Override
     public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento) {
         usuarioService.verificaUsuarioLogado();
-        List<Avaliacao> avaliacoes = avaliacaoRepository.findAllByOrderByDataDesc();
+        List<AvaliacaoView> avaliacoes = avaliacaoViewRepository.findAllByOrderByDataDesc();
         if (idUsuario != null) {
-            avaliacoes = avaliacaoRepository.findByUsuarioIdOrderByDataDesc(idUsuario);
+            avaliacoes = avaliacaoViewRepository.findByUsuarioIdOrderByDataDesc(idUsuario);
         }
         if (idEstabelecimento != null) {
-            avaliacoes = avaliacaoRepository.findByEstabelecimentoIdOrderByDataDesc(idEstabelecimento);
+            avaliacoes = avaliacaoViewRepository.findByEstabelecimentoIdOrderByDataDesc(idEstabelecimento);
         }
         return avaliacoes.stream()
                 .map(avaliacao -> {
                     final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
                     avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacao.getId()));
                     avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacao.getId()));
-                    avaliacaoResponseDTO.setQtdCurtidas(curtidaService.qtdCurtidas(avaliacao.getId()));
-                    avaliacaoResponseDTO.setQtdComentarios(comentarioService.qtdComentarios(avaliacao.getId()));
                     return avaliacaoResponseDTO;
                 })
                 .toList();
