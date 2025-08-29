@@ -6,8 +6,8 @@ import br.com.cumbuca.dto.estabelecimento.EstabelecimentoRequestDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
+import br.com.cumbuca.model.Favorito;
 import br.com.cumbuca.model.Usuario;
-import br.com.cumbuca.model.favorito.Favorito;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.EstabelecimentoRepository;
 import br.com.cumbuca.repository.FavoritoRespository;
@@ -49,7 +49,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
     @Override
     public List<EstabelecimentoResponseDTO> listar(EstabelecimentoFiltroRequestDTO filtros, boolean ordenar) {
-        usuarioService.verificaUsuarioLogado();
+        final Usuario usuario = usuarioService.getUsuarioLogado();
         List<Estabelecimento> estabelecimentos = estabelecimentoRepository.findAll();
 
         final Map<Long, List<Avaliacao>> avaliacoesMap = verificarAvaliacoes(estabelecimentos);
@@ -77,6 +77,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
             final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
             estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
             estabelecimentoResponseDTO.setNotaGeral(calculaNotaGeral(avaliacoes));
+            estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
             return estabelecimentoResponseDTO;
         }).toList();
     }
@@ -131,12 +132,14 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
     @Override
     public EstabelecimentoResponseDTO recuperar(Long id) {
+        final Usuario usuario = usuarioService.getUsuarioLogado();
         final Estabelecimento estabelecimento = estabelecimentoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Estabelecimento não encontrado."));
         final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
         final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
         estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
         estabelecimentoResponseDTO.setNotaGeral(calculaNotaGeral(avaliacoes));
+        estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
         return estabelecimentoResponseDTO;
     }
 

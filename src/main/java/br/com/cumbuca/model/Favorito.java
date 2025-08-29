@@ -1,0 +1,25 @@
+package br.com.cumbuca.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name = "USUARIO_FAVORITA_ESTABELECIMENTO")
+public class Favorito {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_USUARIO", nullable = false)
+    private Usuario usuario;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_ESTABELECIMENTO", nullable = false)
+    private Estabelecimento estabelecimento;
+
+}
+

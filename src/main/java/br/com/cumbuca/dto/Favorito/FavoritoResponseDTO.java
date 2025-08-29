@@ -2,7 +2,7 @@ package br.com.cumbuca.dto.Favorito;
 
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
-import br.com.cumbuca.model.favorito.Favorito;
+import br.com.cumbuca.model.Favorito;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
