@@ -5,7 +5,7 @@ import br.com.cumbuca.dto.estabelecimento.EstabelecimentoRequestDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
-import br.com.cumbuca.model.favorito.Favorito;
+import br.com.cumbuca.model.Favorito;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.EstabelecimentoRepository;
