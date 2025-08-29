@@ -29,11 +29,6 @@ public class CurtidaServiceImpl implements CurtidaService {
     }
 
     @Override
-    public Integer qtdCurtidas(Long idAvaliacao) {
-        return curtidaRepository.countByAvaliacaoId(idAvaliacao);
-    }
-
-    @Override
     public CurtidaResponseDTO curtir(Long id) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)

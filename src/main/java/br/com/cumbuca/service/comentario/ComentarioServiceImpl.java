@@ -31,11 +31,6 @@ public class ComentarioServiceImpl implements ComentarioService {
     }
 
     @Override
-    public Integer qtdComentarios(Long idAvaliacao) {
-        return comentarioRepository.countByAvaliacaoId(idAvaliacao);
-    }
-
-    @Override
     public List<ComentarioResponseDTO> recuperar(Long idAvaliacao) {
         final List<Comentario> comentarios = comentarioRepository.findByAvaliacaoId(idAvaliacao);
 
