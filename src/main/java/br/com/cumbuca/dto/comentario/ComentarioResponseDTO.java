@@ -1,5 +1,6 @@
 package br.com.cumbuca.dto.comentario;
 
+import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.model.Comentario;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,13 +9,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ComentarioResponseDTO {
     private Long id;
-    private Long idUsuario;
+    private UsuarioResponseDTO usuario;
     private Long idAvaliacao;
     private String comentario;
 
     public ComentarioResponseDTO(Comentario comentario) {
         this.id = comentario.getId();
-        this.idUsuario = comentario.getUsuario().getId();
+        this.usuario = new UsuarioResponseDTO(comentario.getUsuario());
         this.idAvaliacao = comentario.getAvaliacao().getId();
         this.comentario = comentario.getComentario();
     }
