@@ -1,6 +1,5 @@
 package br.com.cumbuca.service.autenticacao;
 
-import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Usuario;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -9,6 +8,7 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -35,7 +35,7 @@ public class TokenServiceImpl implements TokenService {
                     .withExpiresAt(getExpiracao(expiracaoMinutos))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
-            throw new CumbucaException("Erro ao gerar token JWT de acesso.");
+            throw new BadCredentialsException("Erro ao gerar token JWT de acesso.");
         }
     }
 
@@ -50,7 +50,7 @@ public class TokenServiceImpl implements TokenService {
             decodedJWT = verifier.verify(token);
             return Long.parseLong(decodedJWT.getSubject());
         } catch (JWTVerificationException exception) {
-            throw new CumbucaException("Erro ao gerar token JWT de acesso.");
+            throw new BadCredentialsException("Erro ao gerar token JWT de acesso.");
         }
     }
 
