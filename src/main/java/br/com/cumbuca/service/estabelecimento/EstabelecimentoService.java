@@ -10,7 +10,7 @@ import java.util.List;
 public interface EstabelecimentoService {
     Estabelecimento buscarOuCriar(EstabelecimentoRequestDTO estabelecimentoRequestDTO);
 
-    List<EstabelecimentoResponseDTO> listar(EstabelecimentoFiltroRequestDTO filtros, boolean ordenar);
+    List<EstabelecimentoResponseDTO> listar(EstabelecimentoFiltroRequestDTO filtros, String ordenador);
 
     EstabelecimentoResponseDTO recuperar(Long id);
 

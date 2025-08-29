@@ -6,32 +6,36 @@ import br.com.cumbuca.dto.estabelecimento.EstabelecimentoRequestDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
+import br.com.cumbuca.model.EstabelecimentoView;
 import br.com.cumbuca.model.Favorito;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.EstabelecimentoRepository;
+import br.com.cumbuca.repository.EstabelecimentoViewRepository;
 import br.com.cumbuca.repository.FavoritoRespository;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
     private final EstabelecimentoRepository estabelecimentoRepository;
+    private final EstabelecimentoViewRepository estabelecimentoViewRepository;
     private final AvaliacaoRepository avaliacaoRepository;
     private final FavoritoRespository favoritoRespository;
     private final UsuarioService usuarioService;
     private final ModelMapper modelMapper;
 
-    public EstabelecimentoServiceImpl(EstabelecimentoRepository estabelecimentoRepository, AvaliacaoRepository avaliacaoRepository, FavoritoRespository favoritoRespository, UsuarioService usuarioService, ModelMapper modelMapper) {
+    public EstabelecimentoServiceImpl(EstabelecimentoRepository estabelecimentoRepository, EstabelecimentoViewRepository estabelecimentoViewRepository, AvaliacaoRepository avaliacaoRepository, FavoritoRespository favoritoRespository, UsuarioService usuarioService, ModelMapper modelMapper) {
         this.estabelecimentoRepository = estabelecimentoRepository;
+        this.estabelecimentoViewRepository = estabelecimentoViewRepository;
         this.avaliacaoRepository = avaliacaoRepository;
         this.favoritoRespository = favoritoRespository;
         this.usuarioService = usuarioService;
@@ -48,109 +52,60 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     @Override
-    public List<EstabelecimentoResponseDTO> listar(EstabelecimentoFiltroRequestDTO filtros, boolean ordenar) {
+    public List<EstabelecimentoResponseDTO> listar(EstabelecimentoFiltroRequestDTO filtros, String ordenador) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
-        List<Estabelecimento> estabelecimentos = estabelecimentoRepository.findAll();
+        EstabelecimentoView exemplo = new EstabelecimentoView();
 
-        final Map<Long, List<Avaliacao>> avaliacoesMap = verificarAvaliacoes(estabelecimentos);
-
-        estabelecimentos = estabelecimentos.stream()
-                .filter(estabelecimento -> filtrarPorTexto(filtros.getNome(), estabelecimento.getNome()))
-                .filter(estabelecimento -> filtrarPorTexto(filtros.getCategoria(), estabelecimento.getCategoria()))
-                .filter(estabelecimento -> filtrarPorLocal(filtros.getLocal(), estabelecimento))
-                .filter(estabelecimento -> filtrarPorFavorito(filtros.getFavoritos(), estabelecimento))
-                .filter(estabelecimento -> {
-                    final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
-                    final double notaGeral = calculaNotaGeral(avaliacoes);
-                    return filtrarPorNota(filtros.getNotaGeral(), notaGeral);
-                }).toList();
-
-        if (ordenar) {
-            estabelecimentos = estabelecimentos.stream()
-                    .sorted(Comparator.comparingInt((Estabelecimento est) -> avaliacoesMap.get(est.getId()).size())
-                            .reversed())
-                    .toList();
+        if (filtros.getNome() != null && !filtros.getNome().isBlank()) {
+            exemplo.setNome(filtros.getNome());
         }
+        if (filtros.getCategoria() != null && !filtros.getCategoria().isBlank()) {
+            exemplo.setCategoria(filtros.getCategoria());
+        }
+        if (filtros.getLocal() != null && !filtros.getLocal().isBlank()) {
+            exemplo.setRua(filtros.getLocal());
+            exemplo.setBairro(filtros.getLocal());
+            exemplo.setCidade(filtros.getLocal());
+            exemplo.setEstado(filtros.getLocal());
+        }
+        if (filtros.getFavoritado() != null) {
+            exemplo.setFavoritado(filtros.getFavoritado());
+        }
+        if (filtros.getNotaGeral() != null) {
+            exemplo.setNotaGeral(filtros.getNotaGeral());
+        }
+
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+
+        Example<EstabelecimentoView> example = Example.of(exemplo, matcher);
+
+        List<EstabelecimentoView> estabelecimentos = (ordenador != null && !ordenador.isBlank())
+                ? estabelecimentoViewRepository.findAll(example, Sort.by(Sort.Order.desc(ordenador)))
+                : estabelecimentoViewRepository.findAll(example);
 
         return estabelecimentos.stream().map(estabelecimento -> {
             final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
-            final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
-            estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
-            estabelecimentoResponseDTO.setNotaGeral(calculaNotaGeral(avaliacoes));
-            estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
-            return estabelecimentoResponseDTO;
+            EstabelecimentoResponseDTO dto = new EstabelecimentoResponseDTO(estabelecimento);
+            dto.setQtdAvaliacoes(avaliacoes.size());
+            dto.setNotaGeral(estabelecimento.getNotaGeral());
+            dto.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
+            return dto;
         }).toList();
-    }
-
-    private Map<Long, List<Avaliacao>> verificarAvaliacoes(List<Estabelecimento> estabelecimentos) {
-        final Map<Long, List<Avaliacao>> avaliacoesMap = estabelecimentos.stream()
-                .collect(Collectors.toMap(
-                        Estabelecimento::getId,
-                        estabelecimento -> avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId())
-                ));
-
-        estabelecimentos = estabelecimentos.stream()
-                .filter(est -> !avaliacoesMap.get(est.getId()).isEmpty())
-                .toList();
-
-        if (estabelecimentos.isEmpty()) {
-            throw new NoSuchElementException("Estabelecimento não encontrado, pois não há avaliações");
-        }
-
-        return avaliacoesMap;
-    }
-
-    private boolean filtrarPorTexto(String filtro, String valor) {
-        return filtro == null || filtro.isBlank() ||
-                (valor != null && valor.toLowerCase().contains(filtro.toLowerCase()));
-    }
-
-    private boolean filtrarPorNota(Double notaFiltro, Double nota) {
-        return notaFiltro == null || nota.equals(notaFiltro);
-    }
-
-    private boolean filtrarPorLocal(String filtro, Estabelecimento estabelecimento) {
-        if (filtro == null || filtro.isBlank()) {
-            return true;
-        }
-        return (estabelecimento.getRua() != null && estabelecimento.getRua().toLowerCase().contains(filtro.toLowerCase()) ||
-                estabelecimento.getBairro() != null && estabelecimento.getBairro().toLowerCase().contains(filtro.toLowerCase())) ||
-                (estabelecimento.getCidade() != null && estabelecimento.getCidade().toLowerCase().contains(filtro.toLowerCase())) ||
-                (estabelecimento.getEstado() != null && estabelecimento.getEstado().toLowerCase().contains(filtro.toLowerCase()));
-    }
-
-    private boolean filtrarPorFavorito(String favoritoFiltro, Estabelecimento estabelecimento) {
-        if (favoritoFiltro == null || favoritoFiltro.isBlank()) {
-            return true;
-        }
-
-        final Usuario usuario = usuarioService.getUsuarioLogado();
-        final Favorito favorito = favoritoRespository.findByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId());
-
-        return favorito != null;
     }
 
     @Override
     public EstabelecimentoResponseDTO recuperar(Long id) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
-        final Estabelecimento estabelecimento = estabelecimentoRepository.findById(id)
+        final EstabelecimentoView estabelecimento = estabelecimentoViewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Estabelecimento não encontrado."));
         final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
         final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
         estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
-        estabelecimentoResponseDTO.setNotaGeral(calculaNotaGeral(avaliacoes));
+        estabelecimentoResponseDTO.setNotaGeral(estabelecimento.getNotaGeral());
         estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
         return estabelecimentoResponseDTO;
-    }
-
-    private double calculaNotaGeral(List<Avaliacao> avaliacoes) {
-        if (avaliacoes == null || avaliacoes.isEmpty()) {
-            return 0.0;
-        }
-        return avaliacoes.stream()
-                .mapToDouble(Avaliacao::getNotaGeral)
-                .average()
-                .orElse(0.0);
     }
 
     @Override

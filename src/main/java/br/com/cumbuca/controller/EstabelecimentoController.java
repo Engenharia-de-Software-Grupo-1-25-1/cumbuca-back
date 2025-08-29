@@ -27,9 +27,9 @@ public class EstabelecimentoController {
 
     @GetMapping("/listar")
     public ResponseEntity<List<EstabelecimentoResponseDTO>> listar(
-            @ModelAttribute EstabelecimentoFiltroRequestDTO filtros,
-            @RequestParam(required = false) Boolean ordenar) {
-        final List<EstabelecimentoResponseDTO> estabelecimentos = estabelecimentoService.listar(filtros, ordenar);
+            @RequestParam EstabelecimentoFiltroRequestDTO filtros,
+            @RequestParam(required = false) String ordenador) {
+        final List<EstabelecimentoResponseDTO> estabelecimentos = estabelecimentoService.listar(filtros, ordenador);
         return ResponseEntity.ok(estabelecimentos);
     }
 
