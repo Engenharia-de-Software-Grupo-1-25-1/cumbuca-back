@@ -1,11 +1,11 @@
 package br.com.cumbuca.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.Data;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Subselect;
-
-import java.util.List;
 
 @Data
 @Entity

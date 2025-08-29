@@ -54,7 +54,24 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     @Override
     public List<EstabelecimentoResponseDTO> listar(EstabelecimentoFiltroRequestDTO filtros, String ordenador) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
-        EstabelecimentoView exemplo = new EstabelecimentoView();
+        final Example<EstabelecimentoView> example = criarExemplo(filtros);
+
+        final List<EstabelecimentoView> estabelecimentos = (ordenador != null && !ordenador.isBlank())
+                ? estabelecimentoViewRepository.findAll(example, Sort.by(Sort.Order.desc(ordenador)))
+                : estabelecimentoViewRepository.findAll(example);
+
+        return estabelecimentos.stream().map(estabelecimento -> {
+            final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
+            final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
+            estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
+            estabelecimentoResponseDTO.setNotaGeral(estabelecimento.getNotaGeral());
+            estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
+            return estabelecimentoResponseDTO;
+        }).toList();
+    }
+
+    private Example<EstabelecimentoView> criarExemplo(EstabelecimentoFiltroRequestDTO filtros) {
+        final EstabelecimentoView exemplo = new EstabelecimentoView();
 
         if (filtros.getNome() != null && !filtros.getNome().isBlank()) {
             exemplo.setNome(filtros.getNome());
@@ -75,24 +92,11 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
             exemplo.setNotaGeral(filtros.getNotaGeral());
         }
 
-        ExampleMatcher matcher = ExampleMatcher.matching()
+        final ExampleMatcher matcher = ExampleMatcher.matching()
                 .withIgnoreCase()
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
 
-        Example<EstabelecimentoView> example = Example.of(exemplo, matcher);
-
-        List<EstabelecimentoView> estabelecimentos = (ordenador != null && !ordenador.isBlank())
-                ? estabelecimentoViewRepository.findAll(example, Sort.by(Sort.Order.desc(ordenador)))
-                : estabelecimentoViewRepository.findAll(example);
-
-        return estabelecimentos.stream().map(estabelecimento -> {
-            final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
-            EstabelecimentoResponseDTO dto = new EstabelecimentoResponseDTO(estabelecimento);
-            dto.setQtdAvaliacoes(avaliacoes.size());
-            dto.setNotaGeral(estabelecimento.getNotaGeral());
-            dto.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
-            return dto;
-        }).toList();
+        return Example.of(exemplo, matcher);
     }
 
     @Override

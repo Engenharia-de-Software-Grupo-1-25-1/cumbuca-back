@@ -5,13 +5,7 @@ import br.com.cumbuca.dto.estabelecimento.EstabelecimentoFiltroRequestDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,7 +21,7 @@ public class EstabelecimentoController {
 
     @GetMapping("/listar")
     public ResponseEntity<List<EstabelecimentoResponseDTO>> listar(
-            @RequestParam EstabelecimentoFiltroRequestDTO filtros,
+            @ModelAttribute EstabelecimentoFiltroRequestDTO filtros,
             @RequestParam(required = false) String ordenador) {
         final List<EstabelecimentoResponseDTO> estabelecimentos = estabelecimentoService.listar(filtros, ordenador);
         return ResponseEntity.ok(estabelecimentos);
