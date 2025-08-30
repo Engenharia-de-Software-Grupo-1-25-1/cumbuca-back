@@ -60,7 +60,6 @@ public class UsuarioControllerTest {
                 "perfil.jpg",
                 "image/jpeg",
                 "conteudo da foto".getBytes());
-        usuarioRequestDTO.setFoto(foto);
     }
 
     @AfterEach
