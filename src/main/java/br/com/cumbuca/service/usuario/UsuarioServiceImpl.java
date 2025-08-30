@@ -36,18 +36,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public UsuarioResponseDTO criar(UsuarioRequestDTO usuarioRequestDTO) {
+    public UsuarioResponseDTO criar(UsuarioRequestDTO usuarioRequestDTO) throws IOException {
         modelMapper.typeMap(UsuarioRequestDTO.class, Usuario.class)
                 .addMappings(mapper -> mapper.skip(Usuario::setSenha));
         final Usuario usuario = modelMapper.map(usuarioRequestDTO, Usuario.class);
         usuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.getSenha()));
 
         if (usuarioRequestDTO.getFoto() != null && !usuarioRequestDTO.getFoto().isEmpty()) {
-            try {
-                usuario.setFoto(usuarioRequestDTO.getFoto().getBytes());
-            } catch (IOException e) {
-                throw new CumbucaException("Erro ao processar a foto.");
-            }
+            usuario.setFoto(usuarioRequestDTO.getFoto().getBytes());
         }
 
         usuarioRepository.save(usuario);
@@ -55,7 +51,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO) {
+    public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO) throws IOException {
         final Usuario usuario = getUsuarioLogado();
         if (!id.equals(usuario.getId())) {
             throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
@@ -67,12 +63,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.getSenha()));
 
         if (usuarioRequestDTO.getFoto() != null && !usuarioRequestDTO.getFoto().isEmpty()) {
-            try {
-                usuario.setFoto(usuarioRequestDTO.getFoto().getBytes());
-            } catch (IOException e) {
-                throw new CumbucaException("Erro ao processar a foto.");
-            }
+            usuario.setFoto(usuarioRequestDTO.getFoto().getBytes());
         }
+
         usuarioRepository.save(usuario);
         return modelMapper.map(usuario, UsuarioResponseDTO.class);
     }

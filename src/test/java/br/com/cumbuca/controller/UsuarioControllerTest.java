@@ -24,6 +24,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.time.LocalDate;
 import java.nio.charset.StandardCharsets;
@@ -106,12 +108,7 @@ public class UsuarioControllerTest {
             dto.setNome("Criar JUnit");
             dto.setUsername("criarJunit");
             dto.setDtNascimento(LocalDate.of(2000, 1, 1));
-            final MockMultipartFile foto = new MockMultipartFile(
-                    "foto",
-                    "perfil.jpg",
-                    "image/jpeg",
-                    "conteudo da foto".getBytes());
-
+            final MockMultipartFile foto = new MockMultipartFile("foto", "perfil.jpg", "image/jpeg", "conteudo da foto".getBytes());
 
             final String responseJson = driver.perform(multipart(URI + "/criar")
                             .file(foto)
@@ -142,23 +139,25 @@ public class UsuarioControllerTest {
         @Test
         void testAtualizarUsuario() throws Exception {
             final UsuarioRequestDTO dto = new UsuarioRequestDTO();
-            dto.setEmail("atualizarJunit@email.com");
+            dto.setEmail("criarJunit@email.com");
             dto.setSenha("123456");
-            dto.setNome("Atualizar JUnit");
-            dto.setUsername("atualizarJunit");
+            dto.setNome("Criar JUnit");
+            dto.setUsername("criarJunit");
             dto.setDtNascimento(LocalDate.of(2000, 1, 1));
+            final MockMultipartFile foto = new MockMultipartFile("foto", "perfil.jpg", "image/jpeg", "conteudo da foto".getBytes());
+
+            final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("email", dto.getEmail());
+            params.add("senha", dto.getSenha());
+            params.add("nome", dto.getNome());
+            params.add("username", dto.getUsername());
+            params.add("dtNascimento", dto.getDtNascimento().toString());
 
             final String responseJson = driver.perform(
                             multipart(URI + "/atualizar/" + usuario.getId())
-                                    .param("email", dto.getEmail())
-                                    .param("senha", dto.getSenha())
-                                    .param("nome", dto.getNome())
-                                    .param("username", dto.getUsername())
-                                    .param("dtNascimento", dto.getDtNascimento().toString())
-                                    .with(request -> {
-                                        request.setMethod("PUT");
-                                        return request;
-                                    })
+                                    .file(foto)
+                                    .params(params)
+                                    .with(request -> { request.setMethod("PUT"); return request; })
                                     .header("Authorization", "Bearer " + token)
                                     .characterEncoding("UTF-8"))
                     .andDo(print())
@@ -168,7 +167,6 @@ public class UsuarioControllerTest {
                     .getContentAsString(StandardCharsets.UTF_8);
 
             final UsuarioResponseDTO resultado = objectMapper.readValue(responseJson, UsuarioResponseDTO.class);
-
             assertAll(
                     () -> assertNotNull(resultado.getId()),
                     () -> assertEquals(dto.getNome(), resultado.getNome()),
@@ -357,16 +355,15 @@ public class UsuarioControllerTest {
             dto.setNome("Criar JUnit");
             dto.setUsername("criarJunit");
             dto.setDtNascimento(LocalDate.of(2000, 1, 1));
-
-            final MockMultipartFile fotoVazia = new MockMultipartFile(
+            final MockMultipartFile foto = new MockMultipartFile(
                     "foto",
                     "perfil.jpg",
                     "image/jpeg",
-                    new byte[0] // foto vazia
+                    new byte[0]
             );
 
             final String responseJson = driver.perform(multipart(URI + "/criar")
-                            .file(fotoVazia)
+                            .file(foto)
                             .param("email", dto.getEmail())
                             .param("senha", dto.getSenha())
                             .param("nome", dto.getNome())
@@ -382,6 +379,89 @@ public class UsuarioControllerTest {
 
             final UsuarioResponseDTO resultado = objectMapper.readValue(responseJson, UsuarioResponseDTO.class);
 
+            assertAll(
+                    () -> assertNotNull(resultado.getId()),
+                    () -> assertEquals(dto.getNome(), resultado.getNome()),
+                    () -> assertEquals(dto.getUsername(), resultado.getUsername()),
+                    () -> assertEquals(dto.getEmail(), resultado.getEmail()),
+                    () -> assertEquals(dto.getDtNascimento(), resultado.getDtNascimento())
+            );
+        }
+    }
+
+    @Nested
+    class AtualizacaoUsuarioInconsistente {
+
+        @Test
+        void testAtualizaUsuarioFotoNula() throws Exception {
+            final UsuarioRequestDTO dto = new UsuarioRequestDTO();
+            dto.setEmail("atualizarJunit@email.com");
+            dto.setSenha("123456");
+            dto.setNome("Atualizar JUnit");
+            dto.setUsername("atualizarJunit");
+            dto.setDtNascimento(LocalDate.of(2000, 1, 1));
+
+            final String responseJson = driver.perform(
+                            multipart(URI + "/atualizar/" + usuario.getId())
+                                    .param("email", dto.getEmail())
+                                    .param("senha", dto.getSenha())
+                                    .param("nome", dto.getNome())
+                                    .param("username", dto.getUsername())
+                                    .param("dtNascimento", dto.getDtNascimento().toString())
+                                    .with(request -> {
+                                        request.setMethod("PUT");
+                                        return request;
+                                    })
+                                    .header("Authorization", "Bearer " + token)
+                                    .characterEncoding("UTF-8"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString(StandardCharsets.UTF_8);
+
+            final UsuarioResponseDTO resultado = objectMapper.readValue(responseJson, UsuarioResponseDTO.class);
+
+            assertAll(
+                    () -> assertNotNull(resultado.getId()),
+                    () -> assertEquals(dto.getNome(), resultado.getNome()),
+                    () -> assertEquals(dto.getUsername(), resultado.getUsername()),
+                    () -> assertEquals(dto.getEmail(), resultado.getEmail()),
+                    () -> assertEquals(dto.getDtNascimento(), resultado.getDtNascimento())
+            );
+        }
+
+        @Test
+        void testAtualizarUsuarioFotoVazia() throws Exception {
+            final UsuarioRequestDTO dto = new UsuarioRequestDTO();
+            dto.setEmail("criarJunit@email.com");
+            dto.setSenha("123456");
+            dto.setNome("Criar JUnit");
+            dto.setUsername("criarJunit");
+            dto.setDtNascimento(LocalDate.of(2000, 1, 1));
+            final MockMultipartFile foto = new MockMultipartFile("foto", "perfil.jpg", "image/jpeg", new byte[0]);
+
+            final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("email", dto.getEmail());
+            params.add("senha", dto.getSenha());
+            params.add("nome", dto.getNome());
+            params.add("username", dto.getUsername());
+            params.add("dtNascimento", dto.getDtNascimento().toString());
+
+            final String responseJson = driver.perform(
+                            multipart(URI + "/atualizar/" + usuario.getId())
+                                    .file(foto)
+                                    .params(params)
+                                    .with(request -> { request.setMethod("PUT"); return request; })
+                                    .header("Authorization", "Bearer " + token)
+                                    .characterEncoding("UTF-8"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString(StandardCharsets.UTF_8);
+
+            final UsuarioResponseDTO resultado = objectMapper.readValue(responseJson, UsuarioResponseDTO.class);
             assertAll(
                     () -> assertNotNull(resultado.getId()),
                     () -> assertEquals(dto.getNome(), resultado.getNome()),
@@ -496,7 +576,7 @@ public class UsuarioControllerTest {
             usuario1.setDtNascimento(LocalDate.of(2000, 1, 1));
             usuarioRepository.save(usuario1);
 
-            String responseText = driver.perform(delete(URI + "/remover/" + usuario1.getId())
+            final String responseText = driver.perform(delete(URI + "/remover/" + usuario1.getId())
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token))
                     .andExpect(status().isBadRequest())
