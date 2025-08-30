@@ -23,5 +23,4 @@ public interface UsuarioService extends UserDetailsService {
 
     Usuario getUsuarioLogado();
 
-    void verificaUsuarioLogado();
 }

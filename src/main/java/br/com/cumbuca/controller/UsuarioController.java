@@ -65,12 +65,11 @@ public class UsuarioController {
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<UsuarioResponseDTO>> listar(@RequestParam String nome) {
+    public ResponseEntity<List<UsuarioResponseDTO>> listar(@RequestParam(required = false) String nome) {
         final List<UsuarioResponseDTO> usuarios = usuarioService.listar(nome);
         if (usuarios.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(usuarios);
     }
-
 }
