@@ -73,7 +73,6 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                     return estabelecimentoResponseDTO;
                 })
                 .toList();
-
     }
 
     private Example<EstabelecimentoView> criarExemplo(EstabelecimentoFiltroRequestDTO filtros) {
@@ -85,11 +84,8 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         if (filtros.getCategoria() != null && !filtros.getCategoria().isBlank()) {
             exemplo.setCategoria(filtros.getCategoria());
         }
-        if (filtros.getLocal() != null && !filtros.getLocal().isBlank()) {
-            exemplo.setRua(filtros.getLocal());
-            exemplo.setBairro(filtros.getLocal());
-            exemplo.setCidade(filtros.getLocal());
-            exemplo.setEstado(filtros.getLocal());
+        if (filtros.getLocalizacao() != null && !filtros.getLocalizacao().isBlank()) {
+            exemplo.setLocalizacao(filtros.getLocalizacao());
         }
         if (filtros.isFavoritado()) {
             exemplo.setFavoritado(true);

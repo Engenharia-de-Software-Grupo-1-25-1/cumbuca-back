@@ -17,29 +17,32 @@ public class EstabelecimentoView {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "NOME", nullable = false, length = 100)
+    @Column(name = "NOME")
     private String nome;
 
-    @Column(name = "CATEGORIA", nullable = false, length = 50)
+    @Column(name = "CATEGORIA")
     private String categoria;
 
-    @Column(name = "RUA", length = 100)
+    @Column(name = "RUA")
     private String rua;
 
-    @Column(name = "NUMERO", length = 20)
+    @Column(name = "NUMERO")
     private String numero;
 
-    @Column(name = "BAIRRO", length = 50)
+    @Column(name = "BAIRRO")
     private String bairro;
 
-    @Column(name = "CIDADE", length = 50)
+    @Column(name = "CIDADE")
     private String cidade;
 
-    @Column(name = "ESTADO", length = 2)
+    @Column(name = "ESTADO")
     private String estado;
 
-    @Column(name = "CEP", length = 10)
+    @Column(name = "CEP")
     private String cep;
+
+    @Column(name = "LOCALIZACAO")
+    private String localizacao;
 
     @Column(name = "AVALIACOES")
     private Integer qtdAvaliacoes;
