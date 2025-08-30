@@ -60,14 +60,21 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                 ? estabelecimentoViewRepository.findAll(example, Sort.by(Sort.Order.desc(ordenador)))
                 : estabelecimentoViewRepository.findAll(example);
 
-        return estabelecimentos.stream().map(estabelecimento -> {
-            final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
-            final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
-            estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
-            estabelecimentoResponseDTO.setNotaGeral(estabelecimento.getNotaGeral());
-            estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
-            return estabelecimentoResponseDTO;
-        }).toList();
+        return estabelecimentos.stream()
+                .filter(estabelecimento ->
+                        filtros.getNotaGeral() == null || (estabelecimento.getNotaGeral() >= filtros.getNotaGeral()
+                                && estabelecimento.getNotaGeral() < filtros.getNotaGeral() + 1)
+                )
+                .map(estabelecimento -> {
+                    final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
+                    final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
+                    estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
+                    estabelecimentoResponseDTO.setNotaGeral(estabelecimento.getNotaGeral());
+                    estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
+                    return estabelecimentoResponseDTO;
+                })
+                .toList();
+
     }
 
     private Example<EstabelecimentoView> criarExemplo(EstabelecimentoFiltroRequestDTO filtros) {
@@ -85,11 +92,8 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
             exemplo.setCidade(filtros.getLocal());
             exemplo.setEstado(filtros.getLocal());
         }
-        if (filtros.getFavoritado() != null) {
-            exemplo.setFavoritado(filtros.getFavoritado());
-        }
-        if (filtros.getNotaGeral() != null) {
-            exemplo.setNotaGeral(filtros.getNotaGeral());
+        if (filtros.isFavoritado()) {
+            exemplo.setFavoritado(true);
         }
 
         final ExampleMatcher matcher = ExampleMatcher.matching()
