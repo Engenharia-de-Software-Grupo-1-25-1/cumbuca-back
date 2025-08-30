@@ -48,7 +48,7 @@ public class EstabelecimentoView {
     private Integer qtdAvaliacoes;
 
     @Column(name = "FAVORITADO")
-    private Boolean favoritado;
+    private Boolean isFavoritado;
 
     @Column(name = "NOTA_GERAL")
     private Double notaGeral;

@@ -7,6 +7,6 @@ public class EstabelecimentoFiltroRequestDTO {
     private String nome;
     private String categoria;
     private String localizacao;
-    private boolean isFavoritado;
+    private Boolean isFavoritado;
     private Double notaGeral;
 }

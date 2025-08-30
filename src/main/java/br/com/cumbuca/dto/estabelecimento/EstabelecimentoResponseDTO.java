@@ -23,7 +23,7 @@ public class EstabelecimentoResponseDTO {
     private List<String> horarios;
     private int qtdAvaliacoes;
     private Double notaGeral;
-    private boolean isFavoritado;
+    private Boolean isFavoritado;
 
     public EstabelecimentoResponseDTO(Estabelecimento estabelecimento) {
         this.id = estabelecimento.getId();
