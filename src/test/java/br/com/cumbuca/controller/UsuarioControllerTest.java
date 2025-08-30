@@ -2,12 +2,14 @@ package br.com.cumbuca.controller;
 
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
+import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,8 +45,10 @@ public class UsuarioControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    private final ModelMapper modelMapper = new ModelMapper();
+
     UsuarioRequestDTO usuarioRequestDTO;
-    MockMultipartFile foto;
+    Usuario usuario;
 
     @BeforeEach
     void setup() {
@@ -55,11 +59,8 @@ public class UsuarioControllerTest {
         usuarioRequestDTO.setUsername("testejunit");
         usuarioRequestDTO.setDtNascimento(LocalDate.of(2000, 1, 1));
 
-        foto = new MockMultipartFile(
-                "foto",
-                "perfil.jpg",
-                "image/jpeg",
-                "conteudo da foto".getBytes());
+        usuario = modelMapper.map(usuarioRequestDTO, Usuario.class);
+        usuarioRepository.save(usuario);
     }
 
     @AfterEach
@@ -72,13 +73,26 @@ public class UsuarioControllerTest {
 
         @Test
         void testCriarUsuario() throws Exception {
+            UsuarioRequestDTO dto = new UsuarioRequestDTO();
+            dto.setEmail("criarjunit@email.com");
+            dto.setSenha("123456");
+            dto.setNome("Criar JUnit");
+            dto.setUsername("criarjunit");
+            dto.setDtNascimento(LocalDate.of(2000, 1, 1));
+            MockMultipartFile foto = new MockMultipartFile(
+                    "foto",
+                    "perfil.jpg",
+                    "image/jpeg",
+                    "conteudo da foto".getBytes());
+
+
             final String responseJson = driver.perform(multipart(URI + "/criar")
                             .file(foto)
-                            .param("email", usuarioRequestDTO.getEmail())
-                            .param("senha", usuarioRequestDTO.getSenha())
-                            .param("nome", usuarioRequestDTO.getNome())
-                            .param("username", usuarioRequestDTO.getUsername())
-                            .param("dtNascimento", usuarioRequestDTO.getDtNascimento().toString())
+                            .param("email", dto.getEmail())
+                            .param("senha", dto.getSenha())
+                            .param("nome", dto.getNome())
+                            .param("username", dto.getUsername())
+                            .param("dtNascimento", dto.getDtNascimento().toString())
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                             .characterEncoding("UTF-8"))
                     .andDo(print())
@@ -91,10 +105,10 @@ public class UsuarioControllerTest {
 
             assertAll(
                     () -> assertNotNull(resultado.getId()),
-                    () -> assertEquals(usuarioRequestDTO.getNome(), resultado.getNome()),
-                    () -> assertEquals(usuarioRequestDTO.getUsername(), resultado.getUsername()),
-                    () -> assertEquals(usuarioRequestDTO.getEmail(), resultado.getEmail()),
-                    () -> assertEquals(usuarioRequestDTO.getDtNascimento(), resultado.getDtNascimento())
+                    () -> assertEquals(dto.getNome(), resultado.getNome()),
+                    () -> assertEquals(dto.getUsername(), resultado.getUsername()),
+                    () -> assertEquals(dto.getEmail(), resultado.getEmail()),
+                    () -> assertEquals(dto.getDtNascimento(), resultado.getDtNascimento())
             );
         }
     }
