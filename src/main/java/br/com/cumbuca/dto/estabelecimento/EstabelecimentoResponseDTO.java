@@ -23,7 +23,7 @@ public class EstabelecimentoResponseDTO {
     private List<String> horarios;
     private int qtdAvaliacoes;
     private Double notaGeral;
-    private boolean favoritado;
+    private boolean isFavoritado;
 
     public EstabelecimentoResponseDTO(Estabelecimento estabelecimento) {
         this.id = estabelecimento.getId();
@@ -34,7 +34,7 @@ public class EstabelecimentoResponseDTO {
         this.bairro = estabelecimento.getBairro();
         this.cidade = estabelecimento.getCidade();
         this.estado = estabelecimento.getEstado();
-        this.favoritado = false;
+        this.isFavoritado = false;
     }
 
     public EstabelecimentoResponseDTO(EstabelecimentoView estabelecimento) {
@@ -48,7 +48,7 @@ public class EstabelecimentoResponseDTO {
         this.estado = estabelecimento.getEstado();
         this.qtdAvaliacoes = estabelecimento.getQtdAvaliacoes();
         this.notaGeral = estabelecimento.getNotaGeral();
-        this.favoritado = false;
+        this.isFavoritado = false;
     }
 }
 
