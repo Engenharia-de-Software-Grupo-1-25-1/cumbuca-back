@@ -88,7 +88,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioResponseDTO recuperar(Long id) {
-        verificaUsuarioLogado();
         final Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
         return new UsuarioResponseDTO(usuario);
@@ -96,7 +95,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioResponseDTO recuperar(String username) {
-        verificaUsuarioLogado();
         final Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
         return new UsuarioResponseDTO(usuario);
@@ -116,17 +114,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario getUsuarioLogado() {
-        verificaUsuarioLogado();
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final String login = authentication.getName();
         return usuarioRepository.findByUsernameOrEmail(login, login)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
-    }
-
-    public void verificaUsuarioLogado() {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            throw new UsernameNotFoundException("Usuário não autenticado.");
-        }
     }
 }

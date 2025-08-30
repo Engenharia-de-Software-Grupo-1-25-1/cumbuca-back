@@ -123,7 +123,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
     @Override
     public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros, String ordenador) {
-        usuarioService.verificaUsuarioLogado();
         final Example<AvaliacaoView> example = criarExemplo(filtros);
 
         final Sort sort = getSort(ordenador);

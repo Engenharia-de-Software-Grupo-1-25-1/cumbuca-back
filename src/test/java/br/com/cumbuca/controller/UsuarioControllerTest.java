@@ -18,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -68,12 +67,10 @@ public class UsuarioControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    private final ModelMapper modelMapper = new ModelMapper();
-
+    ModelMapper modelMapper = new ModelMapper();
     UsuarioRequestDTO usuarioRequestDTO;
     Usuario usuario;
-
-    private String token;
+    String token;
 
     @BeforeEach
     void setup() {
@@ -316,10 +313,90 @@ public class UsuarioControllerTest {
     }
 
     @Nested
-    class ListarUsuarioApiRest {
+    class CriacaosuarioInconsistente {
 
         @Test
-        void testListarUsuariosRetornaNoContent() throws Exception {
+        void testCriarUsuarioFotoNula() throws Exception {
+            final UsuarioRequestDTO dto = new UsuarioRequestDTO();
+            dto.setEmail("criarJunit@email.com");
+            dto.setSenha("123456");
+            dto.setNome("Criar JUnit");
+            dto.setUsername("criarJunit");
+            dto.setDtNascimento(LocalDate.of(2000, 1, 1));
+
+            final String responseJson = driver.perform(multipart(URI + "/criar")
+                            .param("email", dto.getEmail())
+                            .param("senha", dto.getSenha())
+                            .param("nome", dto.getNome())
+                            .param("username", dto.getUsername())
+                            .param("dtNascimento", dto.getDtNascimento().toString())
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .characterEncoding("UTF-8"))
+                    .andDo(print())
+                    .andExpect(status().isCreated())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString(StandardCharsets.UTF_8);
+
+            final UsuarioResponseDTO resultado = objectMapper.readValue(responseJson, UsuarioResponseDTO.class);
+
+            assertAll(
+                    () -> assertNotNull(resultado.getId()),
+                    () -> assertEquals(dto.getNome(), resultado.getNome()),
+                    () -> assertEquals(dto.getUsername(), resultado.getUsername()),
+                    () -> assertEquals(dto.getEmail(), resultado.getEmail()),
+                    () -> assertEquals(dto.getDtNascimento(), resultado.getDtNascimento())
+            );
+        }
+
+        @Test
+        void testCriarUsuarioFotoVazia() throws Exception {
+            final UsuarioRequestDTO dto = new UsuarioRequestDTO();
+            dto.setEmail("criarJunit@email.com");
+            dto.setSenha("123456");
+            dto.setNome("Criar JUnit");
+            dto.setUsername("criarJunit");
+            dto.setDtNascimento(LocalDate.of(2000, 1, 1));
+
+            final MockMultipartFile fotoVazia = new MockMultipartFile(
+                    "foto",
+                    "perfil.jpg",
+                    "image/jpeg",
+                    new byte[0] // foto vazia
+            );
+
+            final String responseJson = driver.perform(multipart(URI + "/criar")
+                            .file(fotoVazia)
+                            .param("email", dto.getEmail())
+                            .param("senha", dto.getSenha())
+                            .param("nome", dto.getNome())
+                            .param("username", dto.getUsername())
+                            .param("dtNascimento", dto.getDtNascimento().toString())
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .characterEncoding("UTF-8"))
+                    .andDo(print())
+                    .andExpect(status().isCreated())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString(StandardCharsets.UTF_8);
+
+            final UsuarioResponseDTO resultado = objectMapper.readValue(responseJson, UsuarioResponseDTO.class);
+
+            assertAll(
+                    () -> assertNotNull(resultado.getId()),
+                    () -> assertEquals(dto.getNome(), resultado.getNome()),
+                    () -> assertEquals(dto.getUsername(), resultado.getUsername()),
+                    () -> assertEquals(dto.getEmail(), resultado.getEmail()),
+                    () -> assertEquals(dto.getDtNascimento(), resultado.getDtNascimento())
+            );
+        }
+    }
+
+    @Nested
+    class ListagemUsuarioInconsistente {
+
+        @Test
+        void testListarUsuariosNomeInvalido() throws Exception {
             driver.perform(get(URI + "/listar")
                             .param("nome", "usuarioinexistente")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -327,13 +404,32 @@ public class UsuarioControllerTest {
                     .andDo(print())
                     .andExpect(status().isNoContent());
         }
+
+        @Test
+        void testListarUsuariosNomeVazio() throws Exception {
+            driver.perform(get(URI + "/listar")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("nome", "")
+                            .header("Authorization", "Bearer " + token))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        void testListarUsuariosNomeNulo() throws Exception {
+            driver.perform(get(URI + "/listar")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
     }
 
     @Nested
     class VerificarPermissaoUsuario {
 
         @Test
-        void testAtualizarUsuario() throws Exception {
+        void testUsuarioAutenticado() throws Exception {
             final String responseText = driver.perform(
                             multipart(URI + "/atualizar/" + usuario.getId())
                                     .param("email", usuarioRequestDTO.getEmail())
@@ -345,7 +441,7 @@ public class UsuarioControllerTest {
                                         request.setMethod("PUT");
                                         return request;
                                     })
-                                    .header("Authorization", "Bearer tokenAleatorio12345")
+                                    .header("Authorization", "Bearer tokenInvalido")
                                     .characterEncoding("UTF-8"))
                     .andDo(print())
                     .andExpect(status().isUnauthorized())
@@ -353,11 +449,63 @@ public class UsuarioControllerTest {
                     .getResponse()
                     .getContentAsString(StandardCharsets.UTF_8);
 
-            BadCredentialsException resultado = new BadCredentialsException(responseText);
-
-            System.out.println("resultado: " + resultado);
-            assertEquals("Erro ao gerar token JWT de acesso.", resultado.getMessage());
+            assertEquals("Token JWT inválido ou expirado.", responseText);
         }
+
+
+        @Test
+        void testAtualizarUsuarioSemPermissao() throws Exception {
+            final Usuario usuario1 = new Usuario();
+            usuario1.setEmail("atualizarJunit@email.com");
+            usuario1.setSenha("123456");
+            usuario1.setNome("Atualizar JUnit");
+            usuario1.setUsername("atualizarJunit");
+            usuario1.setDtNascimento(LocalDate.of(2000, 1, 1));
+            usuarioRepository.save(usuario1);
+
+            final String responseText = driver.perform(
+                            multipart(URI + "/atualizar/" + usuario1.getId())
+                                    .param("email", usuario1.getEmail())
+                                    .param("senha", usuario1.getSenha())
+                                    .param("nome", usuario1.getNome())
+                                    .param("username", usuario1.getUsername())
+                                    .param("dtNascimento", usuario1.getDtNascimento().toString())
+                                    .with(request -> {
+                                        request.setMethod("PUT");
+                                        return request;
+                                    })
+                                    .header("Authorization", "Bearer " + token)
+                                    .characterEncoding("UTF-8"))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString(StandardCharsets.UTF_8);
+
+            assertEquals("Usuário não tem permissão para realizar esta ação.", responseText);
+        }
+
+
+        @Test
+        void testRemoverUsuarioSemPermissao() throws Exception {
+            final Usuario usuario1 = new Usuario();
+            usuario1.setEmail("atualizarJunit@email.com");
+            usuario1.setSenha("123456");
+            usuario1.setNome("Atualizar JUnit");
+            usuario1.setUsername("atualizarJunit");
+            usuario1.setDtNascimento(LocalDate.of(2000, 1, 1));
+            usuarioRepository.save(usuario1);
+
+            String responseText = driver.perform(delete(URI + "/remover/" + usuario1.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+            assertEquals("Usuário não tem permissão para realizar esta ação.", responseText);
+        }
+
     }
 
 }
