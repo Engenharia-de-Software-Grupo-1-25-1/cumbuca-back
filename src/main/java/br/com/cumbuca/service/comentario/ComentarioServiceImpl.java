@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 @Service
 public class ComentarioServiceImpl implements ComentarioService {
 
-    private ComentarioRepository comentarioRepository;
-    private UsuarioService usuarioService;
-    private AvaliacaoRepository avaliacaoRepository;
-    private ModelMapper modelMapper;
+    private final ComentarioRepository comentarioRepository;
+    private final UsuarioService usuarioService;
+    private final AvaliacaoRepository avaliacaoRepository;
+    private final ModelMapper modelMapper;
 
     public ComentarioServiceImpl(ComentarioRepository comentarioRepository,  UsuarioService usuarioService, AvaliacaoRepository avaliacaoRepository, ModelMapper modelMapper) {
         this.comentarioRepository = comentarioRepository;
@@ -31,20 +31,18 @@ public class ComentarioServiceImpl implements ComentarioService {
     }
 
     @Override
-    public List<ComentarioResponseDTO> recuperar(Long idAvaliacao) {
-        final List<Comentario> comentarios = comentarioRepository.findByAvaliacaoId(idAvaliacao);
-
+    public List<ComentarioResponseDTO> recuperar(Long avaliacaoId) {
+        final List<Comentario> comentarios = comentarioRepository.findByAvaliacaoId(avaliacaoId);
         return comentarios.stream()
                 .map(ComentarioResponseDTO::new)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public ComentarioResponseDTO comentar(Long id, String texto) {
+    public ComentarioResponseDTO comentar(Long avaliacaoId, String texto) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
-        final Avaliacao avaliacao = avaliacaoRepository.findById(id)
+        final Avaliacao avaliacao = avaliacaoRepository.findById(avaliacaoId)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
-
         final Comentario comentario = new Comentario();
         comentario.setAvaliacao(avaliacao);
         comentario.setUsuario(usuario);

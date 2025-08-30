@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface ComentarioService {
 
-    List<ComentarioResponseDTO> recuperar(Long idAvaliacao);
+    List<ComentarioResponseDTO> recuperar(Long avaliacaoId);
 
-    ComentarioResponseDTO comentar(Long id, String texto);
+    ComentarioResponseDTO comentar(Long avaliacaoId, String texto);
 
     void remover(Long id);
 }

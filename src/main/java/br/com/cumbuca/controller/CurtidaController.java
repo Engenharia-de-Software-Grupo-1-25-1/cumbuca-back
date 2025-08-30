@@ -16,9 +16,9 @@ public class CurtidaController {
         this.curtidaService = curtidaService;
     }
 
-    @PostMapping("/avaliacao/curtir/{id}")
-    public ResponseEntity<CurtidaResponseDTO> curtir(@PathVariable Long id) {
-        final CurtidaResponseDTO curtida = curtidaService.curtir(id);
+    @PostMapping("/avaliacao/curtir/{avaliacaoId}")
+    public ResponseEntity<CurtidaResponseDTO> curtir(@PathVariable Long avaliacaoId) {
+        final CurtidaResponseDTO curtida = curtidaService.curtir(avaliacaoId);
         return ResponseEntity.ok(curtida);
     }
 }

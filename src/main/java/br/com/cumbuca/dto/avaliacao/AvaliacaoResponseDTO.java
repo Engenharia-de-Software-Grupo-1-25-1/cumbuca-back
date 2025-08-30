@@ -29,6 +29,7 @@ public class AvaliacaoResponseDTO {
     private LocalDate data;
     private List<String> fotos;
     private List<String> tags;
+    private boolean curtida;
     private Integer qtdCurtidas;
     private Integer qtdComentarios;
     private List<ComentarioResponseDTO> comentarios;
@@ -45,6 +46,7 @@ public class AvaliacaoResponseDTO {
         this.notaAtendimento = avaliacao.getNotaAtendimento();
         this.notaAmbiente = avaliacao.getNotaAmbiente();
         this.data = avaliacao.getData();
+        this.curtida = false;
         this.qtdCurtidas = 0;
         this.qtdComentarios = 0;
         this.comentarios = new ArrayList<>();
@@ -62,6 +64,7 @@ public class AvaliacaoResponseDTO {
         this.notaAtendimento = avaliacao.getNotaAtendimento();
         this.notaAmbiente = avaliacao.getNotaAmbiente();
         this.data = avaliacao.getData();
+        this.curtida = false;
         this.qtdCurtidas = avaliacao.getQtdCurtidas();
         this.qtdComentarios = avaliacao.getQtdComentarios();
         this.comentarios = new ArrayList<>();

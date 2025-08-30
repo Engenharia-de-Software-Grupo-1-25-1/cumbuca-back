@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 public class ComentarioResponseDTO {
     private Long id;
     private UsuarioResponseDTO usuario;
-    private Long idAvaliacao;
+    private Long avaliacaoId;
     private String comentario;
 
     public ComentarioResponseDTO(Comentario comentario) {
         this.id = comentario.getId();
         this.usuario = new UsuarioResponseDTO(comentario.getUsuario());
-        this.idAvaliacao = comentario.getAvaliacao().getId();
+        this.avaliacaoId = comentario.getAvaliacao().getId();
         this.comentario = comentario.getComentario();
     }
 }

@@ -21,10 +21,10 @@ public class ComentarioController {
     }
 
 
-    @PostMapping("avaliacao/comentar/{id}")
-    public ResponseEntity<ComentarioResponseDTO> comentar(@PathVariable Long id,
+    @PostMapping("avaliacao/comentar/{avaliacaoId}")
+    public ResponseEntity<ComentarioResponseDTO> comentar(@PathVariable Long avaliacaoId,
                                                           @Valid @RequestBody String texto) {
-        final ComentarioResponseDTO comentario = comentarioService.comentar(id, texto);
+        final ComentarioResponseDTO comentario = comentarioService.comentar(avaliacaoId, texto);
         return ResponseEntity.ok(comentario);
     }
 

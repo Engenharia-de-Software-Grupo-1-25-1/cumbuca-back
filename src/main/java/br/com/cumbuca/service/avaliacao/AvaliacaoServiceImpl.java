@@ -12,6 +12,7 @@ import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.AvaliacaoViewRepository;
 import br.com.cumbuca.service.comentario.ComentarioService;
+import br.com.cumbuca.service.curtida.CurtidaService;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import br.com.cumbuca.service.foto.FotoService;
 import br.com.cumbuca.service.tag.TagService;
@@ -36,10 +37,12 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     private final TagService tagService;
     private final FotoService fotoService;
     private final ComentarioService comentarioService;
+    private final CurtidaService curtidaService;
 
     public AvaliacaoServiceImpl(AvaliacaoRepository avaliacaoRepository, AvaliacaoViewRepository avaliacaoViewRepository,
                                 ModelMapper modelMapper, UsuarioService usuarioService, EstabelecimentoService estabelecimentoService,
-                                TagService tagService, FotoService fotoService, ComentarioService comentarioService) {
+                                TagService tagService, FotoService fotoService, ComentarioService comentarioService,
+                                CurtidaService curtidaService) {
         this.avaliacaoRepository = avaliacaoRepository;
         this.avaliacaoViewRepository = avaliacaoViewRepository;
         this.modelMapper = modelMapper;
@@ -48,6 +51,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         this.tagService = tagService;
         this.fotoService = fotoService;
         this.comentarioService = comentarioService;
+        this.curtidaService = curtidaService;
     }
 
     @Override
@@ -112,13 +116,14 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
     @Override
     public AvaliacaoResponseDTO recuperar(Long id) {
-        usuarioService.verificaUsuarioLogado();
+        final Usuario usuario = usuarioService.getUsuarioLogado();
         final AvaliacaoView avaliacao = avaliacaoViewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
         final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
         avaliacaoResponseDTO.setFotos(fotoService.recuperar(id));
         avaliacaoResponseDTO.setTags(tagService.recuperar(id));
         avaliacaoResponseDTO.setComentarios(comentarioService.recuperar(id));
+        avaliacaoResponseDTO.setCurtida(curtidaService.isAvaliacaoCurtida(usuario.getId(), avaliacao.getId()));
         return avaliacaoResponseDTO;
     }
 

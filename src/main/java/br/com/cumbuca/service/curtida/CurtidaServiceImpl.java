@@ -16,9 +16,9 @@ import java.util.NoSuchElementException;
 @Service
 public class CurtidaServiceImpl implements CurtidaService {
 
-    private UsuarioService usuarioService;
-    private CurtidaRepository curtidaRepository;
-    private AvaliacaoRepository avaliacaoRepository;
+    private final UsuarioService usuarioService;
+    private final CurtidaRepository curtidaRepository;
+    private final AvaliacaoRepository avaliacaoRepository;
     private final ModelMapper modelMapper;
 
     public CurtidaServiceImpl(CurtidaRepository curtidaRepository, UsuarioService usuarioService, AvaliacaoRepository avaliacaoRepository, ModelMapper modelMapper) {
@@ -29,9 +29,9 @@ public class CurtidaServiceImpl implements CurtidaService {
     }
 
     @Override
-    public CurtidaResponseDTO curtir(Long id) {
+    public CurtidaResponseDTO curtir(Long avaliacaoId) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
-        final Avaliacao avaliacao = avaliacaoRepository.findById(id)
+        final Avaliacao avaliacao = avaliacaoRepository.findById(avaliacaoId)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
 
         Curtida curtida = curtidaRepository.findByUsuarioIdAndAvaliacaoId(usuario.getId(), avaliacao.getId());
@@ -54,5 +54,10 @@ public class CurtidaServiceImpl implements CurtidaService {
         curtidaResponseDTO.setCurtido(true);
         curtidaRepository.save(curtida);
         return curtidaResponseDTO;
+    }
+
+    @Override
+    public boolean isAvaliacaoCurtida(Long usuarioId, Long avaliacaoId) {
+        return curtidaRepository.existsByUsuarioIdAndAvaliacaoId(usuarioId, avaliacaoId);
     }
 }
