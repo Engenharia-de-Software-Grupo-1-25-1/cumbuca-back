@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class EstabelecimentoServiceImpl implements EstabelecimentoService {
@@ -33,9 +34,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     private final UsuarioService usuarioService;
     private final ModelMapper modelMapper;
 
-    public EstabelecimentoServiceImpl(EstabelecimentoRepository estabelecimentoRepository, EstabelecimentoViewRepository estabelecimentoViewRepository,
-                                      AvaliacaoViewRepository avaliacaoViewRepository, FavoritoRespository favoritoRespository,
-                                      UsuarioService usuarioService, ModelMapper modelMapper) {
+    public EstabelecimentoServiceImpl(EstabelecimentoRepository estabelecimentoRepository, EstabelecimentoViewRepository estabelecimentoViewRepository, AvaliacaoViewRepository avaliacaoViewRepository, FavoritoRespository favoritoRespository, UsuarioService usuarioService, ModelMapper modelMapper) {
         this.estabelecimentoRepository = estabelecimentoRepository;
         this.estabelecimentoViewRepository = estabelecimentoViewRepository;
         this.avaliacaoViewRepository = avaliacaoViewRepository;
@@ -46,9 +45,9 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
     @Override
     public Estabelecimento buscarOuCriar(EstabelecimentoRequestDTO estabelecimentoRequestDTO) {
-        return estabelecimentoRepository.findById(estabelecimentoRequestDTO.getId())
+        return Optional.ofNullable(estabelecimentoRepository.findByNomeAndCategoria(estabelecimentoRequestDTO.getNome(), estabelecimentoRequestDTO.getCategoria()))
                 .orElseGet(() -> {
-                    final Estabelecimento novo = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
+                    Estabelecimento novo = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
                     return estabelecimentoRepository.save(novo);
                 });
     }
@@ -62,14 +61,21 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                 ? estabelecimentoViewRepository.findAll(example, Sort.by(Sort.Order.desc(ordenador)))
                 : estabelecimentoViewRepository.findAll(example);
 
-        return estabelecimentos.stream().map(estabelecimento -> {
-            final List<Avaliacao> avaliacoes = avaliacaoViewRepository.findByEstabelecimentoId(estabelecimento.getId());
-            final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
-            estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
-            estabelecimentoResponseDTO.setNotaGeral(estabelecimento.getNotaGeral());
-            estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
-            return estabelecimentoResponseDTO;
-        }).toList();
+        return estabelecimentos.stream()
+                .filter(estabelecimento ->
+                        filtros.getNotaGeral() == null || (estabelecimento.getNotaGeral() >= filtros.getNotaGeral()
+                                && estabelecimento.getNotaGeral() < filtros.getNotaGeral() + 1)
+                )
+                .map(estabelecimento -> {
+                    final List<Avaliacao> avaliacoes = avaliacaoViewRepository.findByEstabelecimentoId(estabelecimento.getId());
+                    final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
+                    estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
+                    estabelecimentoResponseDTO.setNotaGeral(estabelecimento.getNotaGeral());
+                    estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
+                    return estabelecimentoResponseDTO;
+                })
+                .toList();
+
     }
 
     private Example<EstabelecimentoView> criarExemplo(EstabelecimentoFiltroRequestDTO filtros) {
@@ -87,11 +93,8 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
             exemplo.setCidade(filtros.getLocal());
             exemplo.setEstado(filtros.getLocal());
         }
-        if (filtros.getFavoritado() != null) {
-            exemplo.setFavoritado(filtros.getFavoritado());
-        }
-        if (filtros.getNotaGeral() != null) {
-            exemplo.setNotaGeral(filtros.getNotaGeral());
+        if (filtros.isFavoritado()) {
+            exemplo.setFavoritado(true);
         }
 
         final ExampleMatcher matcher = ExampleMatcher.matching()
