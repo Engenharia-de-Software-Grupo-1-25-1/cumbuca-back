@@ -170,7 +170,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     private Example<AvaliacaoView> criarExemplo(AvaliacaoFiltroRequestDTO filtros) {
-        final AvaliacaoView exemplo = new AvaliacaoView();
+        final AvaliacaoView exemplo = modelMapper.map(filtros, AvaliacaoView.class);
 
         if (filtros.getUsuario() != null && !filtros.getUsuario().isBlank()) {
             final Usuario usuario = new Usuario();
@@ -181,9 +181,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             final Estabelecimento estabelecimento = new Estabelecimento();
             estabelecimento.setNome(filtros.getEstabelecimento());
             exemplo.setEstabelecimento(estabelecimento);
-        }
-        if (filtros.getItemConsumido() != null && !filtros.getItemConsumido().isBlank()) {
-            exemplo.setItemConsumido(filtros.getItemConsumido());
         }
 
         final ExampleMatcher matcher = ExampleMatcher.matching()
