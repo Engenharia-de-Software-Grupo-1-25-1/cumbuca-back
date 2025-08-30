@@ -2,7 +2,6 @@ package br.com.cumbuca.controller;
 
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
-import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -16,17 +15,20 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Transactional
 public class UsuarioControllerTest {
     final String URI = "/usuario";
 
@@ -36,19 +38,22 @@ public class UsuarioControllerTest {
     @Autowired
     UsuarioRepository usuarioRepository;
 
-    Usuario usuario;
+    @Autowired
+    ObjectMapper objectMapper;
+
     UsuarioRequestDTO usuarioRequestDTO;
-    ObjectMapper objectMapper = new ObjectMapper();
+    MockMultipartFile foto;
 
     @BeforeEach
     void setup() {
         usuarioRequestDTO = new UsuarioRequestDTO();
-        usuarioRequestDTO.setEmail("teste@email.com");
+        usuarioRequestDTO.setEmail("testejunit@email.com");
         usuarioRequestDTO.setSenha("123456");
-        usuarioRequestDTO.setNome("Usuário Teste");
-        usuarioRequestDTO.setUsername("teste");
+        usuarioRequestDTO.setNome("Teste JUnit");
+        usuarioRequestDTO.setUsername("testejunit");
         usuarioRequestDTO.setDtNascimento(LocalDate.of(2000, 1, 1));
-        MockMultipartFile foto = new MockMultipartFile(
+
+        foto = new MockMultipartFile(
                 "foto",
                 "perfil.jpg",
                 "image/jpeg",
@@ -66,14 +71,20 @@ public class UsuarioControllerTest {
 
         @Test
         void testCriarUsuario() throws Exception {
-            String responseJson = driver.perform(post(URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(usuarioRequestDTO)))
-                    .andExpect(status().isCreated())
+            String responseJson = driver.perform(multipart(URI + "/criar")
+                            .file(foto)
+                            .param("email", usuarioRequestDTO.getEmail())
+                            .param("senha", usuarioRequestDTO.getSenha())
+                            .param("nome", usuarioRequestDTO.getNome())
+                            .param("username", usuarioRequestDTO.getUsername())
+                            .param("dtNascimento", usuarioRequestDTO.getDtNascimento().toString())
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .characterEncoding("UTF-8"))
                     .andDo(print())
+                    .andExpect(status().isCreated())
                     .andReturn()
                     .getResponse()
-                    .getContentAsString();
+                    .getContentAsString(StandardCharsets.UTF_8);
 
             UsuarioResponseDTO resultado = objectMapper.readValue(responseJson, UsuarioResponseDTO.class);
 
@@ -86,5 +97,4 @@ public class UsuarioControllerTest {
             );
         }
     }
-
 }
