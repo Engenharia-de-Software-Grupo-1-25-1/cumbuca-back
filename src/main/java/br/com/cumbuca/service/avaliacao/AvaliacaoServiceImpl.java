@@ -137,12 +137,24 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         }
 
         return avaliacoes.stream()
-                .filter(av -> filtrarPorPreco(filtros.getPrecoMinimo(), filtros.getPrecoMaximo(), av.getPreco()))
-                .filter(av -> filtrarPorTags(filtros.getTags(), av.getId()))
-                .map(av -> {
-                    final AvaliacaoResponseDTO dto = new AvaliacaoResponseDTO(av);
-                    dto.setFotos(fotoService.recuperar(av.getId()));
-                    dto.setTags(tagService.recuperar(av.getId()));
+                .filter(avaliacao -> filtrarPorPreco(filtros.getPrecoMinimo(), filtros.getPrecoMaximo(), avaliacao.getPreco()))
+                .filter(avaliacao -> filtrarPorTags(filtros.getTags(), avaliacao.getId()))
+                .filter(estabelecimento ->
+                        filtros.getNotaGeral() == null || (estabelecimento.getNotaGeral() >= filtros.getNotaGeral()
+                                && estabelecimento.getNotaGeral() < filtros.getNotaGeral() + 1))
+                .filter(estabelecimento ->
+                        filtros.getNotaComida() == null || (estabelecimento.getNotaComida() >= filtros.getNotaComida()
+                                && estabelecimento.getNotaComida() < filtros.getNotaComida() + 1))
+                .filter(estabelecimento ->
+                        filtros.getNotaAmbiente() == null || (estabelecimento.getNotaAmbiente() >= filtros.getNotaAmbiente()
+                                && estabelecimento.getNotaAmbiente() < filtros.getNotaAmbiente() + 1))
+                .filter(estabelecimento ->
+                        filtros.getNotaAtendimento() == null || (estabelecimento.getNotaAtendimento() >= filtros.getNotaAtendimento()
+                                && estabelecimento.getNotaAtendimento() < filtros.getNotaAtendimento() + 1))
+                .map(avaliacao -> {
+                    final AvaliacaoResponseDTO dto = new AvaliacaoResponseDTO(avaliacao);
+                    dto.setFotos(fotoService.recuperar(avaliacao.getId()));
+                    dto.setTags(tagService.recuperar(avaliacao.getId()));
                     return dto;
                 })
                 .toList();
@@ -167,28 +179,13 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             usuario.setNome(filtros.getUsuario());
             exemplo.setUsuario(usuario);
         }
-
         if (filtros.getEstabelecimento() != null && !filtros.getEstabelecimento().isBlank()) {
             final Estabelecimento estabelecimento = new Estabelecimento();
             estabelecimento.setNome(filtros.getEstabelecimento());
             exemplo.setEstabelecimento(estabelecimento);
         }
-
         if (filtros.getItemConsumido() != null && !filtros.getItemConsumido().isBlank()) {
             exemplo.setItemConsumido(filtros.getItemConsumido());
-        }
-
-        if (filtros.getNotaGeral() != null) {
-            exemplo.setNotaGeral(filtros.getNotaGeral());
-        }
-        if (filtros.getNotaComida() != null) {
-            exemplo.setNotaComida(filtros.getNotaComida());
-        }
-        if (filtros.getNotaAmbiente() != null) {
-            exemplo.setNotaAmbiente(filtros.getNotaAmbiente());
-        }
-        if (filtros.getNotaAtendimento() != null) {
-            exemplo.setNotaAtendimento(filtros.getNotaAtendimento());
         }
 
         final ExampleMatcher matcher = ExampleMatcher.matching()

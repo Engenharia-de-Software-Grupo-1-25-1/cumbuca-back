@@ -47,8 +47,8 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     public Estabelecimento buscarOuCriar(EstabelecimentoRequestDTO estabelecimentoRequestDTO) {
         return Optional.ofNullable(estabelecimentoRepository.findByNomeAndCategoria(estabelecimentoRequestDTO.getNome(), estabelecimentoRequestDTO.getCategoria()))
                 .orElseGet(() -> {
-                    Estabelecimento novo = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
-                    return estabelecimentoRepository.save(novo);
+                    final Estabelecimento estabelecimento = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
+                    return estabelecimentoRepository.save(estabelecimento);
                 });
     }
 
@@ -64,8 +64,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         return estabelecimentos.stream()
                 .filter(estabelecimento ->
                         filtros.getNotaGeral() == null || (estabelecimento.getNotaGeral() >= filtros.getNotaGeral()
-                                && estabelecimento.getNotaGeral() < filtros.getNotaGeral() + 1)
-                )
+                                && estabelecimento.getNotaGeral() < filtros.getNotaGeral() + 1))
                 .map(estabelecimento -> {
                     final List<Avaliacao> avaliacoes = avaliacaoViewRepository.findByEstabelecimentoId(estabelecimento.getId());
                     final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
