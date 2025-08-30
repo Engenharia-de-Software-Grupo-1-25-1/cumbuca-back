@@ -8,11 +8,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
@@ -21,27 +24,34 @@ public class FiltroTokenAcesso extends OncePerRequestFilter {
 
     private final TokenService tokenService;
     private final UsuarioRepository usuarioRepository;
+    private final HandlerExceptionResolver resolver;
 
-    public FiltroTokenAcesso(TokenService tokenService, UsuarioRepository usuarioRepository) {
+    public FiltroTokenAcesso(TokenService tokenService, UsuarioRepository usuarioRepository,  @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
         this.tokenService = tokenService;
         this.usuarioRepository = usuarioRepository;
+        this.resolver = resolver;
     }
 
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request,
                                     @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
-        final String token = getToken(request);
+        try {
+            final String token = getToken(request);
 
-        if (token != null) {
-            final Long id = tokenService.verificarToken(token);
-            final Usuario usuario = usuarioRepository.findById(id).orElseThrow();
+            if (token != null) {
+                final Long id = tokenService.verificarToken(token);
+                final Usuario usuario = usuarioRepository.findById(id).orElseThrow();
 
-            final Authentication authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                final Authentication authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
+            filterChain.doFilter(request, response);
+
+        } catch (RuntimeException e) {
+            resolver.resolveException(request, response, null, new BadCredentialsException(e.getMessage(), e));
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private String getToken(HttpServletRequest request) {
