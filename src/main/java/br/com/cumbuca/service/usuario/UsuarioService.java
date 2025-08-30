@@ -5,6 +5,8 @@ import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.model.Usuario;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import java.util.List;
+
 public interface UsuarioService extends UserDetailsService {
 
     UsuarioResponseDTO criar(UsuarioRequestDTO usuarioRequestDTO);
@@ -16,6 +18,8 @@ public interface UsuarioService extends UserDetailsService {
     UsuarioResponseDTO recuperar(Long id);
 
     UsuarioResponseDTO recuperar(String username);
+
+    List<UsuarioResponseDTO> listar(String nome);
 
     Usuario getUsuarioLogado();
 
