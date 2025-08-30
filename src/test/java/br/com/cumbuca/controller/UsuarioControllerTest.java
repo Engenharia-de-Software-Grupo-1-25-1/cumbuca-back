@@ -258,12 +258,51 @@ public class UsuarioControllerTest {
                     .getContentAsString(StandardCharsets.UTF_8);
 
 
-            final List<UsuarioResponseDTO> resultado = objectMapper.readValue(responseJson, new TypeReference<List<UsuarioResponseDTO>>() {
+            final List<UsuarioResponseDTO> resultado = objectMapper.readValue(responseJson, new TypeReference<>() {
             });
 
             assertAll(
                     () -> assertTrue(resultado.stream().anyMatch(u -> u.getEmail().equals(usuario1.getEmail()))),
                     () -> assertTrue(resultado.stream().anyMatch(u -> u.getEmail().equals(usuario2.getEmail())))
+            );
+        }
+
+        @Test
+        void testListarUsuariosPorNome() throws Exception {
+            Usuario usuario1 = new Usuario();
+            usuario1.setEmail("listarjunit1@email.com");
+            usuario1.setSenha(passwordEncoder.encode("123456"));
+            usuario1.setNome("Listar JUnit 1");
+            usuario1.setUsername("listarjunit1");
+            usuario1.setDtNascimento(LocalDate.of(2000, 1, 1));
+
+            Usuario usuario2 = new Usuario();
+            usuario2.setEmail("listarjunit2@email.com");
+            usuario2.setSenha(passwordEncoder.encode("123456"));
+            usuario2.setNome("Listar JUnit 2");
+            usuario2.setUsername("listarjunit2");
+            usuario2.setDtNascimento(LocalDate.of(2000, 1, 1));
+
+            usuarioRepository.saveAll(Arrays.asList(usuario1, usuario2));
+
+            String responseJson = driver.perform(get(URI + "/listar")
+                            .param("nome", "listarjunit")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString(StandardCharsets.UTF_8);
+
+
+            final List<UsuarioResponseDTO> resultado = objectMapper.readValue(responseJson, new TypeReference<>() {
+            });
+
+            assertAll(
+                    () -> assertTrue(resultado.stream().anyMatch(u -> u.getEmail().equals(usuario1.getEmail()))),
+                    () -> assertTrue(resultado.stream().anyMatch(u -> u.getEmail().equals(usuario2.getEmail()))),
+                    () -> assertEquals(2, resultado.size())
             );
         }
 
