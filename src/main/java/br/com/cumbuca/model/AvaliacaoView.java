@@ -58,7 +58,7 @@ public class AvaliacaoView {
     private Integer notaAmbiente;
 
     @Column(name = "DATA")
-    private LocalDate data =  LocalDate.now();
+    private LocalDate data;
 
     @Column(name = "CURTIDAS")
     private Integer qtdCurtidas;

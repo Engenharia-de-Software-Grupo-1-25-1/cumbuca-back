@@ -140,18 +140,18 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         return avaliacoes.stream()
                 .filter(avaliacao -> filtrarPorPreco(filtros.getPrecoMinimo(), filtros.getPrecoMaximo(), avaliacao.getPreco()))
                 .filter(avaliacao -> filtrarPorTags(filtros.getTags(), avaliacao.getId()))
-                .filter(estabelecimento ->
-                        filtros.getNotaGeral() == null || (estabelecimento.getNotaGeral() >= filtros.getNotaGeral()
-                                && estabelecimento.getNotaGeral() < filtros.getNotaGeral() + 1))
-                .filter(estabelecimento ->
-                        filtros.getNotaComida() == null || (estabelecimento.getNotaComida() >= filtros.getNotaComida()
-                                && estabelecimento.getNotaComida() < filtros.getNotaComida() + 1))
-                .filter(estabelecimento ->
-                        filtros.getNotaAmbiente() == null || (estabelecimento.getNotaAmbiente() >= filtros.getNotaAmbiente()
-                                && estabelecimento.getNotaAmbiente() < filtros.getNotaAmbiente() + 1))
-                .filter(estabelecimento ->
-                        filtros.getNotaAtendimento() == null || (estabelecimento.getNotaAtendimento() >= filtros.getNotaAtendimento()
-                                && estabelecimento.getNotaAtendimento() < filtros.getNotaAtendimento() + 1))
+                .filter(avaliacao ->
+                        filtros.getNotaGeral() == null || (avaliacao.getNotaGeral() >= filtros.getNotaGeral()
+                                && avaliacao.getNotaGeral() < filtros.getNotaGeral() + 1))
+                .filter(avaliacao ->
+                        filtros.getNotaComida() == null || (avaliacao.getNotaComida() >= filtros.getNotaComida()
+                                && avaliacao.getNotaComida() < filtros.getNotaComida() + 1))
+                .filter(avaliacao ->
+                        filtros.getNotaAmbiente() == null || (avaliacao.getNotaAmbiente() >= filtros.getNotaAmbiente()
+                                && avaliacao.getNotaAmbiente() < filtros.getNotaAmbiente() + 1))
+                .filter(avaliacao ->
+                        filtros.getNotaAtendimento() == null || (avaliacao.getNotaAtendimento() >= filtros.getNotaAtendimento()
+                                && avaliacao.getNotaAtendimento() < filtros.getNotaAtendimento() + 1))
                 .map(avaliacao -> {
                     final AvaliacaoResponseDTO dto = new AvaliacaoResponseDTO(avaliacao);
                     dto.setFotos(fotoService.recuperar(avaliacao.getId()));
@@ -195,26 +195,22 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         return Example.of(exemplo, matcher);
     }
 
-    private boolean filtrarPorPreco(BigDecimal inicio, BigDecimal fim, BigDecimal preco) {
-        if (inicio == null && fim == null) {
+    private boolean filtrarPorPreco(BigDecimal minimo, BigDecimal maximo, BigDecimal preco) {
+        if (minimo == null && maximo == null) {
             return true;
         }
-
-        final boolean inicioValido = inicio == null || preco.compareTo(inicio) >= 0;
-        final boolean fimValido = fim == null || preco.compareTo(fim) <= 0;
-
-        return inicioValido && fimValido;
+        final boolean minimoValido = minimo == null || preco.compareTo(minimo) >= 0;
+        final boolean maximoValido = maximo == null || preco.compareTo(maximo) <= 0;
+        return minimoValido && maximoValido;
     }
 
-    private boolean filtrarPorTags(List<String> tagsFiltro, Long avaliacaoId) {
-        if (tagsFiltro == null || tagsFiltro.isEmpty()) {
+    private boolean filtrarPorTags(List<String> tags, Long avaliacaoId) {
+        if (tags == null || tags.isEmpty()) {
             return true;
         }
-
         final List<String> tagsAvaliacao = tagService.recuperar(avaliacaoId);
-
         return tagsAvaliacao.stream()
-                .anyMatch(tagAvaliacao -> tagsFiltro.stream()
+                .anyMatch(tagAvaliacao -> tags.stream()
                         .anyMatch(tagFiltro -> tagFiltro.equalsIgnoreCase(tagAvaliacao)));
     }
 }
