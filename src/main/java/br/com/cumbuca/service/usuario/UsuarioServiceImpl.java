@@ -103,6 +103,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public List<UsuarioResponseDTO> listar(String nome) {
+        if (nome == null || nome.isBlank()) {
+            return usuarioRepository.findAll().stream()
+                    .map(UsuarioResponseDTO::new)
+                    .toList();
+        }
+        return usuarioRepository.findByNomeContainingIgnoreCaseOrUsernameContainingIgnoreCase(nome, nome).stream()
+                .map(UsuarioResponseDTO::new)
+                .toList();
+    }
+
+    @Override
     public Usuario getUsuarioLogado() {
         verificaUsuarioLogado();
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -117,18 +129,4 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new UsernameNotFoundException("Usuário não autenticado");
         }
     }
-
-    @Override
-    public List<UsuarioResponseDTO> pesquisar(String termo) {
-        if (termo == null || termo.isBlank()) {
-            return usuarioRepository.findAll().stream()
-                    .map(UsuarioResponseDTO::new)
-                    .toList();
-        }
-
-        return usuarioRepository.findByNomeContainingIgnoreCaseOrUsernameContainingIgnoreCase(termo, termo).stream()
-                .map(UsuarioResponseDTO::new)
-                .toList();
-    }
-
 }

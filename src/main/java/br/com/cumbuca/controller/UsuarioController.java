@@ -64,10 +64,9 @@ public class UsuarioController {
         }
     }
 
-    @GetMapping("/pesquisar")
-    public ResponseEntity<List<UsuarioResponseDTO>> pesquisar(@RequestParam String nome) {
-        final List<UsuarioResponseDTO> usuarios = usuarioService.pesquisar(nome);
-
+    @GetMapping("/listar")
+    public ResponseEntity<List<UsuarioResponseDTO>> listar(@RequestParam String nome) {
+        final List<UsuarioResponseDTO> usuarios = usuarioService.listar(nome);
         if (usuarios.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

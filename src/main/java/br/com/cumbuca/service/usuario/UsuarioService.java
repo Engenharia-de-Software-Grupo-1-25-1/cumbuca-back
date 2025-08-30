@@ -19,9 +19,9 @@ public interface UsuarioService extends UserDetailsService {
 
     UsuarioResponseDTO recuperar(String username);
 
+    List<UsuarioResponseDTO> listar(String nome);
+
     Usuario getUsuarioLogado();
 
     void verificaUsuarioLogado();
-
-    List<UsuarioResponseDTO> pesquisar(String nome);
 }
