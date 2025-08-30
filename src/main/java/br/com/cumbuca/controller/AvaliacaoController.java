@@ -67,8 +67,8 @@ public class AvaliacaoController {
             @RequestParam(required = false) Long idUsuario,
             @RequestParam(required = false) Long idEstabelecimento,
             @ModelAttribute AvaliacaoFiltroRequestDTO filtros,
-            @RequestParam(required = false) String ordenacao) {
-        final List<AvaliacaoResponseDTO> avaliacoes = avaliacaoService.listar(idUsuario, idEstabelecimento, filtros, ordenacao);
+            @RequestParam(required = false) String ordenador) {
+        final List<AvaliacaoResponseDTO> avaliacoes = avaliacaoService.listar(idUsuario, idEstabelecimento, filtros, ordenador);
         return ResponseEntity.ok(avaliacoes);
     }
 }

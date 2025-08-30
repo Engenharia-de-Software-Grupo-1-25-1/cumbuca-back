@@ -9,14 +9,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.validation.constraints.DecimalMin;
-import lombok.Getter;
+import lombok.Data;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Subselect;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Getter
+@Data
 @Entity
 @Immutable
 @Subselect("SELECT * FROM V_AVALIACAO")

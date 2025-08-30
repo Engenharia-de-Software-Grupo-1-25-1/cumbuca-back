@@ -17,10 +17,12 @@ import br.com.cumbuca.service.foto.FotoService;
 import br.com.cumbuca.service.tag.TagService;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -120,9 +122,13 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros, String ordenacao) {
+    public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros, String ordenador) {
         usuarioService.verificaUsuarioLogado();
-        List<AvaliacaoView> avaliacoes = avaliacaoViewRepository.findAllByOrderByDataDesc();
+        final Example<AvaliacaoView> example = criarExemplo(filtros);
+
+        final Sort sort = getSort(ordenador);
+        List<AvaliacaoView> avaliacoes = avaliacaoViewRepository.findAll(example, sort);
+
         if (idUsuario != null) {
             avaliacoes = avaliacaoViewRepository.findByUsuarioIdOrderByDataDesc(idUsuario);
         }
@@ -130,54 +136,66 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             avaliacoes = avaliacaoViewRepository.findByEstabelecimentoIdOrderByDataDesc(idEstabelecimento);
         }
 
-        avaliacoes = avaliacoes.stream()
-                .filter(avaliacao -> filtrarPorTexto(filtros.getUsuario(), avaliacao.getUsuario().getNome()))
-                .filter(avaliacao -> filtrarPorTexto(filtros.getEstabelecimento(), avaliacao.getEstabelecimento().getNome()))
-                .filter(avaliacao -> filtrarPorTexto(filtros.getItemConsumido(), avaliacao.getItemConsumido()))
-                .filter(avaliacao -> filtrarPorTags(filtros.getTags(), avaliacao.getId()))
-                .filter(avaliacao -> filtrarPorPreco(filtros.getPrecoInicio(), filtros.getPrecoFim(), avaliacao.getPreco()))
-                .filter(avaliacao -> filtrarPorNota(filtros.getNotaGeral(), avaliacao.getNotaGeral()))
-                .filter(avaliacao -> filtrarPorNota(filtros.getNotaComida(), avaliacao.getNotaComida()))
-                .filter(avaliacao -> filtrarPorNota(filtros.getNotaAmbiente(), avaliacao.getNotaAmbiente()))
-                .filter(avaliacao -> filtrarPorNota(filtros.getNotaAtendimento(), avaliacao.getNotaAtendimento()))
-                .toList();
-
-        if (ordenacao != null && !ordenacao.isBlank()) {
-            avaliacoes = criteriosOrdenacao(avaliacoes, ordenacao);
-        }
-
         return avaliacoes.stream()
-                .map(avaliacao -> {
-                    final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
-                    avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacao.getId()));
-                    avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacao.getId()));
-                    return avaliacaoResponseDTO;
+                .filter(av -> filtrarPorPreco(filtros.getPrecoMinimo(), filtros.getPrecoMaximo(), av.getPreco()))
+                .filter(av -> filtrarPorTags(filtros.getTags(), av.getId()))
+                .map(av -> {
+                    final AvaliacaoResponseDTO dto = new AvaliacaoResponseDTO(av);
+                    dto.setFotos(fotoService.recuperar(av.getId()));
+                    dto.setTags(tagService.recuperar(av.getId()));
+                    return dto;
                 })
                 .toList();
     }
 
-    private List<AvaliacaoView> criteriosOrdenacao(List<AvaliacaoView> avaliacoes, String ordenacao) {
-        if ("popularidade".equalsIgnoreCase(ordenacao)) {
-            return avaliacoes.stream()
-                    .sorted(Comparator.comparingInt((AvaliacaoView av) ->
-                            (av.getQtdCurtidas() == null ? 0 : av.getQtdCurtidas()) +
-                                    (av.getQtdComentarios() == null ? 0 : av.getQtdComentarios())
-                    ).reversed())
-                    .toList();
-        } else if ("notageral".equalsIgnoreCase(ordenacao)) {
-            return avaliacoes.stream()
-                    .sorted(Comparator.comparing(AvaliacaoView::getNotaGeral).reversed())
-                    .toList();
-        } else {
-            return avaliacoes.stream()
-                    .sorted(Comparator.comparing(AvaliacaoView::getData).reversed())
-                    .toList();
+    private Sort getSort(String ordenador) {
+        if (ordenador == null || ordenador.isBlank()) {
+            return Sort.by(Sort.Order.desc("data"));
         }
+        return switch (ordenador.toLowerCase()) {
+            case "popularidade" -> Sort.by(Sort.Order.desc("qtdCurtidas"));
+            case "nota" -> Sort.by(Sort.Order.desc("notaGeral"));
+            default -> Sort.by(Sort.Order.desc("data"));
+        };
     }
 
-    private boolean filtrarPorTexto(String filtro, String valor) {
-        return filtro == null || filtro.isBlank() ||
-                (valor != null && valor.toLowerCase().contains(filtro.toLowerCase()));
+    private Example<AvaliacaoView> criarExemplo(AvaliacaoFiltroRequestDTO filtros) {
+        final AvaliacaoView exemplo = new AvaliacaoView();
+
+        if (filtros.getUsuario() != null && !filtros.getUsuario().isBlank()) {
+            final Usuario usuario = new Usuario();
+            usuario.setNome(filtros.getUsuario());
+            exemplo.setUsuario(usuario);
+        }
+
+        if (filtros.getEstabelecimento() != null && !filtros.getEstabelecimento().isBlank()) {
+            final Estabelecimento estabelecimento = new Estabelecimento();
+            estabelecimento.setNome(filtros.getEstabelecimento());
+            exemplo.setEstabelecimento(estabelecimento);
+        }
+
+        if (filtros.getItemConsumido() != null && !filtros.getItemConsumido().isBlank()) {
+            exemplo.setItemConsumido(filtros.getItemConsumido());
+        }
+
+        if (filtros.getNotaGeral() != null) {
+            exemplo.setNotaGeral(filtros.getNotaGeral());
+        }
+        if (filtros.getNotaComida() != null) {
+            exemplo.setNotaComida(filtros.getNotaComida());
+        }
+        if (filtros.getNotaAmbiente() != null) {
+            exemplo.setNotaAmbiente(filtros.getNotaAmbiente());
+        }
+        if (filtros.getNotaAtendimento() != null) {
+            exemplo.setNotaAtendimento(filtros.getNotaAtendimento());
+        }
+
+        final ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+
+        return Example.of(exemplo, matcher);
     }
 
     private boolean filtrarPorPreco(BigDecimal inicio, BigDecimal fim, BigDecimal preco) {
@@ -189,10 +207,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         final boolean fimValido = fim == null || preco.compareTo(fim) <= 0;
 
         return inicioValido && fimValido;
-    }
-
-    private boolean filtrarPorNota(Integer notaFiltro, Integer nota) {
-        return notaFiltro == null || nota.equals(notaFiltro);
     }
 
     private boolean filtrarPorTags(List<String> tagsFiltro, Long avaliacaoId) {
