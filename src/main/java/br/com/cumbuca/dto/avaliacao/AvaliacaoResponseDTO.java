@@ -29,7 +29,7 @@ public class AvaliacaoResponseDTO {
     private LocalDate data;
     private List<String> fotos;
     private List<String> tags;
-    private boolean isCurtida;
+    private Boolean isCurtida;
     private Integer qtdCurtidas;
     private Integer qtdComentarios;
     private List<ComentarioResponseDTO> comentarios;

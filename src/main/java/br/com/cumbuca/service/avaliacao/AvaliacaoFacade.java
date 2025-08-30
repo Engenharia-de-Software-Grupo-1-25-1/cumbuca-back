@@ -25,7 +25,7 @@ public class AvaliacaoFacade {
         avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacaoId));
         avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacaoId));
         avaliacaoResponseDTO.setComentarios(comentarioService.recuperar(avaliacaoId));
-        avaliacaoResponseDTO.setCurtida(curtidaService.isAvaliacaoCurtida(usuarioId, avaliacaoId));
+        avaliacaoResponseDTO.setIsCurtida(curtidaService.isAvaliacaoCurtida(usuarioId, avaliacaoId));
     }
 
     public void montarDTO(AvaliacaoResponseDTO avaliacaoResponseDTO, Long avaliacaoId) {

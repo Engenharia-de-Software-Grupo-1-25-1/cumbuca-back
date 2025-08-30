@@ -13,7 +13,7 @@ public class CurtidaResponseDTO {
     private Long id;
     private UsuarioResponseDTO usuario;
     private AvaliacaoResponseDTO avaliacao;
-    private boolean curtido;
+    private Boolean isCurtida;
 
     public CurtidaResponseDTO(Curtida curtida) {
         this.id = curtida.getId();
