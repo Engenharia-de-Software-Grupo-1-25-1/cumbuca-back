@@ -126,7 +126,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public void verificaUsuarioLogado() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            throw new UsernameNotFoundException("Usuário não autenticado");
+            throw new UsernameNotFoundException("Usuário não autenticado.");
         }
     }
 }

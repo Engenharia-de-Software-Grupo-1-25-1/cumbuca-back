@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -103,10 +104,10 @@ public class UsuarioControllerTest {
         @Test
         void testCriarUsuario() throws Exception {
             final UsuarioRequestDTO dto = new UsuarioRequestDTO();
-            dto.setEmail("criarjunit@email.com");
+            dto.setEmail("criarJunit@email.com");
             dto.setSenha("123456");
             dto.setNome("Criar JUnit");
-            dto.setUsername("criarjunit");
+            dto.setUsername("criarJunit");
             dto.setDtNascimento(LocalDate.of(2000, 1, 1));
             final MockMultipartFile foto = new MockMultipartFile(
                     "foto",
@@ -144,10 +145,10 @@ public class UsuarioControllerTest {
         @Test
         void testAtualizarUsuario() throws Exception {
             final UsuarioRequestDTO dto = new UsuarioRequestDTO();
-            dto.setEmail("atualizarjunit@email.com");
+            dto.setEmail("atualizarJunit@email.com");
             dto.setSenha("123456");
             dto.setNome("Atualizar JUnit");
-            dto.setUsername("atualizarjunit");
+            dto.setUsername("atualizarJunit");
             dto.setDtNascimento(LocalDate.of(2000, 1, 1));
 
             final String responseJson = driver.perform(
@@ -239,17 +240,17 @@ public class UsuarioControllerTest {
         @Test
         void testListarUsuarios() throws Exception {
             final Usuario usuario1 = new Usuario();
-            usuario1.setEmail("listarjunit1@email.com");
+            usuario1.setEmail("listarJunit1@email.com");
             usuario1.setSenha(passwordEncoder.encode("123456"));
             usuario1.setNome("Listar JUnit 1");
-            usuario1.setUsername("listarjunit1");
+            usuario1.setUsername("listarJunit1");
             usuario1.setDtNascimento(LocalDate.of(2000, 1, 1));
 
             final Usuario usuario2 = new Usuario();
-            usuario2.setEmail("listarjunit2@email.com");
+            usuario2.setEmail("listarJunit2@email.com");
             usuario2.setSenha(passwordEncoder.encode("123456"));
             usuario2.setNome("Listar JUnit 2");
-            usuario2.setUsername("listarjunit2");
+            usuario2.setUsername("listarJunit2");
             usuario2.setDtNascimento(LocalDate.of(2000, 1, 1));
 
             usuarioRepository.saveAll(Arrays.asList(usuario1, usuario2));
@@ -277,23 +278,23 @@ public class UsuarioControllerTest {
         @Test
         void testListarUsuariosPorNome() throws Exception {
             final Usuario usuario1 = new Usuario();
-            usuario1.setEmail("listarjunit1@email.com");
+            usuario1.setEmail("listarJunit1@email.com");
             usuario1.setSenha(passwordEncoder.encode("123456"));
             usuario1.setNome("Listar JUnit 1");
-            usuario1.setUsername("listarjunit1");
+            usuario1.setUsername("listarJunit1");
             usuario1.setDtNascimento(LocalDate.of(2000, 1, 1));
 
             final Usuario usuario2 = new Usuario();
-            usuario2.setEmail("listarjunit2@email.com");
+            usuario2.setEmail("listarJunit2@email.com");
             usuario2.setSenha(passwordEncoder.encode("123456"));
             usuario2.setNome("Listar JUnit 2");
-            usuario2.setUsername("listarjunit2");
+            usuario2.setUsername("listarJunit2");
             usuario2.setDtNascimento(LocalDate.of(2000, 1, 1));
 
             usuarioRepository.saveAll(Arrays.asList(usuario1, usuario2));
 
             final String responseJson = driver.perform(get(URI + "/listar")
-                            .param("nome", "listarjunit")
+                            .param("nome", "listarJunit")
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token))
                     .andDo(print())
@@ -312,7 +313,51 @@ public class UsuarioControllerTest {
                     () -> assertEquals(2, resultado.size())
             );
         }
-
-
     }
+
+    @Nested
+    class ListarUsuarioApiRest {
+
+        @Test
+        void testListarUsuariosRetornaNoContent() throws Exception {
+            driver.perform(get(URI + "/listar")
+                            .param("nome", "usuarioinexistente")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
+                    .andDo(print())
+                    .andExpect(status().isNoContent());
+        }
+    }
+
+    @Nested
+    class VerificarPermissaoUsuario {
+
+        @Test
+        void testAtualizarUsuario() throws Exception {
+            final String responseText = driver.perform(
+                            multipart(URI + "/atualizar/" + usuario.getId())
+                                    .param("email", usuarioRequestDTO.getEmail())
+                                    .param("senha", usuarioRequestDTO.getSenha())
+                                    .param("nome", usuarioRequestDTO.getNome())
+                                    .param("username", usuarioRequestDTO.getUsername())
+                                    .param("dtNascimento", usuarioRequestDTO.getDtNascimento().toString())
+                                    .with(request -> {
+                                        request.setMethod("PUT");
+                                        return request;
+                                    })
+                                    .header("Authorization", "Bearer tokenAleatorio12345")
+                                    .characterEncoding("UTF-8"))
+                    .andDo(print())
+                    .andExpect(status().isUnauthorized())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString(StandardCharsets.UTF_8);
+
+            BadCredentialsException resultado = new BadCredentialsException(responseText);
+
+            System.out.println("resultado: " + resultado);
+            assertEquals("Erro ao gerar token JWT de acesso.", resultado.getMessage());
+        }
+    }
+
 }
