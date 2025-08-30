@@ -5,13 +5,14 @@ import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.model.Usuario;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface UsuarioService extends UserDetailsService {
 
-    UsuarioResponseDTO criar(UsuarioRequestDTO usuarioRequestDTO);
+    UsuarioResponseDTO criar(UsuarioRequestDTO usuarioRequestDTO) throws IOException;
 
-    UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO);
+    UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO) throws IOException;
 
     void remover(Long id);
 

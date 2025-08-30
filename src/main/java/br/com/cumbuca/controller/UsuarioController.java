@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class UsuarioController {
 
     @PostMapping("/criar")
     public ResponseEntity<UsuarioResponseDTO> criar(@ModelAttribute @Valid UsuarioRequestDTO usuarioRequestDTO,
-                                                    UriComponentsBuilder uriBuilder) {
+                                                    UriComponentsBuilder uriBuilder) throws IOException {
         final UsuarioResponseDTO usuario = usuarioService.criar(usuarioRequestDTO);
         final URI uri = uriBuilder
                 .path("/usuario/{username}")
@@ -43,7 +44,7 @@ public class UsuarioController {
 
     @PutMapping("/atualizar/{id}")
     public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Long id,
-                                                        @ModelAttribute @Valid UsuarioRequestDTO usuarioRequestDTO) {
+                                                        @ModelAttribute @Valid UsuarioRequestDTO usuarioRequestDTO) throws IOException {
         final UsuarioResponseDTO usuario = usuarioService.atualizar(id, usuarioRequestDTO);
         return ResponseEntity.ok(usuario);
     }
