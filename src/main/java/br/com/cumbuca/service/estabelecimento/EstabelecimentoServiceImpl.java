@@ -76,7 +76,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     private Example<EstabelecimentoView> criarExemplo(EstabelecimentoFiltroRequestDTO filtros) {
-        EstabelecimentoView exemplo = modelMapper.map(filtros, EstabelecimentoView.class);
+        final EstabelecimentoView exemplo = modelMapper.map(filtros, EstabelecimentoView.class);
 
         if (filtros.getLocalizacao() != null && !filtros.getLocalizacao().isBlank()) {
             exemplo.setLocalizacao(filtros.getLocalizacao());
