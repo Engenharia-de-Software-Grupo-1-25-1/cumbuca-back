@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Base64;
 
 @Data
 @NoArgsConstructor
@@ -15,7 +14,7 @@ public class UsuarioResponseDTO {
     private String nome;
     private String username;
     private LocalDate dtNascimento;
-    private String foto;
+    private byte[] foto;
     private String status;
 
     public UsuarioResponseDTO(Usuario usuario) {
@@ -24,7 +23,7 @@ public class UsuarioResponseDTO {
         this.nome = usuario.getNome();
         this.username = usuario.getUsername();
         this.dtNascimento = usuario.getDtNascimento();
-        this.foto = usuario.getFoto() != null ? Base64.getEncoder().encodeToString(usuario.getFoto()) : null;
+        this.foto = usuario.getFoto();
         this.status = usuario.getStatus();
     }
 }

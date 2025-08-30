@@ -4,7 +4,7 @@ import br.com.cumbuca.dto.Favorito.FavoritoResponseDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoFiltroRequestDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoRequestDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
-import br.com.cumbuca.model.Avaliacao;
+import br.com.cumbuca.model.AvaliacaoView;
 import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.model.EstabelecimentoView;
 import br.com.cumbuca.model.Favorito;
@@ -56,7 +56,6 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     public List<EstabelecimentoResponseDTO> listar(EstabelecimentoFiltroRequestDTO filtros, String ordenador) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Example<EstabelecimentoView> example = criarExemplo(filtros);
-
         final List<EstabelecimentoView> estabelecimentos = (ordenador != null && !ordenador.isBlank())
                 ? estabelecimentoViewRepository.findAll(example, Sort.by(Sort.Order.desc(ordenador)))
                 : estabelecimentoViewRepository.findAll(example);
@@ -66,7 +65,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                         filtros.getNotaGeral() == null || (estabelecimento.getNotaGeral() >= filtros.getNotaGeral()
                                 && estabelecimento.getNotaGeral() < filtros.getNotaGeral() + 1))
                 .map(estabelecimento -> {
-                    final List<Avaliacao> avaliacoes = avaliacaoViewRepository.findByEstabelecimentoId(estabelecimento.getId());
+                    final List<AvaliacaoView> avaliacoes = avaliacaoViewRepository.findByEstabelecimentoId(estabelecimento.getId());
                     final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
                     estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
                     estabelecimentoResponseDTO.setNotaGeral(estabelecimento.getNotaGeral());
@@ -108,7 +107,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final EstabelecimentoView estabelecimento = estabelecimentoViewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Estabelecimento não encontrado."));
-        final List<Avaliacao> avaliacoes = avaliacaoViewRepository.findByEstabelecimentoId(estabelecimento.getId());
+        final List<AvaliacaoView> avaliacoes = avaliacaoViewRepository.findByEstabelecimentoId(estabelecimento.getId());
         final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
         estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
         estabelecimentoResponseDTO.setNotaGeral(estabelecimento.getNotaGeral());
