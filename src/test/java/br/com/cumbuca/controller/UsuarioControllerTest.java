@@ -20,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -71,7 +73,7 @@ public class UsuarioControllerTest {
 
         @Test
         void testCriarUsuario() throws Exception {
-            String responseJson = driver.perform(multipart(URI + "/criar")
+            final String responseJson = driver.perform(multipart(URI + "/criar")
                             .file(foto)
                             .param("email", usuarioRequestDTO.getEmail())
                             .param("senha", usuarioRequestDTO.getSenha())
@@ -86,7 +88,7 @@ public class UsuarioControllerTest {
                     .getResponse()
                     .getContentAsString(StandardCharsets.UTF_8);
 
-            UsuarioResponseDTO resultado = objectMapper.readValue(responseJson, UsuarioResponseDTO.class);
+            final UsuarioResponseDTO resultado = objectMapper.readValue(responseJson, UsuarioResponseDTO.class);
 
             assertAll(
                     () -> assertNotNull(resultado.getId()),
