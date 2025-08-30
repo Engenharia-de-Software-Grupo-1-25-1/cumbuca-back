@@ -30,8 +30,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -95,13 +102,13 @@ public class UsuarioControllerTest {
 
         @Test
         void testCriarUsuario() throws Exception {
-            UsuarioRequestDTO dto = new UsuarioRequestDTO();
+            final UsuarioRequestDTO dto = new UsuarioRequestDTO();
             dto.setEmail("criarjunit@email.com");
             dto.setSenha("123456");
             dto.setNome("Criar JUnit");
             dto.setUsername("criarjunit");
             dto.setDtNascimento(LocalDate.of(2000, 1, 1));
-            MockMultipartFile foto = new MockMultipartFile(
+            final MockMultipartFile foto = new MockMultipartFile(
                     "foto",
                     "perfil.jpg",
                     "image/jpeg",
@@ -136,7 +143,7 @@ public class UsuarioControllerTest {
 
         @Test
         void testAtualizarUsuario() throws Exception {
-            UsuarioRequestDTO dto = new UsuarioRequestDTO();
+            final UsuarioRequestDTO dto = new UsuarioRequestDTO();
             dto.setEmail("atualizarjunit@email.com");
             dto.setSenha("123456");
             dto.setNome("Atualizar JUnit");
@@ -185,7 +192,7 @@ public class UsuarioControllerTest {
 
         @Test
         void testRecuperarUsuarioPorId() throws Exception {
-            String responseJson = driver.perform(get(URI + "/recuperar/" + usuario.getId())
+            final String responseJson = driver.perform(get(URI + "/recuperar/" + usuario.getId())
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token))
                     .andDo(print())
@@ -208,7 +215,7 @@ public class UsuarioControllerTest {
 
         @Test
         void testRecuperarUsuarioPorUsername() throws Exception {
-            String responseJson = driver.perform(get(URI + "/recuperar/" + usuario.getUsername())
+            final String responseJson = driver.perform(get(URI + "/recuperar/" + usuario.getUsername())
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token))
                     .andDo(print())
@@ -231,14 +238,14 @@ public class UsuarioControllerTest {
 
         @Test
         void testListarUsuarios() throws Exception {
-            Usuario usuario1 = new Usuario();
+            final Usuario usuario1 = new Usuario();
             usuario1.setEmail("listarjunit1@email.com");
             usuario1.setSenha(passwordEncoder.encode("123456"));
             usuario1.setNome("Listar JUnit 1");
             usuario1.setUsername("listarjunit1");
             usuario1.setDtNascimento(LocalDate.of(2000, 1, 1));
 
-            Usuario usuario2 = new Usuario();
+            final Usuario usuario2 = new Usuario();
             usuario2.setEmail("listarjunit2@email.com");
             usuario2.setSenha(passwordEncoder.encode("123456"));
             usuario2.setNome("Listar JUnit 2");
@@ -247,7 +254,7 @@ public class UsuarioControllerTest {
 
             usuarioRepository.saveAll(Arrays.asList(usuario1, usuario2));
 
-            String responseJson = driver.perform(get(URI + "/listar")
+            final String responseJson = driver.perform(get(URI + "/listar")
                             .param("nome", "")
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token))
@@ -269,14 +276,14 @@ public class UsuarioControllerTest {
 
         @Test
         void testListarUsuariosPorNome() throws Exception {
-            Usuario usuario1 = new Usuario();
+            final Usuario usuario1 = new Usuario();
             usuario1.setEmail("listarjunit1@email.com");
             usuario1.setSenha(passwordEncoder.encode("123456"));
             usuario1.setNome("Listar JUnit 1");
             usuario1.setUsername("listarjunit1");
             usuario1.setDtNascimento(LocalDate.of(2000, 1, 1));
 
-            Usuario usuario2 = new Usuario();
+            final Usuario usuario2 = new Usuario();
             usuario2.setEmail("listarjunit2@email.com");
             usuario2.setSenha(passwordEncoder.encode("123456"));
             usuario2.setNome("Listar JUnit 2");
@@ -285,7 +292,7 @@ public class UsuarioControllerTest {
 
             usuarioRepository.saveAll(Arrays.asList(usuario1, usuario2));
 
-            String responseJson = driver.perform(get(URI + "/listar")
+            final String responseJson = driver.perform(get(URI + "/listar")
                             .param("nome", "listarjunit")
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token))
