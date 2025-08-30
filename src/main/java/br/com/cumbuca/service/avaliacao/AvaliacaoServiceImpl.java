@@ -36,6 +36,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     private final TagService tagService;
     private final FotoService fotoService;
     private final ComentarioService comentarioService;
+
     public AvaliacaoServiceImpl(AvaliacaoRepository avaliacaoRepository, AvaliacaoViewRepository avaliacaoViewRepository,
                                 ModelMapper modelMapper, UsuarioService usuarioService, EstabelecimentoService estabelecimentoService,
                                 TagService tagService, FotoService fotoService, ComentarioService comentarioService) {
@@ -89,10 +90,10 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         if (avaliacaoRequestDTO.getFotos() != null) {
             fotoService.criar(avaliacaoRequestDTO.getFotos(), avaliacao);
         }
-        
+
         if (avaliacaoRequestDTO.getTags() != null) {
             tagService.criar(avaliacaoRequestDTO.getTags(), avaliacao);
-        }        
+        }
 
         avaliacaoRepository.save(avaliacao);
         return modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
@@ -161,14 +162,13 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     private Sort getSort(String ordenador) {
-        if (ordenador == null || ordenador.isBlank()) {
-            return Sort.by(Sort.Order.desc("data"));
+        if ("popularidade".equals(ordenador)) {
+            return Sort.by(Sort.Order.desc("qtdCurtidas"), Sort.Order.desc("qtdComentarios"));
         }
-        return switch (ordenador.toLowerCase()) {
-            case "popularidade" -> Sort.by(Sort.Order.desc("qtdCurtidas"));
-            case "nota" -> Sort.by(Sort.Order.desc("notaGeral"));
-            default -> Sort.by(Sort.Order.desc("data"));
-        };
+        if (ordenador != null && !ordenador.isBlank()) {
+            return Sort.by(Sort.Order.desc(ordenador));
+        }
+        return Sort.by(Sort.Order.desc("data"));
     }
 
     private Example<AvaliacaoView> criarExemplo(AvaliacaoFiltroRequestDTO filtros) {
