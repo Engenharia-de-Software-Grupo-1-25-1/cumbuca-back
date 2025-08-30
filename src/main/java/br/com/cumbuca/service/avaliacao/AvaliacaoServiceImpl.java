@@ -1,49 +1,53 @@
 package br.com.cumbuca.service.avaliacao;
 
+import br.com.cumbuca.dto.avaliacao.AvaliacaoFiltroRequestDTO;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
 import br.com.cumbuca.exception.CumbucaException;
 
 import br.com.cumbuca.model.Avaliacao;
+import br.com.cumbuca.model.AvaliacaoView;
 import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.AvaliacaoRepository;
-import br.com.cumbuca.repository.CurtidaRepository;
-import br.com.cumbuca.repository.ComentarioRepository;
+import br.com.cumbuca.repository.AvaliacaoViewRepository;
 import br.com.cumbuca.service.comentario.ComentarioService;
-import br.com.cumbuca.service.curtida.CurtidaService;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import br.com.cumbuca.service.foto.FotoService;
 import br.com.cumbuca.service.tag.TagService;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
 public class AvaliacaoServiceImpl implements AvaliacaoService {
     private final AvaliacaoRepository avaliacaoRepository;
+    private final AvaliacaoViewRepository avaliacaoViewRepository;
     private final ModelMapper modelMapper;
     private final UsuarioService usuarioService;
     private final EstabelecimentoService estabelecimentoService;
     private final TagService tagService;
     private final FotoService fotoService;
     private final ComentarioService comentarioService;
-    private final CurtidaService curtidaService;
 
-    public AvaliacaoServiceImpl(AvaliacaoRepository avaliacaoRepository, ModelMapper modelMapper,
-                                UsuarioService usuarioService, EstabelecimentoService estabelecimentoService, TagService tagService,
-                                FotoService fotoService, ComentarioRepository comentarioRepository, CurtidaRepository curtidaRepository, ComentarioService comentarioService, CurtidaService curtidaService) {
+    public AvaliacaoServiceImpl(AvaliacaoRepository avaliacaoRepository, AvaliacaoViewRepository avaliacaoViewRepository,
+                                ModelMapper modelMapper, UsuarioService usuarioService, EstabelecimentoService estabelecimentoService,
+                                TagService tagService, FotoService fotoService, ComentarioService comentarioService) {
         this.avaliacaoRepository = avaliacaoRepository;
+        this.avaliacaoViewRepository = avaliacaoViewRepository;
         this.modelMapper = modelMapper;
         this.usuarioService = usuarioService;
         this.estabelecimentoService = estabelecimentoService;
         this.tagService = tagService;
         this.fotoService = fotoService;
         this.comentarioService = comentarioService;
-        this.curtidaService = curtidaService;
     }
 
     @Override
@@ -86,10 +90,10 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         if (avaliacaoRequestDTO.getFotos() != null) {
             fotoService.criar(avaliacaoRequestDTO.getFotos(), avaliacao);
         }
-        
+
         if (avaliacaoRequestDTO.getTags() != null) {
             tagService.criar(avaliacaoRequestDTO.getTags(), avaliacao);
-        }        
+        }
 
         avaliacaoRepository.save(avaliacao);
         return modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
@@ -109,36 +113,108 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     @Override
     public AvaliacaoResponseDTO recuperar(Long id) {
         usuarioService.verificaUsuarioLogado();
-        final Avaliacao avaliacao = avaliacaoRepository.findById(id)
+        final AvaliacaoView avaliacao = avaliacaoViewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
         final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
         avaliacaoResponseDTO.setFotos(fotoService.recuperar(id));
         avaliacaoResponseDTO.setTags(tagService.recuperar(id));
-        avaliacaoResponseDTO.setQtdCurtidas(curtidaService.qtdCurtidas(avaliacao.getId()));
-        avaliacaoResponseDTO.setQtdComentarios(comentarioService.qtdComentarios(avaliacao.getId()));
         avaliacaoResponseDTO.setComentarios(comentarioService.recuperar(id));
         return avaliacaoResponseDTO;
     }
 
     @Override
-    public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento) {
+    public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros, String ordenador) {
         usuarioService.verificaUsuarioLogado();
-        List<Avaliacao> avaliacoes = avaliacaoRepository.findAllByOrderByDataDesc();
+        final Example<AvaliacaoView> example = criarExemplo(filtros);
+
+        final Sort sort = getSort(ordenador);
+        List<AvaliacaoView> avaliacoes = avaliacaoViewRepository.findAll(example, sort);
+
         if (idUsuario != null) {
-            avaliacoes = avaliacaoRepository.findByUsuarioIdOrderByDataDesc(idUsuario);
+            avaliacoes = avaliacaoViewRepository.findByUsuarioIdOrderByDataDesc(idUsuario);
         }
         if (idEstabelecimento != null) {
-            avaliacoes = avaliacaoRepository.findByEstabelecimentoIdOrderByDataDesc(idEstabelecimento);
+            avaliacoes = avaliacaoViewRepository.findByEstabelecimentoIdOrderByDataDesc(idEstabelecimento);
         }
+
         return avaliacoes.stream()
+                .filter(avaliacao -> filtrarPorPreco(filtros.getPrecoMinimo(), filtros.getPrecoMaximo(), avaliacao.getPreco()))
+                .filter(avaliacao -> filtrarPorTags(filtros.getTags(), avaliacao.getId()))
+                .filter(estabelecimento ->
+                        filtros.getNotaGeral() == null || (estabelecimento.getNotaGeral() >= filtros.getNotaGeral()
+                                && estabelecimento.getNotaGeral() < filtros.getNotaGeral() + 1))
+                .filter(estabelecimento ->
+                        filtros.getNotaComida() == null || (estabelecimento.getNotaComida() >= filtros.getNotaComida()
+                                && estabelecimento.getNotaComida() < filtros.getNotaComida() + 1))
+                .filter(estabelecimento ->
+                        filtros.getNotaAmbiente() == null || (estabelecimento.getNotaAmbiente() >= filtros.getNotaAmbiente()
+                                && estabelecimento.getNotaAmbiente() < filtros.getNotaAmbiente() + 1))
+                .filter(estabelecimento ->
+                        filtros.getNotaAtendimento() == null || (estabelecimento.getNotaAtendimento() >= filtros.getNotaAtendimento()
+                                && estabelecimento.getNotaAtendimento() < filtros.getNotaAtendimento() + 1))
                 .map(avaliacao -> {
-                    final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
-                    avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacao.getId()));
-                    avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacao.getId()));
-                    avaliacaoResponseDTO.setQtdCurtidas(curtidaService.qtdCurtidas(avaliacao.getId()));
-                    avaliacaoResponseDTO.setQtdComentarios(comentarioService.qtdComentarios(avaliacao.getId()));
-                    return avaliacaoResponseDTO;
+                    final AvaliacaoResponseDTO dto = new AvaliacaoResponseDTO(avaliacao);
+                    dto.setFotos(fotoService.recuperar(avaliacao.getId()));
+                    dto.setTags(tagService.recuperar(avaliacao.getId()));
+                    return dto;
                 })
                 .toList();
+    }
+
+    private Sort getSort(String ordenador) {
+        if ("popularidade".equals(ordenador)) {
+            return Sort.by(Sort.Order.desc("qtdCurtidas"), Sort.Order.desc("qtdComentarios"));
+        }
+        if (ordenador != null && !ordenador.isBlank()) {
+            return Sort.by(Sort.Order.desc(ordenador));
+        }
+        return Sort.by(Sort.Order.desc("data"));
+    }
+
+    private Example<AvaliacaoView> criarExemplo(AvaliacaoFiltroRequestDTO filtros) {
+        final AvaliacaoView exemplo = new AvaliacaoView();
+
+        if (filtros.getUsuario() != null && !filtros.getUsuario().isBlank()) {
+            final Usuario usuario = new Usuario();
+            usuario.setNome(filtros.getUsuario());
+            exemplo.setUsuario(usuario);
+        }
+        if (filtros.getEstabelecimento() != null && !filtros.getEstabelecimento().isBlank()) {
+            final Estabelecimento estabelecimento = new Estabelecimento();
+            estabelecimento.setNome(filtros.getEstabelecimento());
+            exemplo.setEstabelecimento(estabelecimento);
+        }
+        if (filtros.getItemConsumido() != null && !filtros.getItemConsumido().isBlank()) {
+            exemplo.setItemConsumido(filtros.getItemConsumido());
+        }
+
+        final ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+
+        return Example.of(exemplo, matcher);
+    }
+
+    private boolean filtrarPorPreco(BigDecimal inicio, BigDecimal fim, BigDecimal preco) {
+        if (inicio == null && fim == null) {
+            return true;
+        }
+
+        final boolean inicioValido = inicio == null || preco.compareTo(inicio) >= 0;
+        final boolean fimValido = fim == null || preco.compareTo(fim) <= 0;
+
+        return inicioValido && fimValido;
+    }
+
+    private boolean filtrarPorTags(List<String> tagsFiltro, Long avaliacaoId) {
+        if (tagsFiltro == null || tagsFiltro.isEmpty()) {
+            return true;
+        }
+
+        final List<String> tagsAvaliacao = tagService.recuperar(avaliacaoId);
+
+        return tagsAvaliacao.stream()
+                .anyMatch(tagAvaliacao -> tagsFiltro.stream()
+                        .anyMatch(tagFiltro -> tagFiltro.equalsIgnoreCase(tagAvaliacao)));
     }
 }

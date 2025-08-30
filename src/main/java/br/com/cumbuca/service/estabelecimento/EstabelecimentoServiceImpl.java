@@ -9,7 +9,7 @@ import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.model.EstabelecimentoView;
 import br.com.cumbuca.model.Favorito;
 import br.com.cumbuca.model.Usuario;
-import br.com.cumbuca.repository.AvaliacaoRepository;
+import br.com.cumbuca.repository.AvaliacaoViewRepository;
 import br.com.cumbuca.repository.EstabelecimentoRepository;
 import br.com.cumbuca.repository.EstabelecimentoViewRepository;
 import br.com.cumbuca.repository.FavoritoRespository;
@@ -29,15 +29,15 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
     private final EstabelecimentoRepository estabelecimentoRepository;
     private final EstabelecimentoViewRepository estabelecimentoViewRepository;
-    private final AvaliacaoRepository avaliacaoRepository;
+    private final AvaliacaoViewRepository avaliacaoViewRepository;
     private final FavoritoRespository favoritoRespository;
     private final UsuarioService usuarioService;
     private final ModelMapper modelMapper;
 
-    public EstabelecimentoServiceImpl(EstabelecimentoRepository estabelecimentoRepository, EstabelecimentoViewRepository estabelecimentoViewRepository, AvaliacaoRepository avaliacaoRepository, FavoritoRespository favoritoRespository, UsuarioService usuarioService, ModelMapper modelMapper) {
+    public EstabelecimentoServiceImpl(EstabelecimentoRepository estabelecimentoRepository, EstabelecimentoViewRepository estabelecimentoViewRepository, AvaliacaoViewRepository avaliacaoViewRepository, FavoritoRespository favoritoRespository, UsuarioService usuarioService, ModelMapper modelMapper) {
         this.estabelecimentoRepository = estabelecimentoRepository;
         this.estabelecimentoViewRepository = estabelecimentoViewRepository;
-        this.avaliacaoRepository = avaliacaoRepository;
+        this.avaliacaoViewRepository = avaliacaoViewRepository;
         this.favoritoRespository = favoritoRespository;
         this.usuarioService = usuarioService;
         this.modelMapper = modelMapper;
@@ -47,8 +47,8 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     public Estabelecimento buscarOuCriar(EstabelecimentoRequestDTO estabelecimentoRequestDTO) {
         return Optional.ofNullable(estabelecimentoRepository.findByNomeAndCategoria(estabelecimentoRequestDTO.getNome(), estabelecimentoRequestDTO.getCategoria()))
                 .orElseGet(() -> {
-                    Estabelecimento novo = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
-                    return estabelecimentoRepository.save(novo);
+                    final Estabelecimento estabelecimento = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
+                    return estabelecimentoRepository.save(estabelecimento);
                 });
     }
 
@@ -64,10 +64,9 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         return estabelecimentos.stream()
                 .filter(estabelecimento ->
                         filtros.getNotaGeral() == null || (estabelecimento.getNotaGeral() >= filtros.getNotaGeral()
-                                && estabelecimento.getNotaGeral() < filtros.getNotaGeral() + 1)
-                )
+                                && estabelecimento.getNotaGeral() < filtros.getNotaGeral() + 1))
                 .map(estabelecimento -> {
-                    final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
+                    final List<Avaliacao> avaliacoes = avaliacaoViewRepository.findByEstabelecimentoId(estabelecimento.getId());
                     final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
                     estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
                     estabelecimentoResponseDTO.setNotaGeral(estabelecimento.getNotaGeral());
@@ -109,7 +108,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final EstabelecimentoView estabelecimento = estabelecimentoViewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Estabelecimento não encontrado."));
-        final List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimento.getId());
+        final List<Avaliacao> avaliacoes = avaliacaoViewRepository.findByEstabelecimentoId(estabelecimento.getId());
         final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
         estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
         estabelecimentoResponseDTO.setNotaGeral(estabelecimento.getNotaGeral());

@@ -4,6 +4,7 @@ import br.com.cumbuca.dto.comentario.ComentarioResponseDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
+import br.com.cumbuca.model.AvaliacaoView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -46,6 +47,23 @@ public class AvaliacaoResponseDTO {
         this.data = avaliacao.getData();
         this.qtdCurtidas = 0;
         this.qtdComentarios = 0;
+        this.comentarios = new ArrayList<>();
+    }
+
+    public AvaliacaoResponseDTO(AvaliacaoView avaliacao) {
+        this.id = avaliacao.getId();
+        this.usuario = new UsuarioResponseDTO(avaliacao.getUsuario());
+        this.estabelecimento = new EstabelecimentoResponseDTO((avaliacao.getEstabelecimento()));
+        this.itemConsumido = avaliacao.getItemConsumido();
+        this.descricao = avaliacao.getDescricao();
+        this.preco = avaliacao.getPreco();
+        this.notaGeral = avaliacao.getNotaGeral();
+        this.notaComida = avaliacao.getNotaComida();
+        this.notaAtendimento = avaliacao.getNotaAtendimento();
+        this.notaAmbiente = avaliacao.getNotaAmbiente();
+        this.data = avaliacao.getData();
+        this.qtdCurtidas = avaliacao.getQtdCurtidas();
+        this.qtdComentarios = avaliacao.getQtdComentarios();
         this.comentarios = new ArrayList<>();
     }
 }

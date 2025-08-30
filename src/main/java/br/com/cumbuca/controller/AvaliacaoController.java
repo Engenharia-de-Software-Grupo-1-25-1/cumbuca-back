@@ -1,5 +1,6 @@
 package br.com.cumbuca.controller;
 
+import br.com.cumbuca.dto.avaliacao.AvaliacaoFiltroRequestDTO;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
 import br.com.cumbuca.service.avaliacao.AvaliacaoService;
@@ -64,8 +65,10 @@ public class AvaliacaoController {
     @GetMapping("/listar")
     public ResponseEntity<List<AvaliacaoResponseDTO>> listar(
             @RequestParam(required = false) Long idUsuario,
-            @RequestParam(required = false) Long idEstabelecimento) {
-        final List<AvaliacaoResponseDTO> avaliacoes = avaliacaoService.listar(idUsuario, idEstabelecimento);
+            @RequestParam(required = false) Long idEstabelecimento,
+            @ModelAttribute AvaliacaoFiltroRequestDTO filtros,
+            @RequestParam(required = false) String ordenador) {
+        final List<AvaliacaoResponseDTO> avaliacoes = avaliacaoService.listar(idUsuario, idEstabelecimento, filtros, ordenador);
         return ResponseEntity.ok(avaliacoes);
     }
 }
