@@ -496,7 +496,7 @@ public class UsuarioControllerTest {
             usuario1.setDtNascimento(LocalDate.of(2000, 1, 1));
             usuarioRepository.save(usuario1);
 
-            String responseText = driver.perform(delete(URI + "/remover/" + usuario1.getId())
+            final String responseText = driver.perform(delete(URI + "/remover/" + usuario1.getId())
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token))
                     .andExpect(status().isBadRequest())
