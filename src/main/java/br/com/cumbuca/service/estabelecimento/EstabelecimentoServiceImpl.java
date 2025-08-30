@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class EstabelecimentoServiceImpl implements EstabelecimentoService {
@@ -44,9 +45,9 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
     @Override
     public Estabelecimento buscarOuCriar(EstabelecimentoRequestDTO estabelecimentoRequestDTO) {
-        return estabelecimentoRepository.findById(estabelecimentoRequestDTO.getId())
+        return Optional.ofNullable(estabelecimentoRepository.findByNomeAndCategoria(estabelecimentoRequestDTO.getNome(), estabelecimentoRequestDTO.getCategoria()))
                 .orElseGet(() -> {
-                    final Estabelecimento novo = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
+                    Estabelecimento novo = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
                     return estabelecimentoRepository.save(novo);
                 });
     }
