@@ -1,5 +1,6 @@
 package br.com.cumbuca.dto.avaliacao;
 
+import br.com.cumbuca.dto.comentario.ComentarioResponseDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -28,6 +30,7 @@ public class AvaliacaoResponseDTO {
     private List<String> tags;
     private Integer qtdCurtidas;
     private Integer qtdComentarios;
+    private List<ComentarioResponseDTO> comentarios;
 
     public AvaliacaoResponseDTO(Avaliacao avaliacao) {
         this.id = avaliacao.getId();
@@ -43,5 +46,6 @@ public class AvaliacaoResponseDTO {
         this.data = avaliacao.getData();
         this.qtdCurtidas = 0;
         this.qtdComentarios = 0;
+        this.comentarios = new ArrayList<>();
     }
 }

@@ -1,12 +1,11 @@
 package br.com.cumbuca.dto.estabelecimento;
 
 import br.com.cumbuca.model.Estabelecimento;
-import br.com.cumbuca.model.Horario;
+import br.com.cumbuca.model.EstabelecimentoView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -24,6 +23,7 @@ public class EstabelecimentoResponseDTO {
     private List<String> horarios;
     private int qtdAvaliacoes;
     private Double notaGeral;
+    private boolean favoritado;
 
     public EstabelecimentoResponseDTO(Estabelecimento estabelecimento) {
         this.id = estabelecimento.getId();
@@ -34,14 +34,21 @@ public class EstabelecimentoResponseDTO {
         this.bairro = estabelecimento.getBairro();
         this.cidade = estabelecimento.getCidade();
         this.estado = estabelecimento.getEstado();
-        this.cep = estabelecimento.getCep();
-        if (estabelecimento.getHorarios() != null) {
-            this.horarios = estabelecimento.getHorarios().stream()
-                    .map(Horario::getHorario)
-                    .collect(Collectors.toList());
-        } else {
-            this.horarios = List.of();
-        }
+        this.favoritado = false;
+    }
+
+    public EstabelecimentoResponseDTO(EstabelecimentoView estabelecimento) {
+        this.id = estabelecimento.getId();
+        this.nome = estabelecimento.getNome();
+        this.categoria = estabelecimento.getCategoria();
+        this.rua = estabelecimento.getRua();
+        this.numero = estabelecimento.getNumero();
+        this.bairro = estabelecimento.getBairro();
+        this.cidade = estabelecimento.getCidade();
+        this.estado = estabelecimento.getEstado();
+        this.qtdAvaliacoes = estabelecimento.getQtdAvaliacoes();
+        this.notaGeral = estabelecimento.getNotaGeral();
+        this.favoritado = false;
     }
 }
 
