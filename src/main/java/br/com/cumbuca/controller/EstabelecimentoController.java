@@ -1,14 +1,16 @@
 package br.com.cumbuca.controller;
 
 import br.com.cumbuca.dto.Favorito.FavoritoResponseDTO;
+import br.com.cumbuca.dto.estabelecimento.EstabelecimentoFiltroRequestDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -24,8 +26,10 @@ public class EstabelecimentoController {
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<EstabelecimentoResponseDTO>> listar() {
-        final List<EstabelecimentoResponseDTO> estabelecimentos = estabelecimentoService.listar();
+    public ResponseEntity<List<EstabelecimentoResponseDTO>> listar(
+            @ModelAttribute EstabelecimentoFiltroRequestDTO filtros,
+            @RequestParam(required = false) String ordenador) {
+        final List<EstabelecimentoResponseDTO> estabelecimentos = estabelecimentoService.listar(filtros, ordenador);
         return ResponseEntity.ok(estabelecimentos);
     }
 
@@ -39,15 +43,5 @@ public class EstabelecimentoController {
     public ResponseEntity<FavoritoResponseDTO> favoritar(@PathVariable Long id) {
         final FavoritoResponseDTO favorito = estabelecimentoService.favoritar(id);
         return ResponseEntity.ok(favorito);
-    }
-
-    @GetMapping("/pesquisar")
-    public ResponseEntity<List<EstabelecimentoResponseDTO>> pesquisar(@RequestParam String nome) {
-        final List<EstabelecimentoResponseDTO> estabelecimentos = estabelecimentoService.pesquisar(nome);
-
-        if (estabelecimentos.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(estabelecimentos);
     }
 }
