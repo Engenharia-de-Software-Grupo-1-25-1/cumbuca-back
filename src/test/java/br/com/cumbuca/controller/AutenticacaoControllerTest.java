@@ -90,9 +90,23 @@ class AutenticacaoControllerTest {
     class AutenticacaoFluxoBasicoApiRest {
 
         @Test
-        void testEfetuarLogin() throws Exception {
+        void testEfetuarLoginComUsername() throws Exception {
             final LoginRequestDTO loginRequest = new LoginRequestDTO();
             loginRequest.setUsername("testejunit");
+            loginRequest.setSenha("123456");
+
+            driver.perform(post("/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(loginRequest)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.token").exists())
+                    .andExpect(jsonPath("$.id").value(usuario.getId()));
+        }
+
+        @Test
+        void testEfetuarLoginComEmail() throws Exception {
+            final LoginRequestDTO loginRequest = new LoginRequestDTO();
+            loginRequest.setUsername("testejunit@email.com");
             loginRequest.setSenha("123456");
 
             driver.perform(post("/login")
