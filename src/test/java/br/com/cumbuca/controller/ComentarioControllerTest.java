@@ -8,7 +8,6 @@ import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.ComentarioRepository;
 import br.com.cumbuca.repository.EstabelecimentoRepository;
 import br.com.cumbuca.repository.UsuarioRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,9 +37,6 @@ public class ComentarioControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private UsuarioRepository usuarioRepository;
