@@ -50,7 +50,7 @@ public class TokenServiceImpl implements TokenService {
             decodedJWT = verifier.verify(token);
             return Long.parseLong(decodedJWT.getSubject());
         } catch (JWTVerificationException exception) {
-            throw new BadCredentialsException("Erro ao gerar token JWT de acesso.");
+            throw new BadCredentialsException("Token JWT inválido ou expirado.");
         }
     }
 

@@ -36,18 +36,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public UsuarioResponseDTO criar(UsuarioRequestDTO usuarioRequestDTO) {
+    public UsuarioResponseDTO criar(UsuarioRequestDTO usuarioRequestDTO) throws IOException {
         modelMapper.typeMap(UsuarioRequestDTO.class, Usuario.class)
                 .addMappings(mapper -> mapper.skip(Usuario::setSenha));
         final Usuario usuario = modelMapper.map(usuarioRequestDTO, Usuario.class);
         usuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.getSenha()));
 
         if (usuarioRequestDTO.getFoto() != null && !usuarioRequestDTO.getFoto().isEmpty()) {
-            try {
-                usuario.setFoto(usuarioRequestDTO.getFoto().getBytes());
-            } catch (IOException e) {
-                throw new CumbucaException("Erro ao processar a foto.");
-            }
+            usuario.setFoto(usuarioRequestDTO.getFoto().getBytes());
         }
 
         usuarioRepository.save(usuario);
@@ -55,7 +51,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO) {
+    public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO) throws IOException {
         final Usuario usuario = getUsuarioLogado();
         if (!id.equals(usuario.getId())) {
             throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
@@ -67,12 +63,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.getSenha()));
 
         if (usuarioRequestDTO.getFoto() != null && !usuarioRequestDTO.getFoto().isEmpty()) {
-            try {
-                usuario.setFoto(usuarioRequestDTO.getFoto().getBytes());
-            } catch (IOException e) {
-                throw new CumbucaException("Erro ao processar a foto.");
-            }
+            usuario.setFoto(usuarioRequestDTO.getFoto().getBytes());
         }
+
         usuarioRepository.save(usuario);
         return modelMapper.map(usuario, UsuarioResponseDTO.class);
     }
@@ -88,7 +81,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioResponseDTO recuperar(Long id) {
-        verificaUsuarioLogado();
         final Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
         return new UsuarioResponseDTO(usuario);
@@ -96,7 +88,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioResponseDTO recuperar(String username) {
-        verificaUsuarioLogado();
         final Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
         return new UsuarioResponseDTO(usuario);
@@ -116,17 +107,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario getUsuarioLogado() {
-        verificaUsuarioLogado();
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final String login = authentication.getName();
         return usuarioRepository.findByUsernameOrEmail(login, login)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
-    }
-
-    public void verificaUsuarioLogado() {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            throw new UsernameNotFoundException("Usuário não autenticado");
-        }
     }
 }
