@@ -56,6 +56,10 @@ checkstyle {
     configFile = file("config/checkstyle/checkstyle.xml")
 }
 
+tasks.withType(Checkstyle).configureEach {
+    source = sourceSets.main.allJava
+}
+
 pmd {
     toolVersion = '6.55.0'
     ruleSetFiles = files("config/pmd/ruleset.xml")
