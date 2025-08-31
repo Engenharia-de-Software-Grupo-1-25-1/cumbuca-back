@@ -83,7 +83,9 @@ public class AvaliacaoControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    ModelMapper modelMapper = new ModelMapper();
+    @Autowired
+    ModelMapper modelMapper;
+
     UsuarioRequestDTO usuarioRequestDTO;
     Usuario usuario;
     EstabelecimentoRequestDTO estabelecimentoRequestDTO;
@@ -308,7 +310,7 @@ public class AvaliacaoControllerTest {
         }
 
         @Test
-        void testListarAvalicaoes() throws Exception {
+        void testListarAvaliacoes() throws Exception {
             final Avaliacao avaliacao1 = new Avaliacao();
             avaliacao1.setItemConsumido("Pizza Calabresa");
             avaliacao1.setDescricao("Pizza muito saborosa");
@@ -1018,7 +1020,7 @@ public class AvaliacaoControllerTest {
         }
 
         @Test
-        void testFiltrarAvaliacoesPorUsuarioESestabelecimento() throws Exception {
+        void testFiltrarAvaliacoesPorUsuarioEEstabelecimento() throws Exception {
             final UsuarioRequestDTO outroUsuarioDTO = new UsuarioRequestDTO();
             outroUsuarioDTO.setEmail("carlos@email.com");
             outroUsuarioDTO.setSenha("123456");
