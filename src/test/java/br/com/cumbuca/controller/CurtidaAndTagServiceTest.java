@@ -1,6 +1,5 @@
 package br.com.cumbuca.controller;
 
-import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.*;
 import br.com.cumbuca.repository.*;
 import br.com.cumbuca.service.comentario.ComentarioService;
@@ -21,18 +20,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
 public class CurtidaAndTagServiceTest {
-
-    @Autowired
-    private UsuarioService usuarioService;
 
     @Autowired
     private CurtidaService curtidaService;
@@ -54,13 +48,7 @@ public class CurtidaAndTagServiceTest {
 
     @Autowired
     private TagRepository tagRepository;
-
-    @Autowired
-    private ComentarioRepository comentarioRepository;
-
-    @Autowired
-    private ComentarioService comentarioService;
-
+    
     @PersistenceContext
     private EntityManager entityManager;
 
