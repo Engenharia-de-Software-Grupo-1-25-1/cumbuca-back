@@ -4,6 +4,7 @@ import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Usuario;
+import br.com.cumbuca.model.UsuarioView;
 import br.com.cumbuca.repository.UsuarioRepository;
 import br.com.cumbuca.repository.UsuarioViewRepository;
 import org.modelmapper.ModelMapper;
@@ -84,14 +85,14 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioResponseDTO recuperar(Long id) {
-        final Usuario usuario = usuarioRepository.findById(id)
+        final UsuarioView usuario = usuarioViewRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
         return new UsuarioResponseDTO(usuario);
     }
 
     @Override
     public UsuarioResponseDTO recuperar(String username) {
-        final Usuario usuario = usuarioRepository.findByUsername(username)
+        final UsuarioView usuario = usuarioViewRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
         return new UsuarioResponseDTO(usuario);
     }
