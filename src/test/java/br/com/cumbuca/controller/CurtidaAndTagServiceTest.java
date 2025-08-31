@@ -2,10 +2,8 @@ package br.com.cumbuca.controller;
 
 import br.com.cumbuca.model.*;
 import br.com.cumbuca.repository.*;
-import br.com.cumbuca.service.comentario.ComentarioService;
 import br.com.cumbuca.service.curtida.CurtidaService;
 import br.com.cumbuca.service.tag.TagService;
-import br.com.cumbuca.service.usuario.UsuarioService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +19,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -48,7 +51,7 @@ public class CurtidaAndTagServiceTest {
 
     @Autowired
     private TagRepository tagRepository;
-    
+
     @PersistenceContext
     private EntityManager entityManager;
 
