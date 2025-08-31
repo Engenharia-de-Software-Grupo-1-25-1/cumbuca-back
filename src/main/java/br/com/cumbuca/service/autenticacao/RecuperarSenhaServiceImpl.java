@@ -1,6 +1,6 @@
 package br.com.cumbuca.service.autenticacao;
 
-import br.com.cumbuca.dto.recuperarSenha.EmailRequestDTO;
+import br.com.cumbuca.dto.senha.EmailRequestDTO;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;

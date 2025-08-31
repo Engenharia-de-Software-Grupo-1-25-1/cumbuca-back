@@ -1,4 +1,4 @@
-package br.com.cumbuca.dto.recuperarSenha;
+package br.com.cumbuca.dto.senha;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;

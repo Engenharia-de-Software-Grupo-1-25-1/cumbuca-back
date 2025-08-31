@@ -2,8 +2,8 @@ package br.com.cumbuca.controller;
 
 import br.com.cumbuca.dto.login.LoginRequestDTO;
 import br.com.cumbuca.dto.login.LoginResponseDTO;
-import br.com.cumbuca.dto.recuperarSenha.AlterarSenhaRequestDTO;
-import br.com.cumbuca.dto.recuperarSenha.RecuperarSenhaRequestDTO;
+import br.com.cumbuca.dto.senha.AlterarSenhaRequestDTO;
+import br.com.cumbuca.dto.senha.RecuperarSenhaRequestDTO;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.service.autenticacao.RecuperarSenhaService;
 import br.com.cumbuca.service.autenticacao.TokenService;
@@ -40,12 +40,12 @@ public class AutenticacaoController {
 
     @PostMapping("/recuperar-senha")
     public ResponseEntity<String> recuperarSenha(@Valid @RequestBody RecuperarSenhaRequestDTO recuperarSenhaRequestDTO) {
-        this.recuperarSenhaService.recuperarSenha(recuperarSenhaRequestDTO.getEmail());
+        recuperarSenhaService.recuperarSenha(recuperarSenhaRequestDTO.getEmail());
         return ResponseEntity.ok("E-mail enviado.");
     }
 
     @PostMapping("/alterar-senha")
-    public ResponseEntity<String> alterarSenha(@RequestBody AlterarSenhaRequestDTO alterarSenhaRequestDTO) {
+    public ResponseEntity<String> alterarSenha(@Valid @RequestBody AlterarSenhaRequestDTO alterarSenhaRequestDTO) {
         recuperarSenhaService.alterarSenha(alterarSenhaRequestDTO.getToken(), alterarSenhaRequestDTO.getNovaSenha(), alterarSenhaRequestDTO.getConfirmarNovaSenha());
         return ResponseEntity.ok("Senha alterada com sucesso.");
     }
