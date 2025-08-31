@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
+@WithMockUser(username = "Lulu Fazedor de Drift")
 public class CurtidaControllerTest {
 
     @Autowired
@@ -51,15 +53,16 @@ public class CurtidaControllerTest {
     @BeforeEach
     void setUp() {
         usuario = new Usuario();
-        usuario.setEmail("test@email.com");
-        usuario.setSenha("123456");
-        usuario.setNome("Test User");
-        usuario.setUsername("testuser");
-        usuario.setDtNascimento(LocalDate.of(2000, 1, 1));
+        usuario.setEmail("luciano.nascimento.filho@gmail.com");
+        usuario.setSenha("webhead");
+        usuario.setNome("Luciano Nascimento");
+        usuario.setUsername("Lulu Fazedor de Drift");
+        usuario.setDtNascimento(LocalDate.of(2001, 10, 24));
         usuarioRepository.save(usuario);
 
         Estabelecimento estabelecimento = new Estabelecimento();
-        estabelecimento.setNome("Test Estabelecimento");
+        estabelecimento.setId(1L);
+        estabelecimento.setNome("O Gonzagão");
         estabelecimento.setCategoria("Restaurante");
         estabelecimentoRepository.save(estabelecimento);
 
@@ -85,6 +88,6 @@ public class CurtidaControllerTest {
     void testCurtir() throws Exception {
         mockMvc.perform(post("/avaliacao/curtir/{avaliacaoId}", avaliacao.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.curtido").value(true));
+                .andExpect(jsonPath("$.isCurtida").value(true));
     }
 }

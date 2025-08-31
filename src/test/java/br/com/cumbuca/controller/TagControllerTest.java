@@ -47,18 +47,21 @@ public class TagControllerTest {
     @Autowired
     private TagRepository tagRepository;
 
+    private Usuario usuario;
+
     @BeforeEach
     void setUp() {
-        Usuario usuario = new Usuario();
-        usuario.setEmail("test@email.com");
-        usuario.setSenha("123456");
-        usuario.setNome("Test User");
-        usuario.setUsername("testuser");
-        usuario.setDtNascimento(LocalDate.of(2000, 1, 1));
+        usuario = new Usuario();
+        usuario.setEmail("luciano.nascimento.filho@gmail.com");
+        usuario.setSenha("webhead");
+        usuario.setNome("Luciano Nascimento");
+        usuario.setUsername("Lulu Fazedor de Drift");
+        usuario.setDtNascimento(LocalDate.of(2001, 10, 24));
         usuarioRepository.save(usuario);
 
         Estabelecimento estabelecimento = new Estabelecimento();
-        estabelecimento.setNome("Test Estabelecimento");
+        estabelecimento.setId(1L);
+        estabelecimento.setNome("O Gonzagão");
         estabelecimento.setCategoria("Restaurante");
         estabelecimentoRepository.save(estabelecimento);
 
