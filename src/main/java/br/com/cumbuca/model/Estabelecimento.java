@@ -3,8 +3,6 @@ package br.com.cumbuca.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 @Entity
 @Table(name = "ESTABELECIMENTO")
@@ -38,7 +36,4 @@ public class Estabelecimento {
 
     @Column(name = "CEP", length = 10)
     private String cep;
-
-    @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Horario> horarios;
 }
