@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
+@WithMockUser(username = "testuser")
 public class TagControllerTest {
 
     @Autowired
@@ -47,25 +49,23 @@ public class TagControllerTest {
     @Autowired
     private TagRepository tagRepository;
 
-    private Usuario usuario;
-
     @BeforeEach
     void setUp() {
-        usuario = new Usuario();
-        usuario.setEmail("luciano.nascimento.filho@gmail.com");
-        usuario.setSenha("webhead");
-        usuario.setNome("Luciano Nascimento");
-        usuario.setUsername("Lulu Fazedor de Drift");
-        usuario.setDtNascimento(LocalDate.of(2001, 10, 24));
+        final Usuario usuario = new Usuario();
+        usuario.setEmail("test@email.com");
+        usuario.setSenha("123456");
+        usuario.setNome("Test User");
+        usuario.setUsername("testuser");
+        usuario.setDtNascimento(LocalDate.of(2000, 1, 1));
         usuarioRepository.save(usuario);
 
-        Estabelecimento estabelecimento = new Estabelecimento();
+        final Estabelecimento estabelecimento = new Estabelecimento();
         estabelecimento.setId(1L);
-        estabelecimento.setNome("O Gonzagão");
+        estabelecimento.setNome("Test Estabelecimento");
         estabelecimento.setCategoria("Restaurante");
         estabelecimentoRepository.save(estabelecimento);
 
-        Avaliacao avaliacao = new Avaliacao();
+        final Avaliacao avaliacao = new Avaliacao();
         avaliacao.setUsuario(usuario);
         avaliacao.setEstabelecimento(estabelecimento);
         avaliacao.setItemConsumido("Pizza");
@@ -74,12 +74,12 @@ public class TagControllerTest {
         avaliacao.setNotaGeral(5);
         avaliacaoRepository.save(avaliacao);
 
-        Tag tag1 = new Tag();
+        final Tag tag1 = new Tag();
         tag1.setAvaliacao(avaliacao);
         tag1.setTag("bom");
         tagRepository.save(tag1);
 
-        Tag tag2 = new Tag();
+        final Tag tag2 = new Tag();
         tag2.setAvaliacao(avaliacao);
         tag2.setTag("barato");
         tagRepository.save(tag2);

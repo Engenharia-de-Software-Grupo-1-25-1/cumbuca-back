@@ -33,8 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@WithMockUser(username = "Lulu Fazedor de Drift") // 👈 Adicione esta linha
-
+@WithMockUser(username = "Lulu Fazedor de Drift")
 public class ComentarioControllerTest {
 
     @Autowired
@@ -95,22 +94,18 @@ public class ComentarioControllerTest {
 
     @Test
     void testComentar() throws Exception {
-        String comentarioTexto = "Ótimo lugar!";
+        final String comentarioTexto = "Ótimo lugar!";
 
         mockMvc.perform(post("/avaliacao/comentar/{avaliacaoId}", avaliacao.getId())
-                        // 1. Mude o contentType para TEXT_PLAIN
                         .contentType(MediaType.TEXT_PLAIN)
-                        // 2. Envie o texto diretamente, sem o objectMapper
                         .content(comentarioTexto))
                 .andExpect(status().isOk())
-                // A asserção agora funcionará
                 .andExpect(jsonPath("$.comentario").value(comentarioTexto));
     }
 
-
     @Test
     void testRemoverComentario() throws Exception {
-        Comentario comentario = new Comentario();
+        final Comentario comentario = new Comentario();
         comentario.setUsuario(usuario);
         comentario.setAvaliacao(avaliacao);
         comentario.setComentario("Comentário para remover");

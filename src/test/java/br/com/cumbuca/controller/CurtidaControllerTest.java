@@ -60,9 +60,9 @@ public class CurtidaControllerTest {
         usuario.setDtNascimento(LocalDate.of(2001, 10, 24));
         usuarioRepository.save(usuario);
 
-        Estabelecimento estabelecimento = new Estabelecimento();
+        final Estabelecimento estabelecimento = new Estabelecimento();
         estabelecimento.setId(1L);
-        estabelecimento.setNome("O Gonzagão");
+        estabelecimento.setNome("Test Estabelecimento");
         estabelecimento.setCategoria("Restaurante");
         estabelecimentoRepository.save(estabelecimento);
 
