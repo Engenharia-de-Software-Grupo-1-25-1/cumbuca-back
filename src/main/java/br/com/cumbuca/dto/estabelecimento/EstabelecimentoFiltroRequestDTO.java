@@ -6,7 +6,7 @@ import lombok.Data;
 public class EstabelecimentoFiltroRequestDTO {
     private String nome;
     private String categoria;
-    private String local;
-    private boolean favoritado;
+    private String localizacao;
+    private Boolean isFavoritado;
     private Double notaGeral;
 }

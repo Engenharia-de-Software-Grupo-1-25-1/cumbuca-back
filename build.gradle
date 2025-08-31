@@ -72,6 +72,4 @@ tasks.withType(Pmd).configureEach {
 
 test {
     useJUnitPlatform()
-    systemProperty("spring.profiles.active", "test")
-    workingDir = project.projectDir
 }

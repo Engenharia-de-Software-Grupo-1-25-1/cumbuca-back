@@ -69,30 +69,20 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                     final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
                     estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
                     estabelecimentoResponseDTO.setNotaGeral(estabelecimento.getNotaGeral());
-                    estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
+                    estabelecimentoResponseDTO.setIsFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
                     return estabelecimentoResponseDTO;
                 })
                 .toList();
-
     }
 
     private Example<EstabelecimentoView> criarExemplo(EstabelecimentoFiltroRequestDTO filtros) {
-        final EstabelecimentoView exemplo = new EstabelecimentoView();
+        final EstabelecimentoView exemplo = modelMapper.map(filtros, EstabelecimentoView.class);
 
-        if (filtros.getNome() != null && !filtros.getNome().isBlank()) {
-            exemplo.setNome(filtros.getNome());
+        if (filtros.getLocalizacao() != null && !filtros.getLocalizacao().isBlank()) {
+            exemplo.setLocalizacao(filtros.getLocalizacao());
         }
-        if (filtros.getCategoria() != null && !filtros.getCategoria().isBlank()) {
-            exemplo.setCategoria(filtros.getCategoria());
-        }
-        if (filtros.getLocal() != null && !filtros.getLocal().isBlank()) {
-            exemplo.setRua(filtros.getLocal());
-            exemplo.setBairro(filtros.getLocal());
-            exemplo.setCidade(filtros.getLocal());
-            exemplo.setEstado(filtros.getLocal());
-        }
-        if (filtros.isFavoritado()) {
-            exemplo.setFavoritado(true);
+        if (filtros.getIsFavoritado() != null && filtros.getIsFavoritado()) {
+            exemplo.setIsFavoritado(true);
         }
 
         final ExampleMatcher matcher = ExampleMatcher.matching()
@@ -111,7 +101,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         final EstabelecimentoResponseDTO estabelecimentoResponseDTO = new EstabelecimentoResponseDTO(estabelecimento);
         estabelecimentoResponseDTO.setQtdAvaliacoes(avaliacoes.size());
         estabelecimentoResponseDTO.setNotaGeral(estabelecimento.getNotaGeral());
-        estabelecimentoResponseDTO.setFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
+        estabelecimentoResponseDTO.setIsFavoritado(favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()));
         return estabelecimentoResponseDTO;
     }
 
@@ -125,7 +115,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         if (favorito != null) {
             favoritoRespository.delete(favorito);
             final FavoritoResponseDTO favoritoResponseDTO = new FavoritoResponseDTO(favorito);
-            favoritoResponseDTO.setFavoritado(false);
+            favoritoResponseDTO.setIsFavoritado(false);
             return favoritoResponseDTO;
         }
 
@@ -134,7 +124,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         favorito.setEstabelecimento(estabelecimento);
 
         final FavoritoResponseDTO favoritoResponseDTO = modelMapper.map(favorito, FavoritoResponseDTO.class);
-        favoritoResponseDTO.setFavoritado(true);
+        favoritoResponseDTO.setIsFavoritado(true);
         favoritoRespository.save(favorito);
         return favoritoResponseDTO;
     }

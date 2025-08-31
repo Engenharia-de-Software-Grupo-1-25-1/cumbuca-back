@@ -42,7 +42,7 @@ public class CurtidaServiceImpl implements CurtidaService {
             }
             curtidaRepository.delete(curtida);
             final CurtidaResponseDTO curtidaResponseDTO = new CurtidaResponseDTO(curtida);
-            curtidaResponseDTO.setCurtido(false);
+            curtidaResponseDTO.setIsCurtida(false);
             return curtidaResponseDTO;
         }
 
@@ -51,7 +51,7 @@ public class CurtidaServiceImpl implements CurtidaService {
         curtida.setAvaliacao(avaliacao);
 
         final CurtidaResponseDTO curtidaResponseDTO = modelMapper.map(curtida, CurtidaResponseDTO.class);
-        curtidaResponseDTO.setCurtido(true);
+        curtidaResponseDTO.setIsCurtida(true);
         curtidaRepository.save(curtida);
         return curtidaResponseDTO;
     }

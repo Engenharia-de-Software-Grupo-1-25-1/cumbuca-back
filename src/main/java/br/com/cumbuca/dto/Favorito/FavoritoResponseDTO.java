@@ -12,7 +12,7 @@ public class FavoritoResponseDTO {
 
     private UsuarioResponseDTO usuario;
     private EstabelecimentoResponseDTO estabelecimento;
-    private boolean favoritado;
+    private Boolean isFavoritado;
 
     public FavoritoResponseDTO(Favorito favorito) {
         this.usuario = new UsuarioResponseDTO(favorito.getUsuario());

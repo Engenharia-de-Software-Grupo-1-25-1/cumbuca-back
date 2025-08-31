@@ -11,8 +11,6 @@ import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.AvaliacaoViewRepository;
-import br.com.cumbuca.service.comentario.ComentarioService;
-import br.com.cumbuca.service.curtida.CurtidaService;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import br.com.cumbuca.service.foto.FotoService;
 import br.com.cumbuca.service.tag.TagService;
@@ -29,6 +27,8 @@ import java.util.NoSuchElementException;
 
 @Service
 public class AvaliacaoServiceImpl implements AvaliacaoService {
+
+    private final AvaliacaoFacade avaliacaoFacade;
     private final AvaliacaoRepository avaliacaoRepository;
     private final AvaliacaoViewRepository avaliacaoViewRepository;
     private final ModelMapper modelMapper;
@@ -36,13 +36,12 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     private final EstabelecimentoService estabelecimentoService;
     private final TagService tagService;
     private final FotoService fotoService;
-    private final ComentarioService comentarioService;
-    private final CurtidaService curtidaService;
 
-    public AvaliacaoServiceImpl(AvaliacaoRepository avaliacaoRepository, AvaliacaoViewRepository avaliacaoViewRepository,
+
+    public AvaliacaoServiceImpl(AvaliacaoFacade avaliacaoFacade, AvaliacaoRepository avaliacaoRepository, AvaliacaoViewRepository avaliacaoViewRepository,
                                 ModelMapper modelMapper, UsuarioService usuarioService, EstabelecimentoService estabelecimentoService,
-                                TagService tagService, FotoService fotoService, ComentarioService comentarioService,
-                                CurtidaService curtidaService) {
+                                TagService tagService, FotoService fotoService) {
+        this.avaliacaoFacade = avaliacaoFacade;
         this.avaliacaoRepository = avaliacaoRepository;
         this.avaliacaoViewRepository = avaliacaoViewRepository;
         this.modelMapper = modelMapper;
@@ -50,8 +49,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         this.estabelecimentoService = estabelecimentoService;
         this.tagService = tagService;
         this.fotoService = fotoService;
-        this.comentarioService = comentarioService;
-        this.curtidaService = curtidaService;
     }
 
     @Override
@@ -120,16 +117,12 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         final AvaliacaoView avaliacao = avaliacaoViewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
         final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
-        avaliacaoResponseDTO.setFotos(fotoService.recuperar(id));
-        avaliacaoResponseDTO.setTags(tagService.recuperar(id));
-        avaliacaoResponseDTO.setComentarios(comentarioService.recuperar(id));
-        avaliacaoResponseDTO.setCurtida(curtidaService.isAvaliacaoCurtida(usuario.getId(), avaliacao.getId()));
+        avaliacaoFacade.montarDTO(avaliacaoResponseDTO, avaliacao.getId(), usuario.getId());
         return avaliacaoResponseDTO;
     }
 
     @Override
     public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros, String ordenador) {
-        usuarioService.verificaUsuarioLogado();
         final Example<AvaliacaoView> example = criarExemplo(filtros);
 
         final Sort sort = getSort(ordenador);
@@ -158,10 +151,9 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
                         filtros.getNotaAtendimento() == null || (avaliacao.getNotaAtendimento() >= filtros.getNotaAtendimento()
                                 && avaliacao.getNotaAtendimento() < filtros.getNotaAtendimento() + 1))
                 .map(avaliacao -> {
-                    final AvaliacaoResponseDTO dto = new AvaliacaoResponseDTO(avaliacao);
-                    dto.setFotos(fotoService.recuperar(avaliacao.getId()));
-                    dto.setTags(tagService.recuperar(avaliacao.getId()));
-                    return dto;
+                    final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
+                    avaliacaoFacade.montarDTO(avaliacaoResponseDTO, avaliacao.getId());
+                    return  avaliacaoResponseDTO;
                 })
                 .toList();
     }
@@ -177,7 +169,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     private Example<AvaliacaoView> criarExemplo(AvaliacaoFiltroRequestDTO filtros) {
-        final AvaliacaoView exemplo = new AvaliacaoView();
+        final AvaliacaoView exemplo = modelMapper.map(filtros, AvaliacaoView.class);
 
         if (filtros.getUsuario() != null && !filtros.getUsuario().isBlank()) {
             final Usuario usuario = new Usuario();
@@ -188,9 +180,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
             final Estabelecimento estabelecimento = new Estabelecimento();
             estabelecimento.setNome(filtros.getEstabelecimento());
             exemplo.setEstabelecimento(estabelecimento);
-        }
-        if (filtros.getItemConsumido() != null && !filtros.getItemConsumido().isBlank()) {
-            exemplo.setItemConsumido(filtros.getItemConsumido());
         }
 
         final ExampleMatcher matcher = ExampleMatcher.matching()
