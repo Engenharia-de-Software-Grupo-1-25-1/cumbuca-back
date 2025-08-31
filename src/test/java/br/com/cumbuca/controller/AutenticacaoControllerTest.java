@@ -7,18 +7,22 @@ import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;
 import br.com.cumbuca.service.autenticacao.TokenService;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.JWTCreationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,11 +32,13 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -355,6 +361,53 @@ class AutenticacaoControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(alterarSenhaRequest)))
                     .andExpect(status().isBadRequest());
+        }
+    }
+
+    @Nested
+    class AutenticacaoTokenInconsistente {
+
+        @Test
+        void testVerificarTokenInvalido() {
+            final String tokenInvalido = "token-invalido-123";
+
+            final BadCredentialsException exception = assertThrows(
+                    BadCredentialsException.class,
+                    () -> tokenService.verificarToken(tokenInvalido)
+            );
+            assertEquals("Token JWT inválido ou expirado.", exception.getMessage());
+        }
+
+        @Test
+        void testVerificarTokenNulo() {
+            final BadCredentialsException exception = assertThrows(
+                    BadCredentialsException.class,
+                    () -> tokenService.verificarToken(null)
+            );
+            assertEquals("Token JWT inválido ou expirado.", exception.getMessage());
+        }
+
+        @Test
+        void testVerificarTokenVazio() {
+            final BadCredentialsException exception = assertThrows(
+                    BadCredentialsException.class,
+                    () -> tokenService.verificarToken("")
+            );
+            assertEquals("Token JWT inválido ou expirado.", exception.getMessage());
+        }
+
+        @Test
+        void testGerarTokenFalha() {
+            try (MockedStatic<JWT> jwtMock = mockStatic(JWT.class)) {
+                jwtMock.when(JWT::create).thenThrow(new JWTCreationException("Erro simulado", null));
+
+                final BadCredentialsException exception = assertThrows(
+                        BadCredentialsException.class,
+                        () -> tokenService.gerarToken(usuario)
+                );
+
+                assertEquals("Erro ao gerar token JWT de acesso.", exception.getMessage());
+            }
         }
     }
 }

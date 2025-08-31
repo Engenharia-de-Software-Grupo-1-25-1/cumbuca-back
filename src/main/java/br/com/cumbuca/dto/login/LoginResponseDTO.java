@@ -1,8 +1,8 @@
 package br.com.cumbuca.dto.login;
 
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class LoginResponseDTO {
     private String token;
     private Long id;
