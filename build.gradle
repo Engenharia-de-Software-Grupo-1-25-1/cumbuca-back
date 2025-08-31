@@ -25,6 +25,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     implementation 'org.modelmapper:modelmapper:3.1.1'
 
@@ -53,6 +54,10 @@ dependencies {
 checkstyle {
     toolVersion = '10.12.3'
     configFile = file("config/checkstyle/checkstyle.xml")
+}
+
+tasks.withType(Checkstyle).configureEach {
+    source = sourceSets.main.allJava
 }
 
 pmd {

@@ -117,12 +117,13 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         final AvaliacaoView avaliacao = avaliacaoViewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
         final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
-        avaliacaoFacade.montarDTO(avaliacaoResponseDTO, avaliacao.getId(), usuario.getId());
+        avaliacaoFacade.montarDTORecuperar(avaliacaoResponseDTO, avaliacao.getId(), usuario.getId());
         return avaliacaoResponseDTO;
     }
 
     @Override
     public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros, String ordenador) {
+        final Usuario usuario = usuarioService.getUsuarioLogado();
         final Example<AvaliacaoView> example = criarExemplo(filtros);
 
         final Sort sort = getSort(ordenador);
@@ -152,7 +153,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
                                 && avaliacao.getNotaAtendimento() < filtros.getNotaAtendimento() + 1))
                 .map(avaliacao -> {
                     final AvaliacaoResponseDTO avaliacaoResponseDTO = new AvaliacaoResponseDTO(avaliacao);
-                    avaliacaoFacade.montarDTO(avaliacaoResponseDTO, avaliacao.getId());
+                    avaliacaoFacade.montarDTOListar(avaliacaoResponseDTO, avaliacao.getId(), usuario.getId());
                     return  avaliacaoResponseDTO;
                 })
                 .toList();
