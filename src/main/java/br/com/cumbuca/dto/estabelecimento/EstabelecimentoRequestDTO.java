@@ -31,4 +31,5 @@ public class EstabelecimentoRequestDTO {
     private String cep;
 
     private List<String> horarios;
+
 }
