@@ -3,19 +3,26 @@ package br.com.cumbuca.controller;
 import br.com.cumbuca.dto.login.LoginRequestDTO;
 import br.com.cumbuca.dto.senha.AlterarSenhaRequestDTO;
 import br.com.cumbuca.dto.senha.RecuperarSenhaRequestDTO;
+import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;
+import br.com.cumbuca.service.autenticacao.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -29,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 @Transactional
 class AutenticacaoControllerTest {
 
@@ -42,22 +50,35 @@ class AutenticacaoControllerTest {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private Usuario usuario;
+    ModelMapper modelMapper = new ModelMapper();
+    UsuarioRequestDTO usuarioRequestDTO;
+    Usuario usuario;
+    String token;
 
     @BeforeEach
     void setup() {
-        usuario = usuarioRepository.findByEmail("testeautenticacao@email.com")
-                .orElseGet(() -> {
-                    final Usuario novoUsuario = new Usuario();
-                    novoUsuario.setEmail("testeautenticacao@email.com");
-                    novoUsuario.setSenha(passwordEncoder.encode("123456"));
-                    novoUsuario.setNome("Teste Autenticacao");
-                    novoUsuario.setUsername("testeautenticacao");
-                    novoUsuario.setDtNascimento(LocalDate.of(2000, 1, 1));
-                    return usuarioRepository.save(novoUsuario);
-                });
+        usuarioRequestDTO = new UsuarioRequestDTO();
+        usuarioRequestDTO.setEmail("testejunit@email.com");
+        usuarioRequestDTO.setSenha("123456");
+        usuarioRequestDTO.setNome("Teste JUnit");
+        usuarioRequestDTO.setUsername("testejunit");
+        usuarioRequestDTO.setDtNascimento(LocalDate.of(2000, 1, 1));
+
+        usuario = modelMapper.map(usuarioRequestDTO, Usuario.class);
+        usuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.getSenha()));
+        usuarioRepository.save(usuario);
+
+        final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(usuario.getUsername(), usuarioRequestDTO.getSenha());
+        final Authentication authentication = authenticationManager.authenticate(authToken);
+        token = tokenService.gerarToken((Usuario) authentication.getPrincipal());
     }
 
     @AfterEach
@@ -71,7 +92,7 @@ class AutenticacaoControllerTest {
         @Test
         void testEfetuarLogin() throws Exception {
             final LoginRequestDTO loginRequest = new LoginRequestDTO();
-            loginRequest.setUsername("testeautenticacao");
+            loginRequest.setUsername("testejunit");
             loginRequest.setSenha("123456");
 
             driver.perform(post("/login")
@@ -84,12 +105,12 @@ class AutenticacaoControllerTest {
 
         @Test
         void testEnviarEmailRecuperacaoSenha() throws Exception {
-            final RecuperarSenhaRequestDTO request = new RecuperarSenhaRequestDTO();
-            request.setEmail("testeautenticacao@email.com");
+            final RecuperarSenhaRequestDTO recuperarSenhaRequest = new RecuperarSenhaRequestDTO();
+            recuperarSenhaRequest.setEmail("testejunit@email.com");
 
             driver.perform(post("/recuperar-senha")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            .content(objectMapper.writeValueAsString(recuperarSenhaRequest)))
                     .andExpect(status().isOk())
                     .andExpect(content().string("E-mail enviado."));
         }
@@ -97,7 +118,7 @@ class AutenticacaoControllerTest {
         @Test
         void testAlterarSenha() throws Exception {
             final LoginRequestDTO loginRequest = new LoginRequestDTO();
-            loginRequest.setUsername("testeautenticacao");
+            loginRequest.setUsername("testejunit");
             loginRequest.setSenha("123456");
 
             final MvcResult result = driver.perform(post("/login")
@@ -106,17 +127,17 @@ class AutenticacaoControllerTest {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            final String token = objectMapper.readTree(result.getResponse().getContentAsString())
+            final String tokenRecebido = objectMapper.readTree(result.getResponse().getContentAsString())
                     .get("token").asText();
 
-            final AlterarSenhaRequestDTO request = new AlterarSenhaRequestDTO();
-            request.setToken(token);
-            request.setNovaSenha("novaSenha123");
-            request.setConfirmarNovaSenha("novaSenha123");
+            final AlterarSenhaRequestDTO alterarSenhaRequest = new AlterarSenhaRequestDTO();
+            alterarSenhaRequest.setToken(tokenRecebido);
+            alterarSenhaRequest.setNovaSenha("novaSenha123");
+            alterarSenhaRequest.setConfirmarNovaSenha("novaSenha123");
 
             driver.perform(post("/alterar-senha")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            .content(objectMapper.writeValueAsString(alterarSenhaRequest)))
                     .andExpect(status().isOk())
                     .andExpect(content().string("Senha alterada com sucesso."));
         }
@@ -141,7 +162,7 @@ class AutenticacaoControllerTest {
         @Test
         void testEfetuarLoginSenhaNula() throws Exception {
             final LoginRequestDTO loginRequest = new LoginRequestDTO();
-            loginRequest.setUsername("testeautenticacao");
+            loginRequest.setUsername("testejunit");
             loginRequest.setSenha(null);
 
             driver.perform(post("/login")
@@ -165,7 +186,7 @@ class AutenticacaoControllerTest {
         @Test
         void testEfetuarLoginSenhaInvalida() throws Exception {
             final LoginRequestDTO loginRequest = new LoginRequestDTO();
-            loginRequest.setUsername("testeautenticacao");
+            loginRequest.setUsername("testejunit");
             loginRequest.setSenha("654321");
 
             driver.perform(post("/login")
@@ -180,34 +201,34 @@ class AutenticacaoControllerTest {
 
         @Test
         void testEnviarEmailNulo() throws Exception {
-            final RecuperarSenhaRequestDTO request = new RecuperarSenhaRequestDTO();
-            request.setEmail(null);
+            final RecuperarSenhaRequestDTO recuperarSenhaRequest = new RecuperarSenhaRequestDTO();
+            recuperarSenhaRequest.setEmail(null);
 
             driver.perform(post("/recuperar-senha")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            .content(objectMapper.writeValueAsString(recuperarSenhaRequest)))
                     .andExpect(status().isBadRequest());
         }
 
         @Test
         void testEnviarEmailVazio() throws Exception {
-            final RecuperarSenhaRequestDTO request = new RecuperarSenhaRequestDTO();
-            request.setEmail("");
+            final RecuperarSenhaRequestDTO recuperarSenhaRequest = new RecuperarSenhaRequestDTO();
+            recuperarSenhaRequest.setEmail("");
 
             driver.perform(post("/recuperar-senha")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            .content(objectMapper.writeValueAsString(recuperarSenhaRequest)))
                     .andExpect(status().isBadRequest());
         }
 
         @Test
         void testEnviarEmailInvalido() throws Exception {
-            final RecuperarSenhaRequestDTO request = new RecuperarSenhaRequestDTO();
-            request.setEmail("emailinvalido@email.com");
+            final RecuperarSenhaRequestDTO recuperarSenhaRequest = new RecuperarSenhaRequestDTO();
+            recuperarSenhaRequest.setEmail("emailinvalido@email.com");
 
             driver.perform(post("/recuperar-senha")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            .content(objectMapper.writeValueAsString(recuperarSenhaRequest)))
                     .andExpect(status().isNotFound());
         }
 
@@ -219,7 +240,7 @@ class AutenticacaoControllerTest {
         @Test
         void testAlterarSenhaNula() throws Exception {
             final LoginRequestDTO loginRequest = new LoginRequestDTO();
-            loginRequest.setUsername("testeautenticacao");
+            loginRequest.setUsername("testejunit");
             loginRequest.setSenha("123456");
 
             final MvcResult result = driver.perform(post("/login")
@@ -228,24 +249,24 @@ class AutenticacaoControllerTest {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            final String token = objectMapper.readTree(result.getResponse().getContentAsString())
+            final String tokenRecebido = objectMapper.readTree(result.getResponse().getContentAsString())
                     .get("token").asText();
 
-            final AlterarSenhaRequestDTO request = new AlterarSenhaRequestDTO();
-            request.setToken(token);
-            request.setNovaSenha("novaSenha123");
-            request.setConfirmarNovaSenha(null);
+            final AlterarSenhaRequestDTO alterarSenhaRequest = new AlterarSenhaRequestDTO();
+            alterarSenhaRequest.setToken(tokenRecebido);
+            alterarSenhaRequest.setNovaSenha("novaSenha123");
+            alterarSenhaRequest.setConfirmarNovaSenha(null);
 
             driver.perform(post("/alterar-senha")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            .content(objectMapper.writeValueAsString(alterarSenhaRequest)))
                     .andExpect(status().isBadRequest());
         }
 
         @Test
         void testAlterarSenhaVazia() throws Exception {
             final LoginRequestDTO loginRequest = new LoginRequestDTO();
-            loginRequest.setUsername("testeautenticacao");
+            loginRequest.setUsername("testejunit");
             loginRequest.setSenha("123456");
 
             final MvcResult result = driver.perform(post("/login")
@@ -254,24 +275,24 @@ class AutenticacaoControllerTest {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            final String token = objectMapper.readTree(result.getResponse().getContentAsString())
+            final String tokenRecebido = objectMapper.readTree(result.getResponse().getContentAsString())
                     .get("token").asText();
 
-        final AlterarSenhaRequestDTO request = new AlterarSenhaRequestDTO();
-        request.setToken(token);
-        request.setNovaSenha("");
-        request.setConfirmarNovaSenha("");
+        final AlterarSenhaRequestDTO alterarSenhaRequest = new AlterarSenhaRequestDTO();
+        alterarSenhaRequest.setToken(tokenRecebido);
+        alterarSenhaRequest.setNovaSenha("");
+        alterarSenhaRequest.setConfirmarNovaSenha("");
 
             driver.perform(post("/alterar-senha")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            .content(objectMapper.writeValueAsString(alterarSenhaRequest)))
                     .andExpect(status().isBadRequest());
         }
 
         @Test
         void testAlterarSenhasDiferentes() throws Exception {
             final LoginRequestDTO loginRequest = new LoginRequestDTO();
-            loginRequest.setUsername("testeautenticacao");
+            loginRequest.setUsername("testejunit");
             loginRequest.setSenha("123456");
 
             final MvcResult result = driver.perform(post("/login")
@@ -280,17 +301,17 @@ class AutenticacaoControllerTest {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            final String token = objectMapper.readTree(result.getResponse().getContentAsString())
+            final String tokenRecebido = objectMapper.readTree(result.getResponse().getContentAsString())
                     .get("token").asText();
 
-            final AlterarSenhaRequestDTO request = new AlterarSenhaRequestDTO();
-            request.setToken(token);
-            request.setNovaSenha("654321");
-            request.setConfirmarNovaSenha("6543210");
+            final AlterarSenhaRequestDTO alterarSenhaRequest = new AlterarSenhaRequestDTO();
+            alterarSenhaRequest.setToken(tokenRecebido);
+            alterarSenhaRequest.setNovaSenha("654321");
+            alterarSenhaRequest.setConfirmarNovaSenha("6543210");
 
             driver.perform(post("/alterar-senha")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            .content(objectMapper.writeValueAsString(alterarSenhaRequest)))
                     .andExpect(status().isBadRequest())
                     .andExpect(content().string("As senhas não coincidem."));
         }
@@ -299,7 +320,7 @@ class AutenticacaoControllerTest {
         @Test
         void testAlterarSenhaTamanhoInvalido() throws Exception {
             final LoginRequestDTO loginRequest = new LoginRequestDTO();
-            loginRequest.setUsername("testeautenticacao");
+            loginRequest.setUsername("testejunit");
             loginRequest.setSenha("123456");
 
             final MvcResult result = driver.perform(post("/login")
@@ -308,17 +329,17 @@ class AutenticacaoControllerTest {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            final String token = objectMapper.readTree(result.getResponse().getContentAsString())
+            final String tokenRecebido = objectMapper.readTree(result.getResponse().getContentAsString())
                     .get("token").asText();
 
-            final AlterarSenhaRequestDTO request = new AlterarSenhaRequestDTO();
-            request.setToken(token);
-            request.setNovaSenha("12345");
-            request.setConfirmarNovaSenha("12345");
+            final AlterarSenhaRequestDTO alterarSenhaRequest = new AlterarSenhaRequestDTO();
+            alterarSenhaRequest.setToken(tokenRecebido);
+            alterarSenhaRequest.setNovaSenha("12345");
+            alterarSenhaRequest.setConfirmarNovaSenha("12345");
 
             driver.perform(post("/alterar-senha")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                            .content(objectMapper.writeValueAsString(alterarSenhaRequest)))
                     .andExpect(status().isBadRequest());
         }
     }
