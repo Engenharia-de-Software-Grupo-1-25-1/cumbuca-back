@@ -1,6 +1,7 @@
 package br.com.cumbuca.dto.usuario;
 
 import br.com.cumbuca.model.Usuario;
+import br.com.cumbuca.model.UsuarioView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +17,7 @@ public class UsuarioResponseDTO {
     private LocalDate dtNascimento;
     private byte[] foto;
     private String status;
+    private int qtdAvaliacoes;
 
     public UsuarioResponseDTO(Usuario usuario) {
         this.id = usuario.getId();
@@ -25,5 +27,17 @@ public class UsuarioResponseDTO {
         this.dtNascimento = usuario.getDtNascimento();
         this.foto = usuario.getFoto();
         this.status = usuario.getStatus();
+        this.qtdAvaliacoes = 0;
+    }
+
+    public UsuarioResponseDTO(UsuarioView usuario) {
+        this.id = usuario.getId();
+        this.email = usuario.getEmail();
+        this.nome = usuario.getNome();
+        this.username = usuario.getUsername();
+        this.dtNascimento = usuario.getDtNascimento();
+        this.foto = usuario.getFoto();
+        this.status = usuario.getStatus();
+        this.qtdAvaliacoes = usuario.getQtdAvaliacoes();
     }
 }
