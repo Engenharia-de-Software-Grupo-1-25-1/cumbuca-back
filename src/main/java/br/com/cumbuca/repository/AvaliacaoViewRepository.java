@@ -9,14 +9,7 @@ public interface AvaliacaoViewRepository extends JpaRepository<AvaliacaoView, Lo
 
     List<AvaliacaoView> findByEstabelecimentoId(Long estabelecimentoId);
 
-    List<AvaliacaoView> findAllByOrderByDataDesc();
-
     List<AvaliacaoView> findByUsuarioIdOrderByDataDesc(Long usuarioId);
-
-    List<AvaliacaoView> findAllByOrderByQtdCurtidasAscQtdComentariosAsc();
-
-    List<AvaliacaoView> findAllByOrderByNotaGeralAsc();
 
     List<AvaliacaoView> findByEstabelecimentoIdOrderByDataDesc(Long estabelecimentoId);
 }
-

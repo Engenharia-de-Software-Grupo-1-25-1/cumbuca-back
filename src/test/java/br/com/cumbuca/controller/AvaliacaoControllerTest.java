@@ -53,8 +53,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-public class AvaliacaoControllerTest {
-    final String URI = "/avaliacao";
+class AvaliacaoControllerTest {
+    static final String URI = "/avaliacao";
 
     @Autowired
     MockMvc driver;
@@ -154,16 +154,16 @@ public class AvaliacaoControllerTest {
 
         @Test
         void testCriarAvaliacao() throws Exception {
-            final AvaliacaoRequestDTO avaliacaoRequestDTO = new AvaliacaoRequestDTO();
-            avaliacaoRequestDTO.setEstabelecimento(estabelecimentoRequestDTO);
-            avaliacaoRequestDTO.setItemConsumido("Pizza Margherita");
-            avaliacaoRequestDTO.setDescricao("Excelente pizza, massa crocante e ingredientes frescos!");
-            avaliacaoRequestDTO.setPreco(new BigDecimal("35.90"));
-            avaliacaoRequestDTO.setNotaGeral(5);
-            avaliacaoRequestDTO.setNotaComida(5);
-            avaliacaoRequestDTO.setNotaAtendimento(4);
-            avaliacaoRequestDTO.setNotaAmbiente(4);
-            avaliacaoRequestDTO.setTags(Arrays.asList("pizza", "deliciosa", "recomendo"));
+            final AvaliacaoRequestDTO avaliacaoRequest = new AvaliacaoRequestDTO();
+            avaliacaoRequest.setEstabelecimento(estabelecimentoRequestDTO);
+            avaliacaoRequest.setItemConsumido("Pizza Margherita");
+            avaliacaoRequest.setDescricao("Excelente pizza, massa crocante e ingredientes frescos!");
+            avaliacaoRequest.setPreco(new BigDecimal("35.90"));
+            avaliacaoRequest.setNotaGeral(5);
+            avaliacaoRequest.setNotaComida(5);
+            avaliacaoRequest.setNotaAtendimento(4);
+            avaliacaoRequest.setNotaAmbiente(4);
+            avaliacaoRequest.setTags(Arrays.asList("pizza", "deliciosa", "recomendo"));
 
             final MockMultipartFile foto = new MockMultipartFile("fotos", "pizza.jpg", "image/jpeg",
                     "conteudo da foto".getBytes());
@@ -179,13 +179,13 @@ public class AvaliacaoControllerTest {
                     .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
                     .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
                     .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
-                    .param("itemConsumido", avaliacaoRequestDTO.getItemConsumido())
-                    .param("descricao", avaliacaoRequestDTO.getDescricao())
-                    .param("preco", avaliacaoRequestDTO.getPreco().toString())
-                    .param("notaGeral", avaliacaoRequestDTO.getNotaGeral().toString())
-                    .param("notaComida", avaliacaoRequestDTO.getNotaComida().toString())
-                    .param("notaAtendimento", avaliacaoRequestDTO.getNotaAtendimento().toString())
-                    .param("notaAmbiente", avaliacaoRequestDTO.getNotaAmbiente().toString())
+                    .param("itemConsumido", avaliacaoRequest.getItemConsumido())
+                    .param("descricao", avaliacaoRequest.getDescricao())
+                    .param("preco", avaliacaoRequest.getPreco().toString())
+                    .param("notaGeral", avaliacaoRequest.getNotaGeral().toString())
+                    .param("notaComida", avaliacaoRequest.getNotaComida().toString())
+                    .param("notaAtendimento", avaliacaoRequest.getNotaAtendimento().toString())
+                    .param("notaAmbiente", avaliacaoRequest.getNotaAmbiente().toString())
                     .param("tags", "pizza", "deliciosa", "recomendo")
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .header("Authorization", "Bearer " + token)
@@ -200,13 +200,13 @@ public class AvaliacaoControllerTest {
 
             assertAll(
                     () -> assertNotNull(resultado.getId()),
-                    () -> assertEquals(avaliacaoRequestDTO.getItemConsumido(), resultado.getItemConsumido()),
-                    () -> assertEquals(avaliacaoRequestDTO.getDescricao(), resultado.getDescricao()),
-                    () -> assertEquals(avaliacaoRequestDTO.getPreco(), resultado.getPreco()),
-                    () -> assertEquals(avaliacaoRequestDTO.getNotaGeral(), resultado.getNotaGeral()),
-                    () -> assertEquals(avaliacaoRequestDTO.getNotaComida(), resultado.getNotaComida()),
-                    () -> assertEquals(avaliacaoRequestDTO.getNotaAtendimento(), resultado.getNotaAtendimento()),
-                    () -> assertEquals(avaliacaoRequestDTO.getNotaAmbiente(), resultado.getNotaAmbiente()),
+                    () -> assertEquals(avaliacaoRequest.getItemConsumido(), resultado.getItemConsumido()),
+                    () -> assertEquals(avaliacaoRequest.getDescricao(), resultado.getDescricao()),
+                    () -> assertEquals(avaliacaoRequest.getPreco(), resultado.getPreco()),
+                    () -> assertEquals(avaliacaoRequest.getNotaGeral(), resultado.getNotaGeral()),
+                    () -> assertEquals(avaliacaoRequest.getNotaComida(), resultado.getNotaComida()),
+                    () -> assertEquals(avaliacaoRequest.getNotaAtendimento(), resultado.getNotaAtendimento()),
+                    () -> assertEquals(avaliacaoRequest.getNotaAmbiente(), resultado.getNotaAmbiente()),
                     () -> assertEquals(usuario.getId(), resultado.getUsuario().getId()),
                     () -> assertEquals(estabelecimento.getId(), resultado.getEstabelecimento().getId()),
                     () -> assertNotNull(resultado.getData()));
@@ -1230,7 +1230,7 @@ public class AvaliacaoControllerTest {
             driver.perform(get(URI + "/recuperar/" + avaliacao.getId())
                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
-                    .andExpect(status().isNotFound());
+                    .andExpect(status().isForbidden());
         }
 
         @Test

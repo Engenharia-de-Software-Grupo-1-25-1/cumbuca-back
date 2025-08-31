@@ -35,7 +35,7 @@ public class ComentarioServiceImpl implements ComentarioService {
         final List<Comentario> comentarios = comentarioRepository.findByAvaliacaoId(avaliacaoId);
         return comentarios.stream()
                 .map(ComentarioResponseDTO::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ComentarioServiceImpl implements ComentarioService {
         final Comentario comentario = new Comentario();
         comentario.setAvaliacao(avaliacao);
         comentario.setUsuario(usuario);
-        comentario.setComentario(texto);
+        comentario.setConteudo(texto);
         comentarioRepository.save(comentario);
         return modelMapper.map(comentario, ComentarioResponseDTO.class);
     }

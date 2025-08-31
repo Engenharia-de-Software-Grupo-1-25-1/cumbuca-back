@@ -4,7 +4,6 @@ import br.com.cumbuca.dto.tag.TagResponseDTO;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Tag;
 import br.com.cumbuca.repository.TagRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
@@ -17,11 +16,10 @@ import java.util.stream.Collectors;
 public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
-    private final ModelMapper modelMapper;
 
-    public TagServiceImpl(TagRepository tagRepository, ModelMapper modelMapper) {
+
+    public TagServiceImpl(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -30,7 +28,7 @@ public class TagServiceImpl implements TagService {
                 .filter(t -> !t.isEmpty())
                 .forEach(t -> {
                     final Tag tag = new Tag();
-                    tag.setTag(t);
+                    tag.setConteudo(t);
                     tag.setAvaliacao(avaliacao);
                     tagRepository.save(tag);
                 });
@@ -40,7 +38,7 @@ public class TagServiceImpl implements TagService {
     public List<String> recuperar(Long avaliacaoId) {
         return tagRepository.findByAvaliacaoId(avaliacaoId)
                 .stream()
-                .map(Tag::getTag)
+                .map(Tag::getConteudo)
                 .toList();
     }
 
@@ -56,7 +54,7 @@ public class TagServiceImpl implements TagService {
         return tags.stream()
                 .map(tag -> {
                     final TagResponseDTO tagResponseDTO = new TagResponseDTO(tag);
-                    tagResponseDTO.setTag(normalizarTag(tag.getTag()));
+                    tagResponseDTO.setTag(normalizarTag(tag.getConteudo()));
                     return tagResponseDTO;
                 })
                 .toList();
@@ -68,7 +66,7 @@ public class TagServiceImpl implements TagService {
 
         return tags.stream()
                 .collect(Collectors.groupingBy(
-                        tag -> normalizarTag(tag.getTag()),
+                        tag -> normalizarTag(tag.getConteudo()),
                         Collectors.counting()
                 ))
                 .entrySet().stream()

@@ -27,6 +27,6 @@ public class Foto {
     private Avaliacao avaliacao;
 
     @Column(name = "FOTO")
-    private byte[] foto;
+    private byte[] conteudo;
 
 }

@@ -17,6 +17,6 @@ public class ComentarioResponseDTO {
         this.id = comentario.getId();
         this.usuario = new UsuarioResponseDTO(comentario.getUsuario());
         this.avaliacaoId = comentario.getAvaliacao().getId();
-        this.comentario = comentario.getComentario();
+        this.comentario = comentario.getConteudo();
     }
 }

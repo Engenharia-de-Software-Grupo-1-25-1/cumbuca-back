@@ -1,4 +1,4 @@
-package br.com.cumbuca.dto.Favorito;
+package br.com.cumbuca.dto.favorito;
 
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;

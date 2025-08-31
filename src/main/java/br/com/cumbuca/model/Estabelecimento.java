@@ -43,7 +43,4 @@ public class Estabelecimento {
 
     @Column(name = "CEP", length = 10)
     private String cep;
-
-    @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Horario> horarios;
 }

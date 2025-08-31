@@ -27,7 +27,7 @@ public class FotoServiceImpl implements FotoService {
                 .forEach(f -> {
                     try {
                        final Foto foto = new Foto();
-                        foto.setFoto(f.getBytes());
+                        foto.setConteudo(f.getBytes());
                         foto.setAvaliacao(avaliacao);
                         fotoRepository.save(foto);
                     } catch (IOException e) {
@@ -40,7 +40,7 @@ public class FotoServiceImpl implements FotoService {
     public List<String> recuperar(Long avaliacaoId) {
         final List<Foto> fotos = fotoRepository.findByAvaliacaoId(avaliacaoId);
         return fotos.stream()
-                .map(foto -> Base64.getEncoder().encodeToString(foto.getFoto()))
+                .map(foto -> Base64.getEncoder().encodeToString(foto.getConteudo()))
                 .toList();
     }
 

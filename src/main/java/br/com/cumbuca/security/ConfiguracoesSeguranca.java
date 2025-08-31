@@ -44,12 +44,13 @@ public class ConfiguracoesSeguranca {
     @Bean
     public SecurityFilterChain filtrosSeguranca(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         return http
-//                .authorizeHttpRequests(req -> {
-//                    req.requestMatchers("/login").permitAll();
-//                    req.requestMatchers("/recuperarSenha/**").permitAll();
-//                    req.requestMatchers("/alterarSenha/**").permitAll();
-//                    req.anyRequest().authenticated();
-//                })
+                .authorizeHttpRequests(req -> {
+                    req.requestMatchers("/login").permitAll();
+                    req.requestMatchers("/recuperar-senha/**").permitAll();
+                    req.requestMatchers("/alterar-senha/**").permitAll();
+                    req.requestMatchers("/usuario/criar/**").permitAll();
+                    req.anyRequest().authenticated();
+                })
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)

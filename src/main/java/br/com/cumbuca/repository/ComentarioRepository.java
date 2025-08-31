@@ -10,8 +10,6 @@ import java.util.List;
 @Repository
 public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
 
-    Integer countByAvaliacaoId(Long avaliacaoId);
-
     List<Comentario> findByAvaliacaoId(Long avaliacaoId);
 
 }
