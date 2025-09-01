@@ -80,7 +80,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (!id.equals(usuario.getId())) {
             throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }
-        usuarioRepository.delete(usuario);
+        usuario.setStatus("INATIVO");
+        usuarioRepository.save(usuario);
     }
 
     @Override
