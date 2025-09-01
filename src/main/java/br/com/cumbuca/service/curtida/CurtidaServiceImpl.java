@@ -41,9 +41,6 @@ public class CurtidaServiceImpl implements CurtidaService {
         Curtida curtida = curtidaRepository.findByUsuarioIdAndAvaliacaoId(usuario.getId(), avaliacao.getId());
 
         if (curtida != null) {
-            if (!curtida.getUsuario().getId().equals(usuario.getId())) {
-                throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
-            }
             curtidaRepository.delete(curtida);
             final CurtidaResponseDTO curtidaResponseDTO = modelMapper.map(curtida, CurtidaResponseDTO.class);
             curtidaResponseDTO.setIsCurtida(false);

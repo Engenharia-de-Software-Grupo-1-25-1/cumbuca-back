@@ -26,12 +26,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -137,6 +135,7 @@ class CurtidaControllerTest {
 
             final CurtidaResponseDTO resposta = objectMapper.readValue(responseJson, CurtidaResponseDTO.class);
             assertAll(
+                    () -> assertNotNull(resposta.getId()),
                     () -> assertTrue(resposta.getIsCurtida())
             );
 
@@ -161,43 +160,10 @@ class CurtidaControllerTest {
 
             final CurtidaResponseDTO resposta = objectMapper.readValue(responseJson, CurtidaResponseDTO.class);
             assertAll(
+                    () -> assertNotNull(resposta.getId()),
                     () -> assertFalse(resposta.getIsCurtida())
             );
         }
-
-//        @Test
-//        void testDescurtirAvaliacaoOutroUsuario() throws Exception {
-//            UsuarioRequestDTO usuarioRequestDTO2 = new UsuarioRequestDTO();
-//            usuarioRequestDTO2.setEmail("testejunit2@email.com");
-//            usuarioRequestDTO2.setSenha("123456");
-//            usuarioRequestDTO2.setNome("Teste JUnit2");
-//            usuarioRequestDTO2.setUsername("testejunit2");
-//            usuarioRequestDTO2.setDtNascimento(LocalDate.of(2000, 1, 1));
-//            Usuario usuario2 = modelMapper.map(usuarioRequestDTO2, Usuario.class);
-//            usuario2.setSenha(passwordEncoder.encode(usuarioRequestDTO2.getSenha()));
-//            usuarioRepository.save(usuario2);
-//
-//            // salva curtida feita pelo usuario2
-//            Curtida curtida = new Curtida();
-//            curtida.setAvaliacao(avaliacao);
-//            curtida.setUsuario(usuario2);
-//            curtidaRepository.save(curtida);
-//
-//            // tenta descurtir com usuario1 (token do usuario1)
-//            String responseText = driver.perform(
-//                            org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-//                                    .post("/avaliacao/curtir/" + avaliacao.getId())
-//                                    .contentType(MediaType.APPLICATION_JSON)
-//                                    .header("Authorization", "Bearer " + token) // token do usuário1
-//                                    .characterEncoding("UTF-8"))
-//                    .andDo(print())
-//                    .andExpect(status().isBadRequest())
-//                    .andReturn()
-//                    .getResponse()
-//                    .getContentAsString(StandardCharsets.UTF_8);
-//
-//            assertEquals("Usuário não tem permissão para realizar esta ação.", responseText);
-//        }
 
     }
 }

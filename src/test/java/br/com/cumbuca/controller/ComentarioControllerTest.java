@@ -133,16 +133,16 @@ class ComentarioControllerTest {
             String comentario = "Gostei bastante da comida!";
 
             String responseJson = driver.perform(
-                    org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-                        .post("/avaliacao/comentar/" + avaliacao.getId())
-                        .content(comentario)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
-                        .characterEncoding("UTF-8"))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                            org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                                    .post("/avaliacao/comentar/" + avaliacao.getId())
+                                    .content(comentario)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .header("Authorization", "Bearer " + token)
+                                    .characterEncoding("UTF-8"))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
 
             final ComentarioResponseDTO resultado =
                     objectMapper.readValue(responseJson, ComentarioResponseDTO.class);
@@ -161,50 +161,14 @@ class ComentarioControllerTest {
             comentario.setConteudo("comentario teste remoção");
             comentarioRepository.save(comentario);
 
-           driver.perform(delete("/comentario/remover/" + comentario.getId())
-                           .contentType(MediaType.APPLICATION_JSON)
-                           .header("Authorization", "Bearer " + token))
+            driver.perform(delete("/comentario/remover/" + comentario.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isNoContent());
 
             assertFalse(comentarioRepository.findById(comentario.getId()).isPresent());
 
         }
-
-        @Test
-        void testRecuperarComentario() throws Exception {
-
-        }
-
-
-//    @TestsNoContent());
-//    @WithMockUser(username = "Lulu Fazedor de Drift")
-//    void testRecuperarComentarios() {
-//        comentarioService.comentar(avaliacao.getId(), "Comentário de teste");
-//        List<ComentarioResponseDTO> comentarios = comentarioService.recuperar(avaliacao.getId());e Drift")
-//        assertFalse(comentarios.isEmpty());
-//        assertEquals(1, comentarios.size());   comentarioService.comentar(avaliacao.getId(), "Comentário de teste");
-//        assertEquals("Comentário de teste", comentarios.get(0).getComentario());        List<ComentarioResponseDTO> comentarios = comentarioService.recuperar(avaliacao.getId());
-//    }ssertFalse(comentarios.isEmpty());
-//
-//    @Testentarios.get(0).getComentario());
-//    @WithMockUser(username = "Lulu Fazedor de Drift")
-//    void testComentarAvaliacaoNaoEncontrada() {
-//        assertThrows(NoSuchElementException.class, () ->
-//            comentarioService.comentar(999L, "Teste")WithMockUser(username = "Lulu Fazedor de Drift")
-//        );    void testComentarAvaliacaoNaoEncontrada() {
-//    }ssertThrows(NoSuchElementException.class, () ->
-//
-//    @Test
-//    @WithMockUser(username = "Lulu Fazedor de Drift")
-//    void testRemoverComentarioNaoEncontrado() {
-//        assertThrows(NoSuchElementException.class, () -> {
-//            comentarioService.remover(999L);WithMockUser(username = "Lulu Fazedor de Drift")
-//        });/    void testRemoverComentarioNaoEncontrado() {
-
-
-}//    }//        assertThrows(NoSuchElementException.class, () -> {
-//            comentarioService.remover(999L);
-//        });
-//    }
+    }
 }
