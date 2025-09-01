@@ -132,7 +132,7 @@ public class TagControllerTest {
         List<String> novasTags = List.of("hamburguer", "bom-preco");
         tagService.criar(novasTags, avaliacao);
 
-        assertEquals(2, tagRepository.count());
+        assertEquals(4, tagRepository.count());
     }
 
     @Test
