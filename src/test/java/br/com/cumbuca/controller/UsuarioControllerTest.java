@@ -183,8 +183,9 @@ class UsuarioControllerTest {
                             .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isNoContent());
-            assertFalse(usuarioRepository.findById(usuario.getId()).isPresent());
+            assertEquals("INATIVO", usuario.getStatus());
         }
+
 
         @Test
         void testRecuperarUsuarioPorId() throws Exception {

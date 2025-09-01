@@ -5,8 +5,6 @@ import br.com.cumbuca.model.EstabelecimentoView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 public class EstabelecimentoResponseDTO {
@@ -20,10 +18,10 @@ public class EstabelecimentoResponseDTO {
     private String cidade;
     private String estado;
     private String cep;
-    private List<String> horarios;
     private int qtdAvaliacoes;
     private Double notaGeral;
     private Boolean isFavoritado;
+    private String localizacao;
 
     public EstabelecimentoResponseDTO(Estabelecimento estabelecimento) {
         this.id = estabelecimento.getId();
@@ -34,7 +32,15 @@ public class EstabelecimentoResponseDTO {
         this.bairro = estabelecimento.getBairro();
         this.cidade = estabelecimento.getCidade();
         this.estado = estabelecimento.getEstado();
+        this.cep = estabelecimento.getCep();
         this.isFavoritado = false;
+        this.localizacao = String.join(" ",
+                estabelecimento.getRua(),
+                estabelecimento.getBairro(),
+                estabelecimento.getCidade(),
+                estabelecimento.getEstado(),
+                estabelecimento.getCep()
+        );
     }
 
     public EstabelecimentoResponseDTO(EstabelecimentoView estabelecimento) {
@@ -46,9 +52,11 @@ public class EstabelecimentoResponseDTO {
         this.bairro = estabelecimento.getBairro();
         this.cidade = estabelecimento.getCidade();
         this.estado = estabelecimento.getEstado();
+        this.cep = estabelecimento.getCep();
         this.qtdAvaliacoes = estabelecimento.getQtdAvaliacoes();
         this.notaGeral = estabelecimento.getNotaGeral();
         this.isFavoritado = false;
+        this.localizacao = estabelecimento.getLocalizacao();
     }
 }
 
