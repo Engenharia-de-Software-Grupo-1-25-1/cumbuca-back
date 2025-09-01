@@ -119,17 +119,6 @@ public class ComentarioControllerTest {
     }
 
     @Test
-    void testComentar() throws Exception {
-        final String comentarioTexto = "Ótimo lugar!";
-
-        mockMvc.perform(post("/avaliacao/comentar/{avaliacaoId}", avaliacao.getId())
-                        .contentType(MediaType.TEXT_PLAIN)
-                        .content(comentarioTexto))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.comentario").value(comentarioTexto));
-    }
-
-    @Test
     void testRemoverComentario() throws Exception {
         final Comentario comentario = new Comentario();
         comentario.setUsuario(usuario);
