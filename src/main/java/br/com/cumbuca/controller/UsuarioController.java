@@ -58,7 +58,7 @@ public class UsuarioController {
     @GetMapping("/recuperar/{valor}")
     public ResponseEntity<UsuarioResponseDTO> recuperar(@PathVariable String valor) {
         if (valor.matches("\\d+")) {
-            Long id = Long.parseLong(valor);
+            final Long id = Long.parseLong(valor);
             return ResponseEntity.ok(usuarioService.recuperar(id));
         } else {
             return ResponseEntity.ok(usuarioService.recuperar(valor));
