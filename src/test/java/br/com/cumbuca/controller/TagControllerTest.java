@@ -145,8 +145,8 @@ public class TagControllerTest {
         List<String> tagsRecuperadas = tagService.recuperar(avaliacao.getId());
 
         assertNotNull(tagsRecuperadas);
-        assertEquals(1, tagsRecuperadas.size());
-        assertEquals("saboroso", tagsRecuperadas.get(0));
+        assertEquals(3, tagsRecuperadas.size());
+        assertEquals("saboroso", tagsRecuperadas.get(2));
     }
 
     @Test
@@ -156,7 +156,7 @@ public class TagControllerTest {
         tag.setAvaliacao(avaliacao);
         tag.setTag("para-remover");
         tagRepository.save(tag);
-        assertEquals(1, tagRepository.count());
+        assertEquals(3, tagRepository.count());
 
         tagService.remover(avaliacao.getId());
 
