@@ -33,19 +33,19 @@ public class AvaliacaoRequestDTO {
 
     private List<MultipartFile> fotos;
 
-    @Min(value = 1, message = "Nota geral deve ser entre 1 e 5")
-    @Max(value = 5, message = "Nota geral deve ser entre 1 e 5")
+    @Min(value = 0, message = "Nota geral deve ser entre 0 e 5")
+    @Max(value = 5, message = "Nota geral deve ser entre 0 e 5")
     private Integer notaGeral;
 
-    @Min(value = 1, message = "Nota do ambiente deve ser entre 1 e 5")
-    @Max(value = 5, message = "Nota do ambiente deve ser entre 1 e 5")
+    @Min(value = 0, message = "Nota do ambiente deve ser entre 0 e 5")
+    @Max(value = 5, message = "Nota do ambiente deve ser entre 0 e 5")
     private Integer notaAmbiente;
 
-    @Min(value = 1, message = "Nota da comida deve ser entre 1 e 5")
-    @Max(value = 5, message = "Nota da comida deve ser entre 1 e 5")
+    @Min(value = 0, message = "Nota da comida deve ser entre 0 e 5")
+    @Max(value = 5, message = "Nota da comida deve ser entre 0 e 5")
     private Integer notaComida;
 
-    @Min(value = 1, message = "Nota do atendimento deve ser entre 1 e 5")
-    @Max(value = 5, message = "Nota do atendimento deve ser entre 1 e 5")
+    @Min(value = 0, message = "Nota do atendimento deve ser entre 0 e 5")
+    @Max(value = 5, message = "Nota do atendimento deve ser entre 0 e 5")
     private Integer notaAtendimento;
 }
