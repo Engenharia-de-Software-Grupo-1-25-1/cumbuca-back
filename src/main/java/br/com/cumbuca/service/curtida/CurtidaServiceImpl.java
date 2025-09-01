@@ -19,13 +19,11 @@ public class CurtidaServiceImpl implements CurtidaService {
     private final UsuarioService usuarioService;
     private final CurtidaRepository curtidaRepository;
     private final AvaliacaoRepository avaliacaoRepository;
-    private final ModelMapper modelMapper;
 
-    public CurtidaServiceImpl(CurtidaRepository curtidaRepository, UsuarioService usuarioService, AvaliacaoRepository avaliacaoRepository, ModelMapper modelMapper) {
+    public CurtidaServiceImpl(CurtidaRepository curtidaRepository, UsuarioService usuarioService, AvaliacaoRepository avaliacaoRepository) {
         this.curtidaRepository = curtidaRepository;
         this.usuarioService = usuarioService;
         this.avaliacaoRepository = avaliacaoRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -50,7 +48,7 @@ public class CurtidaServiceImpl implements CurtidaService {
         curtida.setUsuario(usuario);
         curtida.setAvaliacao(avaliacao);
 
-        final CurtidaResponseDTO curtidaResponseDTO = modelMapper.map(curtida, CurtidaResponseDTO.class);
+        final CurtidaResponseDTO curtidaResponseDTO = new CurtidaResponseDTO(curtida);
         curtidaResponseDTO.setIsCurtida(true);
         curtidaRepository.save(curtida);
         return curtidaResponseDTO;
