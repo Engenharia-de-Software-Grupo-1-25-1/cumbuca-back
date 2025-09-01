@@ -105,6 +105,7 @@ public class EstabelecimentoControllerTest {
         token = tokenService.gerarToken((Usuario) authentication.getPrincipal());
 
         estabelecimentoRequestDTO = new EstabelecimentoRequestDTO();
+        estabelecimentoRequestDTO.setId(1L);
         estabelecimentoRequestDTO.setNome("Teste JUnit");
         estabelecimentoRequestDTO.setCategoria("Restaurante");
         estabelecimentoRequestDTO.setRua("Rua dos Testes");
@@ -115,6 +116,7 @@ public class EstabelecimentoControllerTest {
 
         estabelecimento = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
         estabelecimentoRepository.save(estabelecimento);
+        estabelecimentoRepository.flush();
     }
 
     @AfterEach
@@ -195,6 +197,7 @@ public class EstabelecimentoControllerTest {
          @Test
          void testListarEstabelecimentos() throws Exception {
              final Estabelecimento e2 = new Estabelecimento();
+             e2.setId(2L);
              e2.setNome("Teste JUnit");
              e2.setCategoria("Pizzaria");
              e2.setRua("Rua Central");
@@ -204,6 +207,7 @@ public class EstabelecimentoControllerTest {
              e2.setCep("58000-000");
 
              final Estabelecimento e3 = new Estabelecimento();
+             e3.setId(3L);
              e3.setNome("Café Gourmet");
              e3.setCategoria("Cafeteria");
              e3.setRua("Av. Principal");
@@ -213,6 +217,7 @@ public class EstabelecimentoControllerTest {
              e3.setCep("01000-000");
 
              estabelecimentoRepository.saveAll(Arrays.asList(e2, e3));
+             estabelecimentoRepository.flush();
 
              final String responseJson = driver.perform(get(URI + "/listar")
                              .contentType(MediaType.APPLICATION_JSON)
@@ -230,14 +235,16 @@ public class EstabelecimentoControllerTest {
              assertAll(
                      () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(estabelecimento.getId()))),
                      () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e2.getId()))),
-                     () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId())))
+                     () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId()))),
+                     () -> assertEquals(3, resultado.size())
              );
          }
 
         @Test
         void testListarEstabelecimentosPorNome() throws Exception {
             final Estabelecimento e2 = new Estabelecimento();
-            e2.setNome("Teste JUnit");
+            e2.setId(2L);
+            e2.setNome("Teste JUnit");;
             e2.setCategoria("Pizzaria");
             e2.setRua("Rua Central");
             e2.setNumero("101");
@@ -246,6 +253,7 @@ public class EstabelecimentoControllerTest {
             e2.setCep("58000-000");
 
             final Estabelecimento e3 = new Estabelecimento();
+            e3.setId(3L);
             e3.setNome("Café Gourmet");
             e3.setCategoria("Cafeteria");
             e3.setRua("Av. Principal");
@@ -255,6 +263,7 @@ public class EstabelecimentoControllerTest {
             e3.setCep("01000-000");
 
             estabelecimentoRepository.saveAll(Arrays.asList(e2, e3));
+            estabelecimentoRepository.flush();
 
             final String responseJson = driver.perform(get(URI + "/listar")
                             .param("nome", e2.getNome())
@@ -273,13 +282,15 @@ public class EstabelecimentoControllerTest {
             assertAll(
                     () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(estabelecimento.getId()))),
                     () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e2.getId()))),
-                    () -> assertFalse(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId())))
+                    () -> assertFalse(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId()))),
+                    () -> assertEquals(2, resultado.size())
             );
         }
 
         @Test
         void testListarEstabelecimentosPorCategoria() throws Exception {
             final Estabelecimento e2 = new Estabelecimento();
+            e2.setId(2L);
             e2.setNome("Starbucks");
             e2.setCategoria("Cafeteria");
             e2.setRua("Rua Central");
@@ -289,6 +300,7 @@ public class EstabelecimentoControllerTest {
             e2.setCep("58000-000");
 
             final Estabelecimento e3 = new Estabelecimento();
+            e3.setId(3L);
             e3.setNome("Café Gourmet");
             e3.setCategoria("Cafeteria");
             e3.setRua("Av. Principal");
@@ -298,6 +310,7 @@ public class EstabelecimentoControllerTest {
             e3.setCep("01000-000");
 
             estabelecimentoRepository.saveAll(Arrays.asList(e2, e3));
+            estabelecimentoRepository.flush();
 
             final String responseJson = driver.perform(get(URI + "/listar")
                             .param("categoria", e2.getCategoria())
@@ -316,13 +329,15 @@ public class EstabelecimentoControllerTest {
             assertAll(
                     () -> assertFalse(resultado.stream().anyMatch(u -> u.getId().equals(estabelecimento.getId()))),
                     () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e2.getId()))),
-                    () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId())))
+                    () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId()))),
+                    () -> assertEquals(2, resultado.size())
             );
         }
 
         @Test
         void testListarEstabelecimentosPorLocalizacao() throws Exception {
             final Estabelecimento e2 = new Estabelecimento();
+            e2.setId(2L);
             e2.setNome("Starbucks");
             e2.setCategoria("Cafeteria");
             e2.setRua("Rua Central");
@@ -333,6 +348,7 @@ public class EstabelecimentoControllerTest {
             e2.setCep("58000-000");
 
             final Estabelecimento e3 = new Estabelecimento();
+            e3.setId(3L);
             e3.setNome("Café Gourmet");
             e3.setCategoria("Cafeteria Gourmet");
             e3.setRua("Rua Central");
@@ -343,6 +359,7 @@ public class EstabelecimentoControllerTest {
             e3.setCep("58000-000");
 
             estabelecimentoRepository.saveAll(Arrays.asList(e2, e3));
+            estabelecimentoRepository.flush();
 
             final String responseJson = driver.perform(get(URI + "/listar")
                             .param("localizacao", e2.getCep())
@@ -361,13 +378,15 @@ public class EstabelecimentoControllerTest {
             assertAll(
                     () -> assertFalse(resultado.stream().anyMatch(u -> u.getId().equals(estabelecimento.getId()))),
                     () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e2.getId()))),
-                    () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId())))
+                    () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId()))),
+                    () -> assertEquals(2, resultado.size())
             );
         }
 
         @Test
         void testListarEstabelecimentosFavoritos() throws Exception {
             final Estabelecimento e2 = new Estabelecimento();
+            e2.setId(2L);
             e2.setNome("Starbucks");
             e2.setCategoria("Cafeteria");
             e2.setRua("Rua Central");
@@ -377,6 +396,7 @@ public class EstabelecimentoControllerTest {
             e2.setCep("58000-000");
 
             final Estabelecimento e3 = new Estabelecimento();
+            e3.setId(3L);
             e3.setNome("Café Gourmet");
             e3.setCategoria("Cafeteria");
             e3.setRua("Av. Principal");
@@ -386,6 +406,7 @@ public class EstabelecimentoControllerTest {
             e3.setCep("01000-000");
 
             estabelecimentoRepository.saveAll(Arrays.asList(e2, e3));
+            estabelecimentoRepository.flush();
 
             driver.perform(post(URI + "/favoritar/" + estabelecimento.getId())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -416,13 +437,15 @@ public class EstabelecimentoControllerTest {
             assertAll(
                     () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(estabelecimento.getId()))),
                     () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e2.getId()))),
-                    () -> assertFalse(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId())))
+                    () -> assertFalse(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId()))),
+                    () -> assertEquals(2, resultado.size())
             );
         }
 
         @Test
         void testListarEstabelecimentosNaoFavoritos() throws Exception {
             final Estabelecimento e2 = new Estabelecimento();
+            e2.setId(2L);
             e2.setNome("Starbucks");
             e2.setCategoria("Cafeteria");
             e2.setRua("Rua Central");
@@ -432,6 +455,7 @@ public class EstabelecimentoControllerTest {
             e2.setCep("58000-000");
 
             final Estabelecimento e3 = new Estabelecimento();
+            e3.setId(3L);
             e3.setNome("Café Gourmet");
             e3.setCategoria("Cafeteria");
             e3.setRua("Av. Principal");
@@ -441,6 +465,7 @@ public class EstabelecimentoControllerTest {
             e3.setCep("01000-000");
 
             estabelecimentoRepository.saveAll(Arrays.asList(e2, e3));
+            estabelecimentoRepository.flush();
 
             driver.perform(post(URI + "/favoritar/" + estabelecimento.getId())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -471,13 +496,15 @@ public class EstabelecimentoControllerTest {
             assertAll(
                     () -> assertFalse(resultado.stream().anyMatch(u -> u.getId().equals(estabelecimento.getId()))),
                     () -> assertFalse(resultado.stream().anyMatch(u -> u.getId().equals(e2.getId()))),
-                    () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId())))
+                    () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId()))),
+                    () -> assertEquals(1, resultado.size())
             );
         }
 
         @Test
         void testListarEstabelecimentosPorNotaGeral() throws Exception {
             final Estabelecimento e2 = new Estabelecimento();
+            e2.setId(2L);
             e2.setNome("Starbucks");
             e2.setCategoria("Cafeteria");
             e2.setRua("Rua Central");
@@ -487,6 +514,7 @@ public class EstabelecimentoControllerTest {
             e2.setCep("58000-000");
 
             final Estabelecimento e3 = new Estabelecimento();
+            e3.setId(3L);
             e3.setNome("Café Gourmet");
             e3.setCategoria("Cafeteria");
             e3.setRua("Av. Principal");
@@ -496,6 +524,7 @@ public class EstabelecimentoControllerTest {
             e3.setCep("01000-000");
 
             estabelecimentoRepository.saveAll(Arrays.asList(e2, e3));
+            estabelecimentoRepository.flush();
 
             Avaliacao avaliacao = new Avaliacao();
             avaliacao.setUsuario(usuario);
