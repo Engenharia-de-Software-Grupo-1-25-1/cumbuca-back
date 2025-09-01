@@ -85,11 +85,11 @@ public class ComentarioControllerTest {
         usuarioRepository.save(usuario);
 
         usuario2 = new Usuario();
-        usuario2.setEmail("luciano.nascimento.filho@gmail.com");
-        usuario2.setSenha("webhead");
-        usuario2.setNome("Luciano Nascimento");
-        usuario2.setUsername("Lulu Fazedor de Drift");
-        usuario2.setDtNascimento(LocalDate.of(2001, 10, 24));
+        usuario2.setEmail("luciano.filho@gmail.com");
+        usuario2.setSenha("alauae");
+        usuario2.setNome("Tetse");
+        usuario2.setUsername("outro.user");
+        usuario2.setDtNascimento(LocalDate.of(2001, 11, 01));
         usuarioRepository.save(usuario2);
 
 
