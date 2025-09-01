@@ -2,6 +2,7 @@ package br.com.cumbuca.service.usuario;
 
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
+import br.com.cumbuca.enums.Status;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.model.UsuarioView;
@@ -81,6 +82,12 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
         }
         usuario.setStatus("INATIVO");
+        usuarioRepository.save(usuario);
+    }
+
+    @Override
+    public void altualizarStatus(Usuario usuario, Status status) {
+        usuario.setStatus(status.toString());
         usuarioRepository.save(usuario);
     }
 
