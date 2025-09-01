@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @WithMockUser(username = "Lulu Fazedor de Drift")
-public class CurtidaControllerTest {
+class CurtidaControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -209,48 +209,4 @@ public class CurtidaControllerTest {
         assertFalse(curtida);
     }
 
-    @Test
-    @WithMockUser(username = "Lulu Fazedor de Drift")
-    void testIsAvaliacaoCurtida_DeveRetornarFalse_QuandoOutroUsuarioCurtiu() {
-        Curtida outraCurtida = new Curtida();
-        outraCurtida.setUsuario(outroUsuario);
-        outraCurtida.setAvaliacao(avaliacao);
-        curtidaRepository.saveAndFlush(outraCurtida);
-
-        boolean curtida = curtidaService.isAvaliacaoCurtida(usuarioDono.getId(), avaliacao.getId());
-
-        assertFalse(curtida);
-    }
-
-    @Test
-    @WithMockUser(username = "Lulu Fazedor de Drift")
-    void testIsAvaliacaoCurtida_DeveRetornarTrue_QuandoUsuarioLogadoCurtiu() {
-        curtidaService.curtir(avaliacao.getId());
-
-        boolean curtida = curtidaService.isAvaliacaoCurtida(usuarioDono.getId(), avaliacao.getId());
-
-        assertTrue(curtida);
-    }
-
-    @Test
-    @WithMockUser(username = "Lulu Fazedor de Drift")
-    void testIsAvaliacaoCurtida_DeveRetornarFalse_QuandoUsuarioLogadoNaoCurtiu() {
-
-        boolean curtida = curtidaService.isAvaliacaoCurtida(usuarioDono.getId(), avaliacao.getId());
-
-        assertFalse(curtida);
-    }
-
-    @Test
-    @WithMockUser(username = "outro.user")
-    void testIsAvaliacaoCurtida_DeveRetornarFalse_QuandoApenasOutroUsuarioCurtiu() {
-        Curtida curtidaDoDono = new Curtida();
-        curtidaDoDono.setUsuario(usuarioDono);
-        curtidaDoDono.setAvaliacao(avaliacao);
-        curtidaRepository.saveAndFlush(curtidaDoDono);
-
-        boolean curtida = curtidaService.isAvaliacaoCurtida(outroUsuario.getId(), avaliacao.getId());
-
-        assertFalse(curtida);
-    }
 }

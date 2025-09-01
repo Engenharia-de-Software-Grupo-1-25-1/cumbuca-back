@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @WithMockUser(username = "Lulu Fazedor de Drift")
-public class TagControllerTest {
+class TagControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

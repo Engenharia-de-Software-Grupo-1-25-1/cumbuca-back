@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,8 +31,6 @@ import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -41,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @WithMockUser(username = "Lulu Fazedor de Drift")
-public class ComentarioControllerTest {
+class ComentarioControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -143,9 +140,7 @@ public class ComentarioControllerTest {
     @Test
     @WithMockUser(username = "Lulu Fazedor de Drift")
     void testComentarAvaliacaoNaoEncontrada() {
-        assertThrows(NoSuchElementException.class, () -> {
-            comentarioService.comentar(999L, "Teste");
-        });
+        assertThrows(NoSuchElementException.class, () -> comentarioService.comentar(999L, "Teste"));
     }
 
     @Test
@@ -155,10 +150,7 @@ public class ComentarioControllerTest {
         Comentario comentarioSalvo = comentarioRepository.findById(comentarioDTO.getId()).orElseThrow();
         comentarioSalvo.setUsuario(usuario);
         comentarioRepository.save(comentarioSalvo);
-
-        assertThrows(CumbucaException.class, () -> {
-            comentarioService.remover(comentarioSalvo.getId());
-        });
+        assertThrows(CumbucaException.class, () -> comentarioService.remover(comentarioSalvo.getId()));
     }
 
     @Test
