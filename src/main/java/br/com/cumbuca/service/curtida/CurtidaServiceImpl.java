@@ -8,7 +8,6 @@ import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.CurtidaRepository;
 import br.com.cumbuca.service.usuario.UsuarioService;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
