@@ -8,6 +8,9 @@ import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.EstabelecimentoRepository;
 import br.com.cumbuca.repository.TagRepository;
 import br.com.cumbuca.repository.UsuarioRepository;
+import br.com.cumbuca.service.tag.TagService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@WithMockUser(username = "testuser")
+@WithMockUser(username = "Lulu Fazedor de Drift")
 public class TagControllerTest {
 
     @Autowired
@@ -49,15 +55,27 @@ public class TagControllerTest {
     @Autowired
     private TagRepository tagRepository;
 
+    @Autowired
+    private TagService tagService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    private Avaliacao avaliacao;
+
     @BeforeEach
     void setUp() {
-        final Usuario usuario = new Usuario();
-        usuario.setEmail("test@email.com");
-        usuario.setSenha("123456");
-        usuario.setNome("Test User");
-        usuario.setUsername("testuser");
-        usuario.setDtNascimento(LocalDate.of(2000, 1, 1));
-        usuarioRepository.save(usuario);
+
+        entityManager.createNativeQuery("TRUNCATE TABLE usuario, estabelecimento, avaliacao, tag, usuario_curte_avaliacao RESTART IDENTITY CASCADE").executeUpdate();
+
+        final Usuario usuarioDono = new Usuario();
+        usuarioDono.setId(1L);
+        usuarioDono.setEmail("luciano.nascimento.filho@gmail.com");
+        usuarioDono.setSenha("webhead");
+        usuarioDono.setNome("Luciano Nascimento");
+        usuarioDono.setUsername("Lulu Fazedor de Drift");
+        usuarioDono.setDtNascimento(LocalDate.of(2000, 10, 24));
+        usuarioRepository.save(usuarioDono);
 
         final Estabelecimento estabelecimento = new Estabelecimento();
         estabelecimento.setId(1L);
@@ -65,8 +83,9 @@ public class TagControllerTest {
         estabelecimento.setCategoria("Restaurante");
         estabelecimentoRepository.save(estabelecimento);
 
-        final Avaliacao avaliacao = new Avaliacao();
-        avaliacao.setUsuario(usuario);
+        avaliacao = new Avaliacao();
+        avaliacao.setId(1L);
+        avaliacao.setUsuario(usuarioDono);
         avaliacao.setEstabelecimento(estabelecimento);
         avaliacao.setItemConsumido("Pizza");
         avaliacao.setDescricao("Muito boa!");
@@ -105,5 +124,60 @@ public class TagControllerTest {
         mockMvc.perform(get("/tag/populares/listar"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    @WithMockUser(username = "Lulu Fazedor de Drift")
+    void testCriarTags() {
+        List<String> novasTags = List.of("hamburguer", "bom-preco");
+        tagService.criar(novasTags, avaliacao);
+
+        assertEquals(2, tagRepository.count());
+    }
+
+    @Test
+    void testRecuperarTags() {
+        Tag tag1 = new Tag();
+        tag1.setAvaliacao(avaliacao);
+        tag1.setTag("saboroso");
+        tagRepository.save(tag1);
+
+        List<String> tagsRecuperadas = tagService.recuperar(avaliacao.getId());
+
+        assertNotNull(tagsRecuperadas);
+        assertEquals(1, tagsRecuperadas.size());
+        assertEquals("saboroso", tagsRecuperadas.get(0));
+    }
+
+    @Test
+    @WithMockUser(username = "Lulu Fazedor de Drift")
+    void testRemoverTagComPermissao() {
+        Tag tag = new Tag();
+        tag.setAvaliacao(avaliacao);
+        tag.setTag("para-remover");
+        tagRepository.save(tag);
+        assertEquals(1, tagRepository.count());
+
+        tagService.remover(avaliacao.getId());
+
+        assertEquals(0, tagRepository.count());
+    }
+
+    @Test
+    @WithMockUser(username = "outro.user")
+    void testRemoverTagSemPermissao() {
+        Tag tag = new Tag();
+        tag.setAvaliacao(avaliacao);
+        tag.setTag("protegida");
+        tagRepository.save(tag);
+
+        assertDoesNotThrow(() -> tagService.remover(avaliacao.getId()));
+        assertEquals(0, tagRepository.count());
+    }
+
+    @Test
+    @WithMockUser(username = "Lulu Fazedor de Drift")
+    void testRemoverTagInexistente() {
+        assertDoesNotThrow(() -> tagService.remover(9999L));
     }
 }
