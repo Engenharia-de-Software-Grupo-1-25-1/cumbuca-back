@@ -109,6 +109,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     @Override
+    @Transactional
     public FavoritoResponseDTO favoritar(Long id) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Estabelecimento estabelecimento = estabelecimentoRepository.findById(id)
