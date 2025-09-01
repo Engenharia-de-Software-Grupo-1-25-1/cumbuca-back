@@ -108,7 +108,6 @@ public class AvaliacaoControllerTest {
         usuarioRepository.save(usuario);
 
         estabelecimentoRequestDTO = new EstabelecimentoRequestDTO();
-        estabelecimentoRequestDTO.setId(1L);
         estabelecimentoRequestDTO.setNome("Restaurante Teste");
         estabelecimentoRequestDTO.setCategoria("Restaurante");
         estabelecimentoRequestDTO.setRua("Rua Teste, 123");
@@ -170,7 +169,6 @@ public class AvaliacaoControllerTest {
 
             final String responseJson = driver.perform(multipart(URI + "/criar")
                     .file(foto)
-                    .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
                     .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
                     .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
                     .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
@@ -230,7 +228,7 @@ public class AvaliacaoControllerTest {
 
             final String responseJson = driver.perform(multipart(URI + "/atualizar/" + avaliacao.getId())
                     .file(foto)
-                    .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                    .param("estabelecimento.id", estabelecimento.getId().toString())
                     .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
                     .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
                     .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
@@ -394,7 +392,6 @@ public class AvaliacaoControllerTest {
             avaliacaoAtualizadaDTO.setNotaAmbiente(5);
 
             final String responseText = driver.perform(multipart(URI + "/atualizar/" + avaliacaoOutroUsuario.getId())
-                    .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
                     .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
                     .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
                     .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
@@ -679,7 +676,6 @@ public class AvaliacaoControllerTest {
 
             driver.perform(multipart(URI + "/criar")
                     .file(foto1)
-                    .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
                     .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
                     .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
                     .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
@@ -721,7 +717,6 @@ public class AvaliacaoControllerTest {
 
             driver.perform(multipart(URI + "/criar")
                     .file(foto2)
-                    .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
                     .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
                     .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
                     .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
@@ -783,7 +778,6 @@ public class AvaliacaoControllerTest {
 
             driver.perform(multipart(URI + "/criar")
                     .file(foto)
-                    .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
                     .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
                     .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
                     .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
@@ -840,7 +834,6 @@ public class AvaliacaoControllerTest {
 
             driver.perform(multipart(URI + "/criar")
                     .file(foto)
-                    .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
                     .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
                     .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
                     .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
@@ -974,7 +967,6 @@ public class AvaliacaoControllerTest {
         @Test
         void testFiltrarAvaliacoesPorNomeEstabelecimento() throws Exception {
             final EstabelecimentoRequestDTO outroEstabelecimentoDTO = new EstabelecimentoRequestDTO();
-            outroEstabelecimentoDTO.setId(2L);
             outroEstabelecimentoDTO.setNome("Pizzaria Bella Vista");
             outroEstabelecimentoDTO.setCategoria("Pizzaria");
             outroEstabelecimentoDTO.setRua("Rua das Flores, 456");
@@ -1033,7 +1025,6 @@ public class AvaliacaoControllerTest {
             usuarioRepository.save(outroUsuario);
 
             final EstabelecimentoRequestDTO outroEstabelecimentoDTO = new EstabelecimentoRequestDTO();
-            outroEstabelecimentoDTO.setId(3L);
             outroEstabelecimentoDTO.setNome("Burger House");
             outroEstabelecimentoDTO.setCategoria("Hamburgueria");
             outroEstabelecimentoDTO.setRua("Rua Principal, 789");
@@ -1187,7 +1178,6 @@ public class AvaliacaoControllerTest {
             avaliacaoDTO.setNotaAmbiente(3);
 
             driver.perform(multipart(URI + "/atualizar/" + idInexistente)
-                    .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
                     .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
                     .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
                     .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
@@ -1260,7 +1250,6 @@ public class AvaliacaoControllerTest {
             avaliacaoDTO.setNotaAmbiente(3);
 
             final String responseJson = driver.perform(multipart(URI + "/criar")
-                    .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
                     .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
                     .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
                     .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
@@ -1310,7 +1299,6 @@ public class AvaliacaoControllerTest {
 
             final String responseJson = driver.perform(multipart(URI + "/criar")
                     .file(foto)
-                    .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
                     .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
                     .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
                     .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
@@ -1356,7 +1344,7 @@ public class AvaliacaoControllerTest {
             avaliacaoDTO.setNotaAmbiente(4);
 
             final String responseJson = driver.perform(multipart(URI + "/atualizar/" + avaliacao.getId())
-                    .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                    .param("estabelecimento.id", estabelecimento.getId().toString())
                     .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
                     .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
                     .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
@@ -1415,7 +1403,6 @@ public class AvaliacaoControllerTest {
             usuarioRepository.save(outroUsuario);
 
             final EstabelecimentoRequestDTO outroEstabelecimentoDTO = new EstabelecimentoRequestDTO();
-            outroEstabelecimentoDTO.setId(5L);
             outroEstabelecimentoDTO.setNome("Estabelecimento Específico");
             outroEstabelecimentoDTO.setCategoria("Cafeteria");
             outroEstabelecimentoDTO.setRua("Rua Específica, 999");
