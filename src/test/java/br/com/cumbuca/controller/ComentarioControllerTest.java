@@ -134,7 +134,7 @@ public class ComentarioControllerTest {
         final Comentario comentario = new Comentario();
         comentario.setUsuario(usuario);
         comentario.setAvaliacao(avaliacao);
-        comentario.setComentario("Comentário para remover");
+        comentario.setConteudo("Comentário para remover");
         comentarioRepository.save(comentario);
 
         mockMvc.perform(delete("/comentario/remover/{id}", comentario.getId()))

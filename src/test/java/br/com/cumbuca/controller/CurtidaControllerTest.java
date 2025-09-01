@@ -145,11 +145,11 @@ public class CurtidaControllerTest {
 
         Tag tag = new Tag();
         tag.setId(1L);
-        tag.setTag("barato");
+        tag.setConteudo("barato");
 
         TagResponseDTO tagDTO1 = new TagResponseDTO();
         tagDTO1.setId(tag.getId());
-        tagDTO1.setTag(tag.getTag());
+        tagDTO1.setTag(tag.getConteudo());
         tagDTO1.setQuantidade(10);
 
         TagResponseDTO tagDTO2 = new TagResponseDTO(tag);

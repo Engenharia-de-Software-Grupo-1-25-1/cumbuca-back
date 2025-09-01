@@ -95,12 +95,12 @@ public class TagControllerTest {
 
         final Tag tag1 = new Tag();
         tag1.setAvaliacao(avaliacao);
-        tag1.setTag("bom");
+        tag1.setConteudo("bom");
         tagRepository.save(tag1);
 
         final Tag tag2 = new Tag();
         tag2.setAvaliacao(avaliacao);
-        tag2.setTag("barato");
+        tag2.setConteudo("barato");
         tagRepository.save(tag2);
     }
 
@@ -139,7 +139,7 @@ public class TagControllerTest {
     void testRecuperarTags() {
         Tag tag1 = new Tag();
         tag1.setAvaliacao(avaliacao);
-        tag1.setTag("saboroso");
+        tag1.setConteudo("saboroso");
         tagRepository.save(tag1);
 
         List<String> tagsRecuperadas = tagService.recuperar(avaliacao.getId());
@@ -154,7 +154,7 @@ public class TagControllerTest {
     void testRemoverTagComPermissao() {
         Tag tag = new Tag();
         tag.setAvaliacao(avaliacao);
-        tag.setTag("para-remover");
+        tag.setConteudo("para-remover");
         tagRepository.save(tag);
         assertEquals(3, tagRepository.count());
 
@@ -168,7 +168,7 @@ public class TagControllerTest {
     void testRemoverTagSemPermissao() {
         Tag tag = new Tag();
         tag.setAvaliacao(avaliacao);
-        tag.setTag("protegida");
+        tag.setConteudo("protegida");
         tagRepository.save(tag);
 
         assertDoesNotThrow(() -> tagService.remover(avaliacao.getId()));
