@@ -19,6 +19,6 @@ public class CurtidaResponseDTO {
         this.id = curtida.getId();
         this.usuario = new UsuarioResponseDTO(curtida.getUsuario());
         this.avaliacao = new AvaliacaoResponseDTO(curtida.getAvaliacao());
-        this.isCurtida = null;
+        this.isCurtida = false;
     }
 }
