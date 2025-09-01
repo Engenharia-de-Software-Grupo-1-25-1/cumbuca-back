@@ -282,7 +282,6 @@ public class EstabelecimentoControllerTest {
             final Estabelecimento e2 = new Estabelecimento();
             e2.setNome("Starbucks");
             e2.setCategoria("Cafeteria");
-            e2.setCidade("João Pessoa");
             e2.setRua("Rua Central");
             e2.setNumero("101");
             e2.setBairro("Centro");
@@ -292,7 +291,6 @@ public class EstabelecimentoControllerTest {
             final Estabelecimento e3 = new Estabelecimento();
             e3.setNome("Café Gourmet");
             e3.setCategoria("Cafeteria");
-            e3.setCidade("João Pessoa");
             e3.setRua("Av. Principal");
             e3.setNumero("200");
             e3.setBairro("Jardins");
@@ -331,6 +329,7 @@ public class EstabelecimentoControllerTest {
             e2.setNumero("101");
             e2.setBairro("Centro");
             e2.setEstado("PB");
+            e2.setCidade("João Pessoa");
             e2.setCep("58000-000");
 
             final Estabelecimento e3 = new Estabelecimento();
@@ -340,11 +339,13 @@ public class EstabelecimentoControllerTest {
             e3.setNumero("101");
             e3.setBairro("Centro");
             e3.setEstado("PB");
+            e3.setCidade("João Pessoa");
             e3.setCep("58000-000");
 
             estabelecimentoRepository.saveAll(Arrays.asList(e2, e3));
 
-            String localizacao = estabelecimentoViewRepository.findAll().getLast().getLocalizacao();
+            EstabelecimentoResponseDTO e2Dto = new EstabelecimentoResponseDTO(e2);
+            String localizacao = e2Dto.getLocalizacao();
 
             final String responseJson = driver.perform(get(URI + "/listar")
                             .param("localizacao", localizacao)

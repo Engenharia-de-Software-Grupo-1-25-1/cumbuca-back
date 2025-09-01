@@ -34,6 +34,13 @@ public class EstabelecimentoResponseDTO {
         this.estado = estabelecimento.getEstado();
         this.cep = estabelecimento.getCep();
         this.isFavoritado = false;
+        this.localizacao = String.join(" ",
+                estabelecimento.getRua(),
+                estabelecimento.getBairro(),
+                estabelecimento.getCidade(),
+                estabelecimento.getEstado(),
+                estabelecimento.getCep()
+        );
     }
 
     public EstabelecimentoResponseDTO(EstabelecimentoView estabelecimento) {
