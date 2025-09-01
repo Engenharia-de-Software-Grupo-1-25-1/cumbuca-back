@@ -10,7 +10,7 @@ public interface TagService {
 
     List<String> recuperar(Long avaliacaoId);
 
-    void remover(Long AvaliacaoId);
+    void remover(Long avaliacaoId);
 
     List<TagResponseDTO> listar();
 

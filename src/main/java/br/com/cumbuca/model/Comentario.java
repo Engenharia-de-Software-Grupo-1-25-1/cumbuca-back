@@ -32,7 +32,5 @@ public class Comentario {
     private Avaliacao avaliacao;
 
     @Column(name = "COMENTARIO", length = 255, nullable = false)
-    private String comentario;
-
-
+    private String conteudo;
 }

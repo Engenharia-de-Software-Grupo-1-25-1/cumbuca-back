@@ -1,6 +1,6 @@
 package br.com.cumbuca.controller;
 
-import br.com.cumbuca.dto.Favorito.FavoritoResponseDTO;
+import br.com.cumbuca.dto.favorito.FavoritoResponseDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoFiltroRequestDTO;
 import br.com.cumbuca.dto.estabelecimento.EstabelecimentoResponseDTO;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;

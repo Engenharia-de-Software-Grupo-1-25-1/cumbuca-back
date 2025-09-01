@@ -27,5 +27,5 @@ public class Tag {
     private Avaliacao avaliacao;
 
     @Column(name = "TAG", nullable = false)
-    private String tag;
+    private String conteudo;
 }

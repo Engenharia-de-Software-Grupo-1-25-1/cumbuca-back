@@ -15,6 +15,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -257,8 +259,13 @@ class AutenticacaoControllerTest {
     @Nested
     class AutenticacaoAlteracaoSenhaInconsistente {
 
-        @Test
-        void testAlterarSenhaNula() throws Exception {
+        @ParameterizedTest
+        @CsvSource({
+                "novaSenha123, null",    // testa alterar senha nula
+                "'', ''",                // testa alterar senha vazia
+                "12345, 12345"           // testa alterar senha com tamanho invalido
+        })
+        void testAlterarSenhaInvalida(String novaSenha, String confirmarNovaSenha) throws Exception {
             final LoginRequestDTO loginRequest = new LoginRequestDTO();
             loginRequest.setUsername("testejunit");
             loginRequest.setSenha("123456");
@@ -274,34 +281,8 @@ class AutenticacaoControllerTest {
 
             final AlterarSenhaRequestDTO alterarSenhaRequest = new AlterarSenhaRequestDTO();
             alterarSenhaRequest.setToken(tokenRecebido);
-            alterarSenhaRequest.setNovaSenha("novaSenha123");
-            alterarSenhaRequest.setConfirmarNovaSenha(null);
-
-            driver.perform(post("/alterar-senha")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(alterarSenhaRequest)))
-                    .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        void testAlterarSenhaVazia() throws Exception {
-            final LoginRequestDTO loginRequest = new LoginRequestDTO();
-            loginRequest.setUsername("testejunit");
-            loginRequest.setSenha("123456");
-
-            final MvcResult result = driver.perform(post("/login")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(loginRequest)))
-                    .andExpect(status().isOk())
-                    .andReturn();
-
-            final String tokenRecebido = objectMapper.readTree(result.getResponse().getContentAsString())
-                    .get("token").asText();
-
-        final AlterarSenhaRequestDTO alterarSenhaRequest = new AlterarSenhaRequestDTO();
-        alterarSenhaRequest.setToken(tokenRecebido);
-        alterarSenhaRequest.setNovaSenha("");
-        alterarSenhaRequest.setConfirmarNovaSenha("");
+            alterarSenhaRequest.setNovaSenha(novaSenha);
+            alterarSenhaRequest.setConfirmarNovaSenha(confirmarNovaSenha);
 
             driver.perform(post("/alterar-senha")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -336,32 +317,6 @@ class AutenticacaoControllerTest {
                     .andExpect(content().string("As senhas não coincidem."));
         }
 
-
-        @Test
-        void testAlterarSenhaTamanhoInvalido() throws Exception {
-            final LoginRequestDTO loginRequest = new LoginRequestDTO();
-            loginRequest.setUsername("testejunit");
-            loginRequest.setSenha("123456");
-
-            final MvcResult result = driver.perform(post("/login")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(loginRequest)))
-                    .andExpect(status().isOk())
-                    .andReturn();
-
-            final String tokenRecebido = objectMapper.readTree(result.getResponse().getContentAsString())
-                    .get("token").asText();
-
-            final AlterarSenhaRequestDTO alterarSenhaRequest = new AlterarSenhaRequestDTO();
-            alterarSenhaRequest.setToken(tokenRecebido);
-            alterarSenhaRequest.setNovaSenha("12345");
-            alterarSenhaRequest.setConfirmarNovaSenha("12345");
-
-            driver.perform(post("/alterar-senha")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(alterarSenhaRequest)))
-                    .andExpect(status().isBadRequest());
-        }
     }
 
     @Nested

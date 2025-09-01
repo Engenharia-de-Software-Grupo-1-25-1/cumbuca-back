@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RestController
 public class CurtidaController {
 
-    public CurtidaService curtidaService;
+    public final CurtidaService curtidaService;
 
     public CurtidaController(CurtidaService curtidaService) {
         this.curtidaService = curtidaService;

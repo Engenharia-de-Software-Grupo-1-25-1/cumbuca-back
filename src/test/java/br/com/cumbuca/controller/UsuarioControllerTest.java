@@ -48,8 +48,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-public class UsuarioControllerTest {
-    final String URI = "/usuario";
+class UsuarioControllerTest {
+    static final String URI = "/usuario";
 
     @Autowired
     MockMvc driver;

@@ -13,7 +13,7 @@ public class TagResponseDTO {
 
     public TagResponseDTO(Tag tag) {
         this.id = tag.getId();
-        this.tag = tag.getTag();
+        this.tag = tag.getConteudo();
         this.quantidade = 1;
     }
 }
