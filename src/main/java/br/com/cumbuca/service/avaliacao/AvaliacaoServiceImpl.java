@@ -53,6 +53,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AvaliacaoResponseDTO criar(AvaliacaoRequestDTO avaliacaoRequestDTO) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
 
@@ -75,7 +76,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public AvaliacaoResponseDTO atualizar(Long id, AvaliacaoRequestDTO avaliacaoRequestDTO) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
@@ -103,7 +104,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public void remover(Long id) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
@@ -115,6 +116,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AvaliacaoResponseDTO recuperar(Long id) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final AvaliacaoView avaliacao = avaliacaoViewRepository.findById(id)
@@ -125,6 +127,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros, String ordenador) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Example<AvaliacaoView> example = criarExemplo(filtros);
@@ -172,7 +175,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         return Sort.by(Sort.Order.desc("data"));
     }
 
-    @Transactional
     private Example<AvaliacaoView> criarExemplo(AvaliacaoFiltroRequestDTO filtros) {
         final AvaliacaoView exemplo = modelMapper.map(filtros, AvaliacaoView.class);
 

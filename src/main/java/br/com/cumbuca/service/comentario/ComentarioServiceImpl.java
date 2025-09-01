@@ -39,6 +39,7 @@ public class ComentarioServiceImpl implements ComentarioService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ComentarioResponseDTO comentar(Long avaliacaoId, String texto) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Avaliacao avaliacao = avaliacaoRepository.findById(avaliacaoId)
@@ -52,7 +53,7 @@ public class ComentarioServiceImpl implements ComentarioService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public void remover(Long id) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Comentario comentario = comentarioRepository.findById(id)

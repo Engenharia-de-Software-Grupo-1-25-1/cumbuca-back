@@ -56,6 +56,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO) throws IOException {
         final Usuario usuario = getUsuarioLogado();
         if (!id.equals(usuario.getId())) {
@@ -76,6 +77,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void remover(Long id) {
         final Usuario usuario = getUsuarioLogado();
         if (!id.equals(usuario.getId())) {
@@ -112,7 +114,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    @Transactional
     public Usuario getUsuarioLogado() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final String login = authentication.getName();

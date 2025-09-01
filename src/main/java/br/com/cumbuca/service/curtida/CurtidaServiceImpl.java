@@ -30,7 +30,7 @@ public class CurtidaServiceImpl implements CurtidaService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public CurtidaResponseDTO curtir(Long avaliacaoId) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Avaliacao avaliacao = avaliacaoRepository.findById(avaliacaoId)
