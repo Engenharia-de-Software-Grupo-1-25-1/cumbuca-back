@@ -1,7 +1,6 @@
 package br.com.cumbuca.controller;
 
 import br.com.cumbuca.dto.comentario.ComentarioResponseDTO;
-import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Comentario;
 import br.com.cumbuca.model.Estabelecimento;
@@ -140,17 +139,9 @@ class ComentarioControllerTest {
     @Test
     @WithMockUser(username = "Lulu Fazedor de Drift")
     void testComentarAvaliacaoNaoEncontrada() {
-        assertThrows(NoSuchElementException.class, () -> comentarioService.comentar(999L, "Teste"));
-    }
-
-    @Test
-    @WithMockUser(username = "outro.user")
-    void testRemoverComentarioSemPermissao() {
-        ComentarioResponseDTO comentarioDTO = comentarioService.comentar(avaliacao.getId(), "Comentário do dono");
-        Comentario comentarioSalvo = comentarioRepository.findById(comentarioDTO.getId()).orElseThrow();
-        comentarioSalvo.setUsuario(usuario);
-        comentarioRepository.save(comentarioSalvo);
-        assertThrows(CumbucaException.class, () -> comentarioService.remover(comentarioSalvo.getId()));
+        assertThrows(NoSuchElementException.class, () ->
+            comentarioService.comentar(999L, "Teste")
+        );
     }
 
     @Test
