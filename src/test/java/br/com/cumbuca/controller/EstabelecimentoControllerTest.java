@@ -443,7 +443,80 @@ public class EstabelecimentoControllerTest {
         }
 
         @Test
-        void testListarEstabelecimentosNaoFavoritos() throws Exception {
+        void testListarEstabelecimentosFavoritosDeOutroUsuario() throws Exception {
+            final Estabelecimento e2 = new Estabelecimento();
+            e2.setId(2L);
+            e2.setNome("Starbucks");
+            e2.setCategoria("Cafeteria");
+            e2.setRua("Rua Central");
+            e2.setNumero("101");
+            e2.setBairro("Centro");
+            e2.setEstado("PB");
+            e2.setCep("58000-000");
+
+            final Estabelecimento e3 = new Estabelecimento();
+            e3.setId(3L);
+            e3.setNome("Café Gourmet");
+            e3.setCategoria("Cafeteria");
+            e3.setRua("Av. Principal");
+            e3.setNumero("200");
+            e3.setBairro("Jardins");
+            e3.setEstado("SP");
+            e3.setCep("01000-000");
+
+            estabelecimentoRepository.saveAll(Arrays.asList(e2, e3));
+            estabelecimentoRepository.flush();
+
+            driver.perform(post(URI + "/favoritar/" + estabelecimento.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token));
+
+            token = null;
+
+            UsuarioRequestDTO usuarioRequestDTO2 = new UsuarioRequestDTO();
+            usuarioRequestDTO2.setEmail("usuario2@email.com");
+            usuarioRequestDTO2.setSenha("abcdef");
+            usuarioRequestDTO2.setNome("Usuário Dois JUnit");
+            usuarioRequestDTO2.setUsername("usuario2");
+            usuarioRequestDTO2.setDtNascimento(LocalDate.of(1998, 8, 20));
+        
+            Usuario usuario2 = modelMapper.map(usuarioRequestDTO2, Usuario.class);
+            usuario2.setSenha(passwordEncoder.encode(usuarioRequestDTO2.getSenha()));
+            usuarioRepository.save(usuario2);
+        
+            UsernamePasswordAuthenticationToken authToken2 =
+                    new UsernamePasswordAuthenticationToken(usuario2.getUsername(), usuarioRequestDTO2.getSenha());
+            Authentication authentication2 = authenticationManager.authenticate(authToken2);
+            token = tokenService.gerarToken((Usuario) authentication2.getPrincipal());
+
+            driver.perform(post(URI + "/favoritar/" + e2.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token));
+
+            final String responseJson = driver.perform(get(URI + "/listar")
+                            .param("isFavoritado", "true")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString(StandardCharsets.UTF_8);
+
+
+            final List<EstabelecimentoResponseDTO> resultado = objectMapper.readValue(responseJson, new TypeReference<>() {
+            });
+
+            assertAll(
+                    () -> assertFalse(resultado.stream().anyMatch(u -> u.getId().equals(estabelecimento.getId()))),
+                    () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e2.getId()))),
+                    () -> assertFalse(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId()))),
+                    () -> assertEquals(1, resultado.size())
+            );
+        }
+
+        @Test
+        void testListarEstabelecimentosIgnorandoIsFavorito() throws Exception {
             final Estabelecimento e2 = new Estabelecimento();
             e2.setId(2L);
             e2.setNome("Starbucks");
