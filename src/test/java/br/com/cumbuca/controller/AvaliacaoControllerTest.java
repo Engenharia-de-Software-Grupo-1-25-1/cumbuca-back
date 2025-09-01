@@ -108,6 +108,7 @@ class AvaliacaoControllerTest {
         usuarioRepository.save(usuario);
 
         estabelecimentoRequestDTO = new EstabelecimentoRequestDTO();
+        estabelecimentoRequestDTO.setId(1L);
         estabelecimentoRequestDTO.setNome("Restaurante Teste");
         estabelecimentoRequestDTO.setCategoria("Restaurante");
         estabelecimentoRequestDTO.setRua("Rua Teste, 123");
@@ -168,26 +169,27 @@ class AvaliacaoControllerTest {
                     "conteudo da foto".getBytes());
 
             final String responseJson = driver.perform(multipart(URI + "/criar")
-                    .file(foto)
-                    .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
-                    .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
-                    .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
-                    .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
-                    .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
-                    .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
-                    .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
-                    .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
-                    .param("itemConsumido", avaliacaoRequest.getItemConsumido())
-                    .param("descricao", avaliacaoRequest.getDescricao())
-                    .param("preco", avaliacaoRequest.getPreco().toString())
-                    .param("notaGeral", avaliacaoRequest.getNotaGeral().toString())
-                    .param("notaComida", avaliacaoRequest.getNotaComida().toString())
-                    .param("notaAtendimento", avaliacaoRequest.getNotaAtendimento().toString())
-                    .param("notaAmbiente", avaliacaoRequest.getNotaAmbiente().toString())
-                    .param("tags", "pizza", "deliciosa", "recomendo")
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header("Authorization", "Bearer " + token)
-                    .characterEncoding("UTF-8"))
+                            .file(foto)
+                            .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                            .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
+                            .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
+                            .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
+                            .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
+                            .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
+                            .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
+                            .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
+                            .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
+                            .param("itemConsumido", avaliacaoRequest.getItemConsumido())
+                            .param("descricao", avaliacaoRequest.getDescricao())
+                            .param("preco", avaliacaoRequest.getPreco().toString())
+                            .param("notaGeral", avaliacaoRequest.getNotaGeral().toString())
+                            .param("notaComida", avaliacaoRequest.getNotaComida().toString())
+                            .param("notaAtendimento", avaliacaoRequest.getNotaAtendimento().toString())
+                            .param("notaAmbiente", avaliacaoRequest.getNotaAmbiente().toString())
+                            .param("tags", "pizza", "deliciosa", "recomendo")
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("Authorization", "Bearer " + token)
+                            .characterEncoding("UTF-8"))
                     .andDo(print())
                     .andExpect(status().isCreated())
                     .andReturn()
@@ -227,31 +229,31 @@ class AvaliacaoControllerTest {
                     "conteudo da foto atualizada".getBytes());
 
             final String responseJson = driver.perform(multipart(URI + "/atualizar/" + avaliacao.getId())
-                    .file(foto)
-                    .param("estabelecimento.id", estabelecimento.getId().toString())
-                    .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
-                    .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
-                    .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
-                    .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
-                    .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
-                    .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
-                    .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
-                    .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
-                    .param("itemConsumido", avaliacaoAtualizadaDTO.getItemConsumido())
-                    .param("descricao", avaliacaoAtualizadaDTO.getDescricao())
-                    .param("preco", avaliacaoAtualizadaDTO.getPreco().toString())
-                    .param("notaGeral", avaliacaoAtualizadaDTO.getNotaGeral().toString())
-                    .param("notaComida", avaliacaoAtualizadaDTO.getNotaComida().toString())
-                    .param("notaAtendimento", avaliacaoAtualizadaDTO.getNotaAtendimento().toString())
-                    .param("notaAmbiente", avaliacaoAtualizadaDTO.getNotaAmbiente().toString())
-                    .param("tags", "hambúrguer", "artesanal", "saboroso")
-                    .with(request -> {
-                        request.setMethod("PUT");
-                        return request;
-                    })
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header("Authorization", "Bearer " + token)
-                    .characterEncoding("UTF-8"))
+                            .file(foto)
+                            .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                            .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
+                            .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
+                            .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
+                            .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
+                            .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
+                            .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
+                            .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
+                            .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
+                            .param("itemConsumido", avaliacaoAtualizadaDTO.getItemConsumido())
+                            .param("descricao", avaliacaoAtualizadaDTO.getDescricao())
+                            .param("preco", avaliacaoAtualizadaDTO.getPreco().toString())
+                            .param("notaGeral", avaliacaoAtualizadaDTO.getNotaGeral().toString())
+                            .param("notaComida", avaliacaoAtualizadaDTO.getNotaComida().toString())
+                            .param("notaAtendimento", avaliacaoAtualizadaDTO.getNotaAtendimento().toString())
+                            .param("notaAmbiente", avaliacaoAtualizadaDTO.getNotaAmbiente().toString())
+                            .param("tags", "hambúrguer", "artesanal", "saboroso")
+                            .with(request -> {
+                                request.setMethod("PUT");
+                                return request;
+                            })
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("Authorization", "Bearer " + token)
+                            .characterEncoding("UTF-8"))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -277,8 +279,8 @@ class AvaliacaoControllerTest {
         @Test
         void testRemoverAvaliacao() throws Exception {
             driver.perform(delete(URI + "/remover/" + avaliacao.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isNoContent());
             assertFalse(avaliacaoRepository.findById(avaliacao.getId()).isPresent());
@@ -287,9 +289,9 @@ class AvaliacaoControllerTest {
         @Test
         void testRecuperarAvaliacaoPorId() throws Exception {
             final String responseJson = driver.perform(get(URI + "/recuperar/" +
-                    avaliacao.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            avaliacao.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -334,8 +336,8 @@ class AvaliacaoControllerTest {
             avaliacaoRepository.saveAll(Arrays.asList(avaliacao1, avaliacao2));
 
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -392,28 +394,29 @@ class AvaliacaoControllerTest {
             avaliacaoAtualizadaDTO.setNotaAmbiente(5);
 
             final String responseText = driver.perform(multipart(URI + "/atualizar/" + avaliacaoOutroUsuario.getId())
-                    .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
-                    .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
-                    .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
-                    .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
-                    .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
-                    .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
-                    .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
-                    .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
-                    .param("itemConsumido", avaliacaoAtualizadaDTO.getItemConsumido())
-                    .param("descricao", avaliacaoAtualizadaDTO.getDescricao())
-                    .param("preco", avaliacaoAtualizadaDTO.getPreco().toString())
-                    .param("notaGeral", avaliacaoAtualizadaDTO.getNotaGeral().toString())
-                    .param("notaComida", avaliacaoAtualizadaDTO.getNotaComida().toString())
-                    .param("notaAtendimento", avaliacaoAtualizadaDTO.getNotaAtendimento().toString())
-                    .param("notaAmbiente", avaliacaoAtualizadaDTO.getNotaAmbiente().toString())
-                    .with(request -> {
-                        request.setMethod("PUT");
-                        return request;
-                    })
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header("Authorization", "Bearer " + token)
-                    .characterEncoding("UTF-8"))
+                            .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                            .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
+                            .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
+                            .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
+                            .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
+                            .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
+                            .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
+                            .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
+                            .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
+                            .param("itemConsumido", avaliacaoAtualizadaDTO.getItemConsumido())
+                            .param("descricao", avaliacaoAtualizadaDTO.getDescricao())
+                            .param("preco", avaliacaoAtualizadaDTO.getPreco().toString())
+                            .param("notaGeral", avaliacaoAtualizadaDTO.getNotaGeral().toString())
+                            .param("notaComida", avaliacaoAtualizadaDTO.getNotaComida().toString())
+                            .param("notaAtendimento", avaliacaoAtualizadaDTO.getNotaAtendimento().toString())
+                            .param("notaAmbiente", avaliacaoAtualizadaDTO.getNotaAmbiente().toString())
+                            .with(request -> {
+                                request.setMethod("PUT");
+                                return request;
+                            })
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("Authorization", "Bearer " + token)
+                            .characterEncoding("UTF-8"))
                     .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andReturn()
@@ -449,8 +452,8 @@ class AvaliacaoControllerTest {
             avaliacaoRepository.save(avaliacaoOutroUsuario);
 
             final String responseText = driver.perform(delete(URI + "/remover/" + avaliacaoOutroUsuario.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andExpect(status().isBadRequest())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -488,9 +491,9 @@ class AvaliacaoControllerTest {
             avaliacaoRepository.saveAll(Arrays.asList(avaliacaoBarata, avaliacaoCara));
 
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("precoMinimo", "30.00")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("precoMinimo", "30.00")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -534,9 +537,9 @@ class AvaliacaoControllerTest {
             avaliacaoRepository.saveAll(Arrays.asList(avaliacaoBarata, avaliacaoCara));
 
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("precoMaximo", "20.00")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("precoMaximo", "20.00")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -591,10 +594,10 @@ class AvaliacaoControllerTest {
             avaliacaoRepository.saveAll(Arrays.asList(avaliacaoBarata, avaliacaoMedia, avaliacaoCara));
 
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("precoMinimo", "20.00")
-                    .param("precoMaximo", "35.00")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("precoMinimo", "20.00")
+                            .param("precoMaximo", "35.00")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -640,8 +643,8 @@ class AvaliacaoControllerTest {
             avaliacaoRepository.saveAll(Arrays.asList(avaliacaoBarata, avaliacaoCara));
 
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -675,26 +678,27 @@ class AvaliacaoControllerTest {
                     "conteudo da foto".getBytes());
 
             driver.perform(multipart(URI + "/criar")
-                    .file(foto1)
-                    .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
-                    .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
-                    .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
-                    .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
-                    .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
-                    .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
-                    .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
-                    .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
-                    .param("itemConsumido", avaliacaoComTagDTO.getItemConsumido())
-                    .param("descricao", avaliacaoComTagDTO.getDescricao())
-                    .param("preco", avaliacaoComTagDTO.getPreco().toString())
-                    .param("notaGeral", avaliacaoComTagDTO.getNotaGeral().toString())
-                    .param("notaComida", avaliacaoComTagDTO.getNotaComida().toString())
-                    .param("notaAtendimento", avaliacaoComTagDTO.getNotaAtendimento().toString())
-                    .param("notaAmbiente", avaliacaoComTagDTO.getNotaAmbiente().toString())
-                    .param("tags", "pizza", "italiana", "queijo")
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header("Authorization", "Bearer " + token)
-                    .characterEncoding("UTF-8"))
+                            .file(foto1)
+                            .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                            .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
+                            .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
+                            .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
+                            .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
+                            .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
+                            .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
+                            .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
+                            .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
+                            .param("itemConsumido", avaliacaoComTagDTO.getItemConsumido())
+                            .param("descricao", avaliacaoComTagDTO.getDescricao())
+                            .param("preco", avaliacaoComTagDTO.getPreco().toString())
+                            .param("notaGeral", avaliacaoComTagDTO.getNotaGeral().toString())
+                            .param("notaComida", avaliacaoComTagDTO.getNotaComida().toString())
+                            .param("notaAtendimento", avaliacaoComTagDTO.getNotaAtendimento().toString())
+                            .param("notaAmbiente", avaliacaoComTagDTO.getNotaAmbiente().toString())
+                            .param("tags", "pizza", "italiana", "queijo")
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("Authorization", "Bearer " + token)
+                            .characterEncoding("UTF-8"))
                     .andDo(print())
                     .andExpect(status().isCreated())
                     .andReturn()
@@ -716,33 +720,34 @@ class AvaliacaoControllerTest {
                     "conteudo da foto".getBytes());
 
             driver.perform(multipart(URI + "/criar")
-                    .file(foto2)
-                    .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
-                    .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
-                    .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
-                    .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
-                    .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
-                    .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
-                    .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
-                    .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
-                    .param("itemConsumido", avaliacaoSemTagDTO.getItemConsumido())
-                    .param("descricao", avaliacaoSemTagDTO.getDescricao())
-                    .param("preco", avaliacaoSemTagDTO.getPreco().toString())
-                    .param("notaGeral", avaliacaoSemTagDTO.getNotaGeral().toString())
-                    .param("notaComida", avaliacaoSemTagDTO.getNotaComida().toString())
-                    .param("notaAtendimento", avaliacaoSemTagDTO.getNotaAtendimento().toString())
-                    .param("notaAmbiente", avaliacaoSemTagDTO.getNotaAmbiente().toString())
-                    .param("tags", "hambúrguer", "carne", "pão")
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header("Authorization", "Bearer " + token)
-                    .characterEncoding("UTF-8"))
+                            .file(foto2)
+                            .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                            .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
+                            .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
+                            .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
+                            .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
+                            .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
+                            .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
+                            .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
+                            .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
+                            .param("itemConsumido", avaliacaoSemTagDTO.getItemConsumido())
+                            .param("descricao", avaliacaoSemTagDTO.getDescricao())
+                            .param("preco", avaliacaoSemTagDTO.getPreco().toString())
+                            .param("notaGeral", avaliacaoSemTagDTO.getNotaGeral().toString())
+                            .param("notaComida", avaliacaoSemTagDTO.getNotaComida().toString())
+                            .param("notaAtendimento", avaliacaoSemTagDTO.getNotaAtendimento().toString())
+                            .param("notaAmbiente", avaliacaoSemTagDTO.getNotaAmbiente().toString())
+                            .param("tags", "hambúrguer", "carne", "pão")
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("Authorization", "Bearer " + token)
+                            .characterEncoding("UTF-8"))
                     .andDo(print())
                     .andExpect(status().isCreated());
 
             final String responseJsonFiltrado = driver.perform(get(URI + "/listar")
-                    .param("tags", "pizza")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("tags", "pizza")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -777,32 +782,33 @@ class AvaliacaoControllerTest {
                     "conteudo da foto".getBytes());
 
             driver.perform(multipart(URI + "/criar")
-                    .file(foto)
-                    .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
-                    .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
-                    .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
-                    .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
-                    .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
-                    .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
-                    .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
-                    .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
-                    .param("itemConsumido", avaliacaoComTagDTO.getItemConsumido())
-                    .param("descricao", avaliacaoComTagDTO.getDescricao())
-                    .param("preco", avaliacaoComTagDTO.getPreco().toString())
-                    .param("notaGeral", avaliacaoComTagDTO.getNotaGeral().toString())
-                    .param("notaComida", avaliacaoComTagDTO.getNotaComida().toString())
-                    .param("notaAtendimento", avaliacaoComTagDTO.getNotaAtendimento().toString())
-                    .param("notaAmbiente", avaliacaoComTagDTO.getNotaAmbiente().toString())
-                    .param("tags", "lasanha", "massa", "molho")
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header("Authorization", "Bearer " + token)
-                    .characterEncoding("UTF-8"))
+                            .file(foto)
+                            .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                            .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
+                            .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
+                            .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
+                            .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
+                            .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
+                            .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
+                            .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
+                            .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
+                            .param("itemConsumido", avaliacaoComTagDTO.getItemConsumido())
+                            .param("descricao", avaliacaoComTagDTO.getDescricao())
+                            .param("preco", avaliacaoComTagDTO.getPreco().toString())
+                            .param("notaGeral", avaliacaoComTagDTO.getNotaGeral().toString())
+                            .param("notaComida", avaliacaoComTagDTO.getNotaComida().toString())
+                            .param("notaAtendimento", avaliacaoComTagDTO.getNotaAtendimento().toString())
+                            .param("notaAmbiente", avaliacaoComTagDTO.getNotaAmbiente().toString())
+                            .param("tags", "lasanha", "massa", "molho")
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("Authorization", "Bearer " + token)
+                            .characterEncoding("UTF-8"))
                     .andDo(print())
                     .andExpect(status().isCreated());
 
             final String responseJsonSemFiltro = driver.perform(get(URI + "/listar")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -833,33 +839,34 @@ class AvaliacaoControllerTest {
                     "conteudo da foto".getBytes());
 
             driver.perform(multipart(URI + "/criar")
-                    .file(foto)
-                    .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
-                    .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
-                    .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
-                    .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
-                    .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
-                    .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
-                    .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
-                    .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
-                    .param("itemConsumido", avaliacaoDTO.getItemConsumido())
-                    .param("descricao", avaliacaoDTO.getDescricao())
-                    .param("preco", avaliacaoDTO.getPreco().toString())
-                    .param("notaGeral", avaliacaoDTO.getNotaGeral().toString())
-                    .param("notaComida", avaliacaoDTO.getNotaComida().toString())
-                    .param("notaAtendimento", avaliacaoDTO.getNotaAtendimento().toString())
-                    .param("notaAmbiente", avaliacaoDTO.getNotaAmbiente().toString())
-                    .param("tags", "RISOTTO", "Italiano", "cremoso")
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header("Authorization", "Bearer " + token)
-                    .characterEncoding("UTF-8"))
+                            .file(foto)
+                            .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                            .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
+                            .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
+                            .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
+                            .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
+                            .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
+                            .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
+                            .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
+                            .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
+                            .param("itemConsumido", avaliacaoDTO.getItemConsumido())
+                            .param("descricao", avaliacaoDTO.getDescricao())
+                            .param("preco", avaliacaoDTO.getPreco().toString())
+                            .param("notaGeral", avaliacaoDTO.getNotaGeral().toString())
+                            .param("notaComida", avaliacaoDTO.getNotaComida().toString())
+                            .param("notaAtendimento", avaliacaoDTO.getNotaAtendimento().toString())
+                            .param("notaAmbiente", avaliacaoDTO.getNotaAmbiente().toString())
+                            .param("tags", "RISOTTO", "Italiano", "cremoso")
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("Authorization", "Bearer " + token)
+                            .characterEncoding("UTF-8"))
                     .andDo(print())
                     .andExpect(status().isCreated());
 
             final String responseJsonFiltrado = driver.perform(get(URI + "/listar")
-                    .param("tags", "risotto")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("tags", "risotto")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -903,9 +910,9 @@ class AvaliacaoControllerTest {
             avaliacaoRepository.save(avaliacaoOutroUsuario);
 
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("usuario", "João")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("usuario", "João")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -947,9 +954,9 @@ class AvaliacaoControllerTest {
             avaliacaoRepository.save(avaliacaoOutroUsuario);
 
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("usuario", "Maria da Silva")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("usuario", "Maria da Silva")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -967,6 +974,7 @@ class AvaliacaoControllerTest {
         @Test
         void testFiltrarAvaliacoesPorNomeEstabelecimento() throws Exception {
             final EstabelecimentoRequestDTO outroEstabelecimentoDTO = new EstabelecimentoRequestDTO();
+            outroEstabelecimentoDTO.setId(2L);
             outroEstabelecimentoDTO.setNome("Pizzaria Bella Vista");
             outroEstabelecimentoDTO.setCategoria("Pizzaria");
             outroEstabelecimentoDTO.setRua("Rua das Flores, 456");
@@ -993,9 +1001,9 @@ class AvaliacaoControllerTest {
             avaliacaoRepository.save(avaliacaoOutroEstabelecimento);
 
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("estabelecimento", "Bella")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("estabelecimento", "Bella")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -1025,6 +1033,7 @@ class AvaliacaoControllerTest {
             usuarioRepository.save(outroUsuario);
 
             final EstabelecimentoRequestDTO outroEstabelecimentoDTO = new EstabelecimentoRequestDTO();
+            outroEstabelecimentoDTO.setId(3L);
             outroEstabelecimentoDTO.setNome("Burger House");
             outroEstabelecimentoDTO.setCategoria("Hamburgueria");
             outroEstabelecimentoDTO.setRua("Rua Principal, 789");
@@ -1051,10 +1060,10 @@ class AvaliacaoControllerTest {
             avaliacaoRepository.save(avaliacaoEspecifica);
 
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("usuario", "Carlos")
-                    .param("estabelecimento", "House")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("usuario", "Carlos")
+                            .param("estabelecimento", "House")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -1098,9 +1107,9 @@ class AvaliacaoControllerTest {
             avaliacaoRepository.save(avaliacaoUpper);
 
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("usuario", "ana costa")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("usuario", "ana costa")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -1116,8 +1125,8 @@ class AvaliacaoControllerTest {
         @Test
         void testFiltrarAvaliacoesSemFiltros() throws Exception {
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -1133,10 +1142,10 @@ class AvaliacaoControllerTest {
         @Test
         void testFiltrarAvaliacoesComFiltroVazio() throws Exception {
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("usuario", "")
-                    .param("estabelecimento", "")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("usuario", "")
+                            .param("estabelecimento", "")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -1158,8 +1167,8 @@ class AvaliacaoControllerTest {
             final long idInexistente = 99999L;
 
             driver.perform(get(URI + "/recuperar/" + idInexistente)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isNotFound());
         }
@@ -1178,28 +1187,29 @@ class AvaliacaoControllerTest {
             avaliacaoDTO.setNotaAmbiente(3);
 
             driver.perform(multipart(URI + "/atualizar/" + idInexistente)
-                    .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
-                    .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
-                    .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
-                    .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
-                    .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
-                    .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
-                    .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
-                    .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
-                    .param("itemConsumido", avaliacaoDTO.getItemConsumido())
-                    .param("descricao", avaliacaoDTO.getDescricao())
-                    .param("preco", avaliacaoDTO.getPreco().toString())
-                    .param("notaGeral", avaliacaoDTO.getNotaGeral().toString())
-                    .param("notaComida", avaliacaoDTO.getNotaComida().toString())
-                    .param("notaAtendimento", avaliacaoDTO.getNotaAtendimento().toString())
-                    .param("notaAmbiente", avaliacaoDTO.getNotaAmbiente().toString())
-                    .with(request -> {
-                        request.setMethod("PUT");
-                        return request;
-                    })
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header("Authorization", "Bearer " + token)
-                    .characterEncoding("UTF-8"))
+                            .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                            .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
+                            .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
+                            .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
+                            .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
+                            .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
+                            .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
+                            .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
+                            .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
+                            .param("itemConsumido", avaliacaoDTO.getItemConsumido())
+                            .param("descricao", avaliacaoDTO.getDescricao())
+                            .param("preco", avaliacaoDTO.getPreco().toString())
+                            .param("notaGeral", avaliacaoDTO.getNotaGeral().toString())
+                            .param("notaComida", avaliacaoDTO.getNotaComida().toString())
+                            .param("notaAtendimento", avaliacaoDTO.getNotaAtendimento().toString())
+                            .param("notaAmbiente", avaliacaoDTO.getNotaAmbiente().toString())
+                            .with(request -> {
+                                request.setMethod("PUT");
+                                return request;
+                            })
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("Authorization", "Bearer " + token)
+                            .characterEncoding("UTF-8"))
                     .andDo(print())
                     .andExpect(status().isNotFound());
         }
@@ -1209,8 +1219,8 @@ class AvaliacaoControllerTest {
             final long idInexistente = 99999L;
 
             driver.perform(delete(URI + "/remover/" + idInexistente)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isNotFound());
         }
@@ -1218,7 +1228,7 @@ class AvaliacaoControllerTest {
         @Test
         void testAcessoSemAutenticacao() throws Exception {
             driver.perform(get(URI + "/recuperar/" + avaliacao.getId())
-                    .contentType(MediaType.APPLICATION_JSON))
+                            .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isForbidden());
         }
@@ -1226,8 +1236,8 @@ class AvaliacaoControllerTest {
         @Test
         void testAcessoComTokenInvalido() throws Exception {
             driver.perform(get(URI + "/recuperar/" + avaliacao.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer tokenInvalido"))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer tokenInvalido"))
                     .andDo(print())
                     .andExpect(status().isUnauthorized());
         }
@@ -1250,24 +1260,25 @@ class AvaliacaoControllerTest {
             avaliacaoDTO.setNotaAmbiente(3);
 
             final String responseJson = driver.perform(multipart(URI + "/criar")
-                    .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
-                    .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
-                    .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
-                    .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
-                    .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
-                    .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
-                    .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
-                    .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
-                    .param("itemConsumido", avaliacaoDTO.getItemConsumido())
-                    .param("descricao", avaliacaoDTO.getDescricao())
-                    .param("preco", avaliacaoDTO.getPreco().toString())
-                    .param("notaGeral", avaliacaoDTO.getNotaGeral().toString())
-                    .param("notaComida", avaliacaoDTO.getNotaComida().toString())
-                    .param("notaAtendimento", avaliacaoDTO.getNotaAtendimento().toString())
-                    .param("notaAmbiente", avaliacaoDTO.getNotaAmbiente().toString())
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header("Authorization", "Bearer " + token)
-                    .characterEncoding("UTF-8"))
+                            .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                            .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
+                            .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
+                            .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
+                            .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
+                            .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
+                            .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
+                            .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
+                            .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
+                            .param("itemConsumido", avaliacaoDTO.getItemConsumido())
+                            .param("descricao", avaliacaoDTO.getDescricao())
+                            .param("preco", avaliacaoDTO.getPreco().toString())
+                            .param("notaGeral", avaliacaoDTO.getNotaGeral().toString())
+                            .param("notaComida", avaliacaoDTO.getNotaComida().toString())
+                            .param("notaAtendimento", avaliacaoDTO.getNotaAtendimento().toString())
+                            .param("notaAmbiente", avaliacaoDTO.getNotaAmbiente().toString())
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("Authorization", "Bearer " + token)
+                            .characterEncoding("UTF-8"))
                     .andDo(print())
                     .andExpect(status().isCreated())
                     .andReturn()
@@ -1298,25 +1309,26 @@ class AvaliacaoControllerTest {
                     "conteudo da foto".getBytes());
 
             final String responseJson = driver.perform(multipart(URI + "/criar")
-                    .file(foto)
-                    .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
-                    .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
-                    .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
-                    .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
-                    .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
-                    .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
-                    .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
-                    .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
-                    .param("itemConsumido", avaliacaoDTO.getItemConsumido())
-                    .param("descricao", avaliacaoDTO.getDescricao())
-                    .param("preco", avaliacaoDTO.getPreco().toString())
-                    .param("notaGeral", avaliacaoDTO.getNotaGeral().toString())
-                    .param("notaComida", avaliacaoDTO.getNotaComida().toString())
-                    .param("notaAtendimento", avaliacaoDTO.getNotaAtendimento().toString())
-                    .param("notaAmbiente", avaliacaoDTO.getNotaAmbiente().toString())
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header("Authorization", "Bearer " + token)
-                    .characterEncoding("UTF-8"))
+                            .file(foto)
+                            .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                            .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
+                            .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
+                            .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
+                            .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
+                            .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
+                            .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
+                            .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
+                            .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
+                            .param("itemConsumido", avaliacaoDTO.getItemConsumido())
+                            .param("descricao", avaliacaoDTO.getDescricao())
+                            .param("preco", avaliacaoDTO.getPreco().toString())
+                            .param("notaGeral", avaliacaoDTO.getNotaGeral().toString())
+                            .param("notaComida", avaliacaoDTO.getNotaComida().toString())
+                            .param("notaAtendimento", avaliacaoDTO.getNotaAtendimento().toString())
+                            .param("notaAmbiente", avaliacaoDTO.getNotaAmbiente().toString())
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("Authorization", "Bearer " + token)
+                            .characterEncoding("UTF-8"))
                     .andDo(print())
                     .andExpect(status().isCreated())
                     .andReturn()
@@ -1344,29 +1356,29 @@ class AvaliacaoControllerTest {
             avaliacaoDTO.setNotaAmbiente(4);
 
             final String responseJson = driver.perform(multipart(URI + "/atualizar/" + avaliacao.getId())
-                    .param("estabelecimento.id", estabelecimento.getId().toString())
-                    .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
-                    .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
-                    .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
-                    .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
-                    .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
-                    .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
-                    .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
-                    .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
-                    .param("itemConsumido", avaliacaoDTO.getItemConsumido())
-                    .param("descricao", avaliacaoDTO.getDescricao())
-                    .param("preco", avaliacaoDTO.getPreco().toString())
-                    .param("notaGeral", avaliacaoDTO.getNotaGeral().toString())
-                    .param("notaComida", avaliacaoDTO.getNotaComida().toString())
-                    .param("notaAtendimento", avaliacaoDTO.getNotaAtendimento().toString())
-                    .param("notaAmbiente", avaliacaoDTO.getNotaAmbiente().toString())
-                    .with(request -> {
-                        request.setMethod("PUT");
-                        return request;
-                    })
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header("Authorization", "Bearer " + token)
-                    .characterEncoding("UTF-8"))
+                            .param("estabelecimento.id", estabelecimentoRequestDTO.getId().toString())
+                            .param("estabelecimento.nome", estabelecimentoRequestDTO.getNome())
+                            .param("estabelecimento.categoria", estabelecimentoRequestDTO.getCategoria())
+                            .param("estabelecimento.rua", estabelecimentoRequestDTO.getRua())
+                            .param("estabelecimento.numero", estabelecimentoRequestDTO.getNumero())
+                            .param("estabelecimento.bairro", estabelecimentoRequestDTO.getBairro())
+                            .param("estabelecimento.cidade", estabelecimentoRequestDTO.getCidade())
+                            .param("estabelecimento.estado", estabelecimentoRequestDTO.getEstado())
+                            .param("estabelecimento.cep", estabelecimentoRequestDTO.getCep())
+                            .param("itemConsumido", avaliacaoDTO.getItemConsumido())
+                            .param("descricao", avaliacaoDTO.getDescricao())
+                            .param("preco", avaliacaoDTO.getPreco().toString())
+                            .param("notaGeral", avaliacaoDTO.getNotaGeral().toString())
+                            .param("notaComida", avaliacaoDTO.getNotaComida().toString())
+                            .param("notaAtendimento", avaliacaoDTO.getNotaAtendimento().toString())
+                            .param("notaAmbiente", avaliacaoDTO.getNotaAmbiente().toString())
+                            .with(request -> {
+                                request.setMethod("PUT");
+                                return request;
+                            })
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("Authorization", "Bearer " + token)
+                            .characterEncoding("UTF-8"))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -1403,6 +1415,7 @@ class AvaliacaoControllerTest {
             usuarioRepository.save(outroUsuario);
 
             final EstabelecimentoRequestDTO outroEstabelecimentoDTO = new EstabelecimentoRequestDTO();
+            outroEstabelecimentoDTO.setId(5L);
             outroEstabelecimentoDTO.setNome("Estabelecimento Específico");
             outroEstabelecimentoDTO.setCategoria("Cafeteria");
             outroEstabelecimentoDTO.setRua("Rua Específica, 999");
@@ -1443,10 +1456,10 @@ class AvaliacaoControllerTest {
         @Test
         void testListarComFiltroExampleSemIdUsuarioNemEstabelecimento() throws Exception {
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("usuario", "Teste")
-                    .param("estabelecimento", "Restaurante")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("usuario", "Teste")
+                            .param("estabelecimento", "Restaurante")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -1461,9 +1474,9 @@ class AvaliacaoControllerTest {
         @Test
         void testListarComIdUsuarioSomente() throws Exception {
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("idUsuario", outroUsuario.getId().toString())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("idUsuario", outroUsuario.getId().toString())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -1483,9 +1496,9 @@ class AvaliacaoControllerTest {
         @Test
         void testListarComIdEstabelecimentoSomente() throws Exception {
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("idEstabelecimento", outroEstabelecimento.getId().toString())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("idEstabelecimento", outroEstabelecimento.getId().toString())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -1504,10 +1517,10 @@ class AvaliacaoControllerTest {
         @Test
         void testListarComIdUsuarioEIdEstabelecimento() throws Exception {
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("idUsuario", outroUsuario.getId().toString())
-                    .param("idEstabelecimento", outroEstabelecimento.getId().toString())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("idUsuario", outroUsuario.getId().toString())
+                            .param("idEstabelecimento", outroEstabelecimento.getId().toString())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -1524,12 +1537,12 @@ class AvaliacaoControllerTest {
         @Test
         void testListarComFiltrosDeNotasCompletos() throws Exception {
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .param("notaGeral", "3")
-                    .param("notaComida", "3")
-                    .param("notaAtendimento", "2")
-                    .param("notaAmbiente", "1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .param("notaGeral", "3")
+                            .param("notaComida", "3")
+                            .param("notaAtendimento", "2")
+                            .param("notaAmbiente", "1")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
@@ -1545,8 +1558,8 @@ class AvaliacaoControllerTest {
         @Test
         void testListarSemFiltros() throws Exception {
             final String responseJson = driver.perform(get(URI + "/listar")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andReturn()
