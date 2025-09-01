@@ -1,15 +1,11 @@
 package br.com.cumbuca.dto.estabelecimento;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 public class EstabelecimentoRequestDTO {
 
-    @NotNull
     private Long id;
 
     @NotBlank(message = "Nome do estabelecimento é obrigatório")
@@ -29,6 +25,4 @@ public class EstabelecimentoRequestDTO {
     private String estado;
 
     private String cep;
-
-    private List<String> horarios;
 }
