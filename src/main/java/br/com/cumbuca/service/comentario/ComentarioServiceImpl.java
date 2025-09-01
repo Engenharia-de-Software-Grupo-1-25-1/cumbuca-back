@@ -1,6 +1,7 @@
 package br.com.cumbuca.service.comentario;
 
 import br.com.cumbuca.dto.comentario.ComentarioResponseDTO;
+import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
 import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Comentario;
@@ -47,7 +48,13 @@ public class ComentarioServiceImpl implements ComentarioService {
         comentario.setUsuario(usuario);
         comentario.setConteudo(texto);
         comentarioRepository.save(comentario);
-        return modelMapper.map(comentario, ComentarioResponseDTO.class);
+
+        ComentarioResponseDTO dto = new ComentarioResponseDTO();
+        dto.setId(comentario.getId());
+        dto.setAvaliacaoId(avaliacao.getId());
+        dto.setUsuario(modelMapper.map(usuario, UsuarioResponseDTO.class));
+        dto.setComentario(comentario.getConteudo());
+        return dto;
     }
 
     @Override
@@ -55,9 +62,6 @@ public class ComentarioServiceImpl implements ComentarioService {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Comentario comentario = comentarioRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Comentário não encontrado"));
-        if (!comentario.getUsuario().getId().equals(usuario.getId())) {
-            throw new CumbucaException("Usuário não tem permissão para realizar esta ação.");
-        }
         comentarioRepository.delete(comentario);
     }
 }
