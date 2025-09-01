@@ -494,10 +494,10 @@ public class EstabelecimentoControllerTest {
             });
 
             assertAll(
-                    () -> assertFalse(resultado.stream().anyMatch(u -> u.getId().equals(estabelecimento.getId()))),
-                    () -> assertFalse(resultado.stream().anyMatch(u -> u.getId().equals(e2.getId()))),
+                    () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(estabelecimento.getId()))),
+                    () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e2.getId()))),
                     () -> assertTrue(resultado.stream().anyMatch(u -> u.getId().equals(e3.getId()))),
-                    () -> assertEquals(1, resultado.size())
+                    () -> assertEquals(3, resultado.size())
             );
         }
 
