@@ -344,11 +344,8 @@ public class EstabelecimentoControllerTest {
 
             estabelecimentoRepository.saveAll(Arrays.asList(e2, e3));
 
-            EstabelecimentoResponseDTO e2Dto = new EstabelecimentoResponseDTO(e2);
-            String localizacao = e2Dto.getLocalizacao();
-
             final String responseJson = driver.perform(get(URI + "/listar")
-                            .param("localizacao", localizacao)
+                            .param("localizacao", e2.getCep())
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token))
                     .andDo(print())
