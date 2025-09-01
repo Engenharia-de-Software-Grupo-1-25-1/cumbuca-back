@@ -53,7 +53,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public AvaliacaoResponseDTO criar(AvaliacaoRequestDTO avaliacaoRequestDTO) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
 
@@ -76,7 +75,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public AvaliacaoResponseDTO atualizar(Long id, AvaliacaoRequestDTO avaliacaoRequestDTO) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
@@ -104,7 +102,6 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public void remover(Long id) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));

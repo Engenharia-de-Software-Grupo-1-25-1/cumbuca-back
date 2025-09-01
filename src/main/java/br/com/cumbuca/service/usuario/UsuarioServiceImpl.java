@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -56,7 +55,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioRequestDTO) throws IOException {
         final Usuario usuario = getUsuarioLogado();
         if (!id.equals(usuario.getId())) {
@@ -77,7 +75,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public void remover(Long id) {
         final Usuario usuario = getUsuarioLogado();
         if (!id.equals(usuario.getId())) {

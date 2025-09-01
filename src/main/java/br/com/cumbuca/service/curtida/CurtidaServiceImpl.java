@@ -10,7 +10,6 @@ import br.com.cumbuca.repository.CurtidaRepository;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
@@ -30,7 +29,6 @@ public class CurtidaServiceImpl implements CurtidaService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public CurtidaResponseDTO curtir(Long avaliacaoId) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Avaliacao avaliacao = avaliacaoRepository.findById(avaliacaoId)
