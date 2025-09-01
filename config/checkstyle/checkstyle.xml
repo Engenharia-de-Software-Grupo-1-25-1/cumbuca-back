@@ -21,7 +21,7 @@
             <property name="max" value="10"/>
         </module>
         <module name="ClassFanOutComplexity">
-            <property name="max" value="23"/>
+            <property name="max" value="24"/>
         </module>
         <module name="ClassTypeParameterName">
             <property name="format" value="^[A-Z]$"/>

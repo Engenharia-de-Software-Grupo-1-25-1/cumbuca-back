@@ -19,6 +19,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -53,6 +54,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<EstabelecimentoResponseDTO> listar(EstabelecimentoFiltroRequestDTO filtros, String ordenador) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Example<EstabelecimentoView> example = criarExemplo(filtros);
@@ -93,6 +95,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public EstabelecimentoResponseDTO recuperar(Long id) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final EstabelecimentoView estabelecimento = estabelecimentoViewRepository.findById(id)
@@ -106,6 +109,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     @Override
+    @Transactional
     public FavoritoResponseDTO favoritar(Long id) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Estabelecimento estabelecimento = estabelecimentoRepository.findById(id)

@@ -20,6 +20,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -112,6 +113,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AvaliacaoResponseDTO recuperar(Long id) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final AvaliacaoView avaliacao = avaliacaoViewRepository.findById(id)
@@ -122,6 +124,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AvaliacaoResponseDTO> listar(Long idUsuario, Long idEstabelecimento, AvaliacaoFiltroRequestDTO filtros, String ordenador) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Example<AvaliacaoView> example = criarExemplo(filtros);
