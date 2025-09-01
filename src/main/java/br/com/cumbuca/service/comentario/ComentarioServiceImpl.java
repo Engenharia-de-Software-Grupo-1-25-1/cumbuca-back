@@ -10,6 +10,7 @@ import br.com.cumbuca.repository.ComentarioRepository;
 import br.com.cumbuca.service.usuario.UsuarioService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -51,6 +52,7 @@ public class ComentarioServiceImpl implements ComentarioService {
     }
 
     @Override
+    @Transactional
     public void remover(Long id) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Comentario comentario = comentarioRepository.findById(id)

@@ -20,6 +20,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -74,6 +75,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
+    @Transactional
     public AvaliacaoResponseDTO atualizar(Long id, AvaliacaoRequestDTO avaliacaoRequestDTO) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
@@ -101,6 +103,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
     }
 
     @Override
+    @Transactional
     public void remover(Long id) {
         final Avaliacao avaliacao = avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
@@ -169,6 +172,7 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         return Sort.by(Sort.Order.desc("data"));
     }
 
+    @Transactional
     private Example<AvaliacaoView> criarExemplo(AvaliacaoFiltroRequestDTO filtros) {
         final AvaliacaoView exemplo = modelMapper.map(filtros, AvaliacaoView.class);
 
