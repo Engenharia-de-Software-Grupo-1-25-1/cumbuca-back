@@ -8,8 +8,8 @@ import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.CurtidaRepository;
 import br.com.cumbuca.service.usuario.UsuarioService;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
@@ -19,16 +19,15 @@ public class CurtidaServiceImpl implements CurtidaService {
     private final UsuarioService usuarioService;
     private final CurtidaRepository curtidaRepository;
     private final AvaliacaoRepository avaliacaoRepository;
-    private final ModelMapper modelMapper;
 
-    public CurtidaServiceImpl(CurtidaRepository curtidaRepository, UsuarioService usuarioService, AvaliacaoRepository avaliacaoRepository, ModelMapper modelMapper) {
+    public CurtidaServiceImpl(CurtidaRepository curtidaRepository, UsuarioService usuarioService, AvaliacaoRepository avaliacaoRepository) {
         this.curtidaRepository = curtidaRepository;
         this.usuarioService = usuarioService;
         this.avaliacaoRepository = avaliacaoRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
+    @Transactional
     public CurtidaResponseDTO curtir(Long avaliacaoId) {
         final Usuario usuario = usuarioService.getUsuarioLogado();
         final Avaliacao avaliacao = avaliacaoRepository.findById(avaliacaoId)
@@ -50,7 +49,7 @@ public class CurtidaServiceImpl implements CurtidaService {
         curtida.setUsuario(usuario);
         curtida.setAvaliacao(avaliacao);
 
-        final CurtidaResponseDTO curtidaResponseDTO = modelMapper.map(curtida, CurtidaResponseDTO.class);
+        final CurtidaResponseDTO curtidaResponseDTO = new CurtidaResponseDTO(curtida);
         curtidaResponseDTO.setIsCurtida(true);
         curtidaRepository.save(curtida);
         return curtidaResponseDTO;

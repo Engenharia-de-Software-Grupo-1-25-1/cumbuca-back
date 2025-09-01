@@ -63,6 +63,8 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                 : estabelecimentoViewRepository.findAll(example);
 
         return estabelecimentos.stream()
+                .filter(estabelecimento -> filtros.getIsFavoritado() == null || !filtros.getIsFavoritado()
+                        || favoritoRespository.existsByUsuarioIdAndEstabelecimentoId(usuario.getId(), estabelecimento.getId()))
                 .filter(estabelecimento ->
                         filtros.getNotaGeral() == null || (estabelecimento.getNotaGeral() >= filtros.getNotaGeral()
                                 && estabelecimento.getNotaGeral() < filtros.getNotaGeral() + 1))
@@ -82,9 +84,6 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
         if (filtros.getLocalizacao() != null && !filtros.getLocalizacao().isBlank()) {
             exemplo.setLocalizacao(filtros.getLocalizacao());
-        }
-        if (filtros.getIsFavoritado() != null && filtros.getIsFavoritado()) {
-            exemplo.setIsFavoritado(true);
         }
 
         final ExampleMatcher matcher = ExampleMatcher.matching()
