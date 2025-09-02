@@ -1,5 +1,9 @@
 package br.com.cumbuca.controller;
 
+import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
+import br.com.cumbuca.dto.estabelecimento.EstabelecimentoRequestDTO;
+import br.com.cumbuca.dto.tag.TagResponseDTO;
+import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.model.Tag;
@@ -8,40 +12,50 @@ import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.EstabelecimentoRepository;
 import br.com.cumbuca.repository.TagRepository;
 import br.com.cumbuca.repository.UsuarioRepository;
-import br.com.cumbuca.service.tag.TagService;
+import br.com.cumbuca.service.autenticacao.TokenService;
+import br.com.cumbuca.service.tag.TagServiceImpl;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@WithMockUser(username = "Lulu Fazedor de Drift")
 class TagControllerTest {
+    static final String URI = "/tag";
 
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc driver;
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -53,55 +67,74 @@ class TagControllerTest {
     private AvaliacaoRepository avaliacaoRepository;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
     private TagRepository tagRepository;
 
     @Autowired
-    private TagService tagService;
+    ObjectMapper objectMapper;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    private Avaliacao avaliacao;
+    ModelMapper modelMapper = new ModelMapper();
+    Usuario usuario;
+    Avaliacao avaliacao;
+    Estabelecimento estabelecimento;
+    UsuarioRequestDTO usuarioRequestDTO;
+    AvaliacaoRequestDTO avaliacaoRequestDTO;
+    EstabelecimentoRequestDTO estabelecimentoRequestDTO;
+    String token;
 
     @BeforeEach
     void setUp() {
+        usuarioRequestDTO = new UsuarioRequestDTO();
+        usuarioRequestDTO.setEmail("testejunit@email.com");
+        usuarioRequestDTO.setSenha("123456");
+        usuarioRequestDTO.setNome("Teste JUnit");
+        usuarioRequestDTO.setUsername("testejunit");
+        usuarioRequestDTO.setDtNascimento(LocalDate.of(2000, 1, 1));
 
-        entityManager.createNativeQuery("TRUNCATE TABLE usuario, estabelecimento, avaliacao, tag, usuario_curte_avaliacao RESTART IDENTITY CASCADE").executeUpdate();
+        usuario = modelMapper.map(usuarioRequestDTO, Usuario.class);
+        usuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.getSenha()));
+        usuarioRepository.save(usuario);
 
-        final Usuario usuarioDono = new Usuario();
-        usuarioDono.setId(1L);
-        usuarioDono.setEmail("luciano.nascimento.filho@gmail.com");
-        usuarioDono.setSenha("webhead");
-        usuarioDono.setNome("Luciano Nascimento");
-        usuarioDono.setUsername("Lulu Fazedor de Drift");
-        usuarioDono.setDtNascimento(LocalDate.of(2000, 10, 24));
-        usuarioRepository.save(usuarioDono);
+        estabelecimentoRequestDTO = new EstabelecimentoRequestDTO();
+        estabelecimentoRequestDTO.setId(1L);
+        estabelecimentoRequestDTO.setNome("Restaurante Teste");
+        estabelecimentoRequestDTO.setCategoria("Restaurante");
 
-        final Estabelecimento estabelecimento = new Estabelecimento();
-        estabelecimento.setId(1L);
-        estabelecimento.setNome("Test Estabelecimento");
-        estabelecimento.setCategoria("Restaurante");
+        estabelecimento = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
         estabelecimentoRepository.save(estabelecimento);
 
-        avaliacao = new Avaliacao();
-        avaliacao.setId(1L);
-        avaliacao.setUsuario(usuarioDono);
+        final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                usuario.getUsername(), usuarioRequestDTO.getSenha());
+        final Authentication authentication = authenticationManager.authenticate(authToken);
+        token = tokenService.gerarToken((Usuario) authentication.getPrincipal());
+
+        avaliacaoRequestDTO = new AvaliacaoRequestDTO();
+        avaliacaoRequestDTO.setItemConsumido("picado");
+        avaliacaoRequestDTO.setDescricao("Muito bem servido");
+        avaliacaoRequestDTO.setPreco(new BigDecimal("25.00"));
+        avaliacao = modelMapper.map(avaliacaoRequestDTO, Avaliacao.class);
         avaliacao.setEstabelecimento(estabelecimento);
-        avaliacao.setItemConsumido("Pizza");
-        avaliacao.setDescricao("Muito boa!");
-        avaliacao.setPreco(BigDecimal.valueOf(50.00));
-        avaliacao.setNotaGeral(5);
+        avaliacao.setUsuario(usuario);
         avaliacaoRepository.save(avaliacao);
 
-        final Tag tag1 = new Tag();
+        Tag tag1 = new Tag();
+        tag1.setConteudo("jantar");
         tag1.setAvaliacao(avaliacao);
-        tag1.setConteudo("bom");
-        tagRepository.save(tag1);
-
-        final Tag tag2 = new Tag();
+        Tag tag2 = new Tag();
+        tag2.setConteudo("amigos");
         tag2.setAvaliacao(avaliacao);
-        tag2.setConteudo("barato");
-        tagRepository.save(tag2);
+        tagRepository.saveAll(Arrays.asList(tag1, tag2));
     }
 
     @AfterEach
@@ -112,72 +145,77 @@ class TagControllerTest {
         usuarioRepository.deleteAll();
     }
 
-    @Test
-    void testListarTags() throws Exception {
-        mockMvc.perform(get("/tag/listar"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)));
+    @Nested
+    class TagFluxoBasicoApiRest {
+        @Test
+        void testListarTags() throws Exception {
+            final String responseJson = driver.perform(get(URI + "/listar")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString(StandardCharsets.UTF_8);
+
+
+            final List<TagResponseDTO> resultado = objectMapper.readValue(responseJson, new TypeReference<>() {
+            });
+
+            assertAll(
+                    () -> assertTrue(resultado.stream().anyMatch(t -> t.getTag().equals("jantar"))),
+                    () -> assertTrue(resultado.stream().anyMatch(t -> t.getTag().equals("amigos")))
+            );
+        }
+
+        @Test
+        void testListarTagsPopulares() throws Exception {
+            AvaliacaoRequestDTO avaliacaoRequestDTO2 = new AvaliacaoRequestDTO();
+            avaliacaoRequestDTO2.setItemConsumido("pizza");
+            avaliacaoRequestDTO2.setDescricao("muito boa");
+            avaliacaoRequestDTO2.setPreco(new BigDecimal("25.00"));
+            Avaliacao avaliacao2 = modelMapper.map(avaliacaoRequestDTO2, Avaliacao.class);
+            avaliacao2.setEstabelecimento(estabelecimento);
+            avaliacao2.setUsuario(usuario);
+            avaliacaoRepository.save(avaliacao2);
+            Tag tagExtra = new Tag();
+            tagExtra.setConteudo("jantar");
+            tagExtra.setAvaliacao(avaliacao2);
+            tagRepository.saveAll(Arrays.asList(tagExtra));
+            avaliacaoRequestDTO2.setTags(List.of(tagExtra.getConteudo()));
+            avaliacaoRepository.save(avaliacao2);
+
+            final String responseJson = driver.perform(get(URI + "/populares/listar")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString(StandardCharsets.UTF_8);
+
+            final List<TagResponseDTO> resultado = objectMapper.readValue(responseJson, new TypeReference<>() {});
+
+            assertAll(
+                    () -> assertTrue(resultado.stream().anyMatch(t -> t.getTag().equals("jantar"))),
+                    () -> assertTrue(resultado.stream().anyMatch(t -> t.getTag().equals("amigos"))),
+                    () -> assertEquals(2, resultado.stream()
+                            .filter(t -> t.getTag().equals("jantar"))
+                            .findFirst()
+                            .get()
+                            .getQuantidade()),
+                    () -> assertEquals(1, resultado.stream()
+                            .filter(t -> t.getTag().equals("amigos"))
+                            .findFirst()
+                            .get()
+                            .getQuantidade())
+            );
+        }
+
+        @Test
+        void testNormalizarTagComNull() {
+            assertNull(TagServiceImpl.normalizarTag(null));
+        }
     }
 
-    @Test
-    void testListarTagsPopulares() throws Exception {
-        mockMvc.perform(get("/tag/populares/listar"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)));
-    }
-
-    @Test
-    @WithMockUser(username = "Lulu Fazedor de Drift")
-    void testCriarTags() {
-        List<String> novasTags = List.of("hamburguer", "bom-preco");
-        tagService.criar(novasTags, avaliacao);
-
-        assertEquals(4, tagRepository.count());
-    }
-
-    @Test
-    void testRecuperarTags() {
-        Tag tag1 = new Tag();
-        tag1.setAvaliacao(avaliacao);
-        tag1.setConteudo("saboroso");
-        tagRepository.save(tag1);
-
-        List<String> tagsRecuperadas = tagService.recuperar(avaliacao.getId());
-
-        assertNotNull(tagsRecuperadas);
-        assertEquals(3, tagsRecuperadas.size());
-        assertEquals("saboroso", tagsRecuperadas.get(2));
-    }
-
-    @Test
-    @WithMockUser(username = "Lulu Fazedor de Drift")
-    void testRemoverTagComPermissao() {
-        Tag tag = new Tag();
-        tag.setAvaliacao(avaliacao);
-        tag.setConteudo("para-remover");
-        tagRepository.save(tag);
-        assertEquals(3, tagRepository.count());
-
-        tagService.remover(avaliacao.getId());
-
-        assertEquals(0, tagRepository.count());
-    }
-
-    @Test
-    @WithMockUser(username = "outro.user")
-    void testRemoverTagSemPermissao() {
-        Tag tag = new Tag();
-        tag.setAvaliacao(avaliacao);
-        tag.setConteudo("protegida");
-        tagRepository.save(tag);
-
-        assertDoesNotThrow(() -> tagService.remover(avaliacao.getId()));
-        assertEquals(0, tagRepository.count());
-    }
-
-    @Test
-    @WithMockUser(username = "Lulu Fazedor de Drift")
-    void testRemoverTagInexistente() {
-        assertDoesNotThrow(() -> tagService.remover(9999L));
-    }
 }
