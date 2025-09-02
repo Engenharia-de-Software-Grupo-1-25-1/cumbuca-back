@@ -21,14 +21,14 @@ public class AvaliacaoFacade {
         this.curtidaService = curtidaService;
     }
 
-    public void montarDTOListar(AvaliacaoResponseDTO avaliacaoResponseDTO, Long avaliacaoId, Long usuarioId) {
+    public void montarDTORecuperar(AvaliacaoResponseDTO avaliacaoResponseDTO, Long avaliacaoId, Long usuarioId) {
         avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacaoId));
         avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacaoId));
         avaliacaoResponseDTO.setComentarios(comentarioService.recuperar(avaliacaoId));
         avaliacaoResponseDTO.setIsCurtida(curtidaService.isAvaliacaoCurtida(usuarioId, avaliacaoId));
     }
 
-    public void montarDTORecuperar(AvaliacaoResponseDTO avaliacaoResponseDTO, Long avaliacaoId, Long usuarioId) {
+    public void montarDTOListar(AvaliacaoResponseDTO avaliacaoResponseDTO, Long avaliacaoId, Long usuarioId) {
         avaliacaoResponseDTO.setFotos(fotoService.recuperar(avaliacaoId));
         avaliacaoResponseDTO.setTags(tagService.recuperar(avaliacaoId));
         avaliacaoResponseDTO.setIsCurtida(curtidaService.isAvaliacaoCurtida(usuarioId, avaliacaoId));
