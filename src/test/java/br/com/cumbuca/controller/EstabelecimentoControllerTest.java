@@ -51,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 public class EstabelecimentoControllerTest {
-    final String URI = "/estabelecimento";
+    static final String URI = "/estabelecimento";
 
     @Autowired
     MockMvc driver;
@@ -244,7 +244,7 @@ public class EstabelecimentoControllerTest {
         void testListarEstabelecimentosPorNome() throws Exception {
             final Estabelecimento e2 = new Estabelecimento();
             e2.setId(2L);
-            e2.setNome("Teste JUnit");;
+            e2.setNome("Teste JUnit");
             e2.setCategoria("Pizzaria");
             e2.setRua("Rua Central");
             e2.setNumero("101");
