@@ -2,7 +2,6 @@ package br.com.cumbuca.service.comentario;
 
 import br.com.cumbuca.dto.comentario.ComentarioResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
-import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Comentario;
 import br.com.cumbuca.model.Usuario;
@@ -49,7 +48,7 @@ public class ComentarioServiceImpl implements ComentarioService {
         comentario.setConteudo(texto);
         comentarioRepository.save(comentario);
 
-        ComentarioResponseDTO dto = new ComentarioResponseDTO();
+        final ComentarioResponseDTO dto = new ComentarioResponseDTO();
         dto.setId(comentario.getId());
         dto.setAvaliacaoId(avaliacao.getId());
         dto.setUsuario(modelMapper.map(usuario, UsuarioResponseDTO.class));

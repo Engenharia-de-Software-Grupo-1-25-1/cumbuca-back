@@ -3,7 +3,6 @@ package br.com.cumbuca.service.curtida;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
 import br.com.cumbuca.dto.curtida.CurtidaResponseDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
-import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Curtida;
 import br.com.cumbuca.model.Usuario;
@@ -52,7 +51,7 @@ public class CurtidaServiceImpl implements CurtidaService {
         curtida.setAvaliacao(avaliacao);
         curtidaRepository.save(curtida);
 
-        CurtidaResponseDTO curtidaResponseDTO = new CurtidaResponseDTO();
+        final CurtidaResponseDTO curtidaResponseDTO = new CurtidaResponseDTO();
         curtidaResponseDTO.setId(curtida.getId());
         curtidaResponseDTO.setUsuario(modelMapper.map(usuario, UsuarioResponseDTO.class));
         curtidaResponseDTO.setAvaliacao(modelMapper.map(avaliacao, AvaliacaoResponseDTO.class));
