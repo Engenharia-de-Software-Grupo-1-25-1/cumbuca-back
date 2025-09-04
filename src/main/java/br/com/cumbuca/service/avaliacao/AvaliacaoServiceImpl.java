@@ -3,14 +3,17 @@ package br.com.cumbuca.service.avaliacao;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoFiltroRequestDTO;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoRequestDTO;
 import br.com.cumbuca.dto.avaliacao.AvaliacaoResponseDTO;
+import br.com.cumbuca.dto.comentario.ComentarioResponseDTO;
 import br.com.cumbuca.exception.CumbucaException;
 
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.AvaliacaoView;
+import br.com.cumbuca.model.Comentario;
 import br.com.cumbuca.model.Estabelecimento;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.AvaliacaoRepository;
 import br.com.cumbuca.repository.AvaliacaoViewRepository;
+import br.com.cumbuca.repository.ComentarioRepository;
 import br.com.cumbuca.service.estabelecimento.EstabelecimentoService;
 import br.com.cumbuca.service.foto.FotoService;
 import br.com.cumbuca.service.tag.TagService;
@@ -30,6 +33,7 @@ import java.util.NoSuchElementException;
 public class AvaliacaoServiceImpl implements AvaliacaoService {
 
     private final AvaliacaoFacade avaliacaoFacade;
+    private final ComentarioRepository comentarioRepository;
     private final AvaliacaoRepository avaliacaoRepository;
     private final AvaliacaoViewRepository avaliacaoViewRepository;
     private final ModelMapper modelMapper;
@@ -40,10 +44,11 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
 
 
     public AvaliacaoServiceImpl(AvaliacaoFacade avaliacaoFacade, AvaliacaoRepository avaliacaoRepository, AvaliacaoViewRepository avaliacaoViewRepository,
-                                ModelMapper modelMapper, UsuarioService usuarioService, EstabelecimentoService estabelecimentoService,
-                                TagService tagService, FotoService fotoService) {
+                                ComentarioRepository comentarioRepository, ModelMapper modelMapper, UsuarioService usuarioService,
+                                EstabelecimentoService estabelecimentoService, TagService tagService, FotoService fotoService) {
         this.avaliacaoFacade = avaliacaoFacade;
         this.avaliacaoRepository = avaliacaoRepository;
+        this.comentarioRepository = comentarioRepository;
         this.avaliacaoViewRepository = avaliacaoViewRepository;
         this.modelMapper = modelMapper;
         this.usuarioService = usuarioService;
@@ -120,6 +125,14 @@ public class AvaliacaoServiceImpl implements AvaliacaoService {
         final AvaliacaoView avaliacao = avaliacaoViewRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
         final AvaliacaoResponseDTO avaliacaoResponseDTO = modelMapper.map(avaliacao, AvaliacaoResponseDTO.class);
+        
+        List<Comentario> comentarios = comentarioRepository.findByAvaliacaoId(avaliacao.getId());
+        List<ComentarioResponseDTO> comentariosDTO = comentarios.stream()
+                .map(ComentarioResponseDTO::new)
+                .toList();
+
+        avaliacaoResponseDTO.setComentarios(comentariosDTO);
+
         avaliacaoFacade.montarDTORecuperar(avaliacaoResponseDTO, avaliacao.getId(), usuario.getId());
         return avaliacaoResponseDTO;
     }
