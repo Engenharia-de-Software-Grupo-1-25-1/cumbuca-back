@@ -1,4 +1,5 @@
 package br.com.cumbuca.utils;
+
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -11,13 +12,13 @@ import java.io.IOException;
 
 public class ImageCompressor {
 
-    private static byte[] comprimir(byte[] imagemOriginal, float qualidade) throws IOException {
-        BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imagemOriginal));
+    private static byte[] comprimir(final byte[] imagemOriginal, final float qualidade) throws IOException {
+        final BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imagemOriginal));
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
 
-        ImageWriteParam param = writer.getDefaultWriteParam();
+        final ImageWriteParam param = writer.getDefaultWriteParam();
         if (param.canWriteCompressed()) {
             param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
             param.setCompressionQuality(qualidade);
@@ -30,18 +31,16 @@ public class ImageCompressor {
         return baos.toByteArray();
     }
 
-    public static byte[] comprimirAte100KB(byte[] imagemOriginal) throws IOException {
+    public static byte[] comprimirAte100KB(final byte[] imagemOriginal) throws IOException {
         final int LIMITE = 100_000;
         float qualidade = 0.9f;
         byte[] comprimida = imagemOriginal;
-    
+
         while (comprimida.length > LIMITE && qualidade > 0.1f) {
-            comprimida = comprimir(imagemOriginal, qualidade);
+            comprimida = comprimir(comprimida, qualidade);
             qualidade -= 0.1f;
         }
-    
+
         return comprimida;
     }
-    
 }
-
