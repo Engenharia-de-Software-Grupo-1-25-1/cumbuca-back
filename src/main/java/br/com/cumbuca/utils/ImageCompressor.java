@@ -36,7 +36,7 @@ public class ImageCompressor {
         float qualidade = 0.9f;
         byte[] comprimida = imagemOriginal;
 
-        while (comprimida.length > LIMITE && qualidade > 0.1f) {
+        while (comprimida.length > LIMITE && qualidade > 0.4f) {
             comprimida = comprimir(imagemOriginal, qualidade);
             qualidade -= 0.1f;
         }
