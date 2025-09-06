@@ -49,6 +49,7 @@ public class ConfiguracoesSeguranca {
                     req.requestMatchers("/recuperar-senha/**").permitAll();
                     req.requestMatchers("/alterar-senha/**").permitAll();
                     req.requestMatchers("/usuario/criar/**").permitAll();
+                    req.requestMatchers("/health").permitAll();
                     req.anyRequest().authenticated();
                 })
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
