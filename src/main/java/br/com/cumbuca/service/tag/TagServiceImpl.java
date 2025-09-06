@@ -28,7 +28,7 @@ public class TagServiceImpl implements TagService {
                 .filter(t -> !t.isEmpty())
                 .forEach(t -> {
                     final Tag tag = new Tag();
-                    tag.setConteudo(t);
+                    tag.setConteudo(normalizarTag(t));
                     tag.setAvaliacao(avaliacao);
                     tagRepository.save(tag);
                 });
