@@ -5,7 +5,9 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,7 +18,9 @@ public class ImageCompressor {
 
     private static byte[] comprimir(final byte[] imagemOriginal, final float qualidade) throws IOException {
         final BufferedImage src = ImageIO.read(new ByteArrayInputStream(imagemOriginal));
-        if (src == null) throw new IOException("Imagem inválida");
+        if (src == null) {
+            throw new IOException("Imagem inválida");
+        }
 
         final int w = src.getWidth();
         final int h = src.getHeight();
@@ -30,7 +34,9 @@ public class ImageCompressor {
 
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             final Iterator<ImageWriter> it = ImageIO.getImageWritersByFormatName("jpeg");
-            if (!it.hasNext()) throw new IOException("Writer JPEG não encontrado");
+            if (!it.hasNext()) {
+                throw new IOException("Writer JPEG não encontrado");
+            }
             final ImageWriter writer = it.next();
 
             final ImageWriteParam param = writer.getDefaultWriteParam();
