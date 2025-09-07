@@ -4,6 +4,7 @@ import br.com.cumbuca.dto.login.LoginRequestDTO;
 import br.com.cumbuca.dto.senha.AlterarSenhaRequestDTO;
 import br.com.cumbuca.dto.senha.RecuperarSenhaRequestDTO;
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
+import br.com.cumbuca.enums.Status;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;
 import br.com.cumbuca.service.autenticacao.TokenService;
@@ -215,6 +216,25 @@ class AutenticacaoControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(loginRequest)))
                     .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void testAtivarUsuarioInativoAoLogar() throws Exception {
+            usuario.setStatus(Status.INATIVO.toString());
+
+            final LoginRequestDTO loginRequest = new LoginRequestDTO();
+            loginRequest.setUsername(usuario.getUsername());
+            loginRequest.setSenha("123456");
+
+            driver.perform(post("/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(loginRequest)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.token").exists())
+                    .andExpect(jsonPath("$.id").value(usuario.getId()));
+
+            Usuario usuarioAtualizado = usuarioRepository.findById(usuario.getId()).orElseThrow();
+            assertEquals(Status.ATIVO.toString(), usuarioAtualizado.getStatus());
         }
     }
 

@@ -2,6 +2,7 @@ package br.com.cumbuca.controller;
 
 import br.com.cumbuca.dto.usuario.UsuarioRequestDTO;
 import br.com.cumbuca.dto.usuario.UsuarioResponseDTO;
+import br.com.cumbuca.exception.TratadorErros;
 import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.repository.UsuarioRepository;
 import br.com.cumbuca.service.autenticacao.TokenService;
@@ -15,8 +16,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -41,6 +46,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -67,6 +73,9 @@ class UsuarioControllerTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    private final TratadorErros tratadorErros = new TratadorErros();
 
     ModelMapper modelMapper = new ModelMapper();
     UsuarioRequestDTO usuarioRequestDTO;
@@ -311,7 +320,7 @@ class UsuarioControllerTest {
     }
 
     @Nested
-    class CriacaosuarioInconsistente {
+    class CriacaoUsuarioInconsistente {
 
         @Test
         void testCriarUsuarioFotoNula() throws Exception {
@@ -586,6 +595,45 @@ class UsuarioControllerTest {
             assertEquals("Usuário não tem permissão para realizar esta ação.", responseText);
         }
 
+    }
+
+    @Nested
+    class tratarErros {
+
+        @Test
+        void testTratarErro400() {
+            HttpMessageNotReadableException ex =
+                    new HttpMessageNotReadableException("Erro de leitura da requisição");
+
+            ResponseEntity<String> response = tratadorErros.tratarErro400(ex);
+
+            assertAll(
+                    () -> assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode()),
+                    () -> assertTrue(response.getBody().contains("Erro de leitura da requisição"))
+            );
+        }
+
+        @Test
+        void testTratarErro403() throws Exception {
+            AccessDeniedException ex = new AccessDeniedException("Acesso negado");
+
+            ResponseEntity<String> response = tratadorErros.tratarErro403(ex);
+
+            assertAll(
+                    () -> assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode()),
+                    () -> assertEquals("Acesso negado", response.getBody())
+            );
+        }
+    }
+
+    @Nested
+    class healthController{
+        @Test
+        void testHealthController() throws Exception {
+            driver.perform(get("/health"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string("OK"));
+        }
     }
 
 }

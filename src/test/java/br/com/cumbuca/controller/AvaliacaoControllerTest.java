@@ -12,8 +12,11 @@ import br.com.cumbuca.repository.EstabelecimentoRepository;
 import br.com.cumbuca.repository.TagRepository;
 import br.com.cumbuca.repository.UsuarioRepository;
 import br.com.cumbuca.service.autenticacao.TokenService;
+import br.com.cumbuca.utils.ImageCompressor;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -32,17 +35,19 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -773,7 +778,73 @@ class AvaliacaoControllerTest {
             assertTrue(resultado.stream()
                     .allMatch(a -> a.getEstabelecimento().getId().equals(outroEstabelecimento.getId())));
         }
+    }
 
+    @Nested
+    class criaAvaliacoesComFalha {
+        @Test
+        void testAvaliacaoComPrecoNegativo() {
+            final Avaliacao avaliacaoFalha = new Avaliacao();
+            avaliacaoFalha.setPreco(new BigDecimal("-5.00"));
 
+            final Set<ConstraintViolation<Avaliacao>> violations = Validation.buildDefaultValidatorFactory()
+                    .getValidator()
+                    .validate(avaliacaoFalha);
+
+            assertFalse(violations.isEmpty());
+            assertTrue(violations.stream()
+                    .anyMatch(v -> v.getPropertyPath().toString().equals("preco")));
+        }
+    }
+
+    @Nested
+    class compressaoDeImagens {
+
+        private byte[] gerarImagemDeTeste(int largura, int altura) throws Exception {
+            final BufferedImage img = new BufferedImage(largura, altura, BufferedImage.TYPE_INT_RGB);
+            ByteArrayOutputStream array = new ByteArrayOutputStream();
+            ImageIO.write(img, "jpg", array);
+            return array.toByteArray();
+        }
+
+        @Test
+        void testComprimirAte100KBImagemGrande() throws Exception {
+            byte[] imagemOriginal = gerarImagemDeTeste(1000, 1000);
+            byte[] comprimida = ImageCompressor.comprimirAte100KB(imagemOriginal);
+
+            assertTrue(comprimida.length <= 100_000);
+            assertTrue(comprimida.length > 0);
+
+            BufferedImage img = ImageIO.read(new ByteArrayInputStream(comprimida));
+            assertNotNull(img, "Imagem comprimida deve ser válida");
+        }
+
+        @Test
+        void testComprimirAte100KBImagemPequena() throws Exception {
+            byte[] imagemOriginal = gerarImagemDeTeste(50, 50);
+            byte[] comprimida = ImageCompressor.comprimirAte100KB(imagemOriginal);
+
+            assertArrayEquals(imagemOriginal, comprimida, "Imagem pequena não deve ser alterada");
+        }
+
+        @Test
+        void testComprimirAte100KBImagemMuitoGrande() throws Exception {
+            byte[] imagemOriginal = gerarImagemDeTeste(5000, 5000);
+            byte[] comprimida = ImageCompressor.comprimirAte100KB(imagemOriginal);
+
+            assertTrue(comprimida.length <= imagemOriginal.length, "Imagem comprimida deve ser menor ou igual que a original");
+            assertTrue(comprimida.length > 0, "Imagem não deve estar vazia");
+        }
+
+        @Test
+        void testComprimirAte100KBImagemIntegra() throws Exception {
+            byte[] imagemOriginal = gerarImagemDeTeste(800, 600);
+            byte[] comprimida = ImageCompressor.comprimirAte100KB(imagemOriginal);
+
+            BufferedImage img = ImageIO.read(new ByteArrayInputStream(comprimida));
+            assertNotNull(img, "Imagem comprimida deve ser lida corretamente");
+            assertEquals(800, img.getWidth(), "Largura deve ser preservada");
+            assertEquals(600, img.getHeight(), "Altura deve ser preservada");
+        }
     }
 }
