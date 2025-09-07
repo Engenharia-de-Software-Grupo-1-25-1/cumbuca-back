@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.Normalizer;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -46,7 +47,8 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
     @Override
     public Estabelecimento buscarOuCriar(EstabelecimentoRequestDTO estabelecimentoRequestDTO) {
-        return Optional.ofNullable(estabelecimentoRepository.findByNomeAndCategoria(estabelecimentoRequestDTO.getNome(), estabelecimentoRequestDTO.getCategoria()))
+        String nomeNormalizado = normalizarNome(estabelecimentoRequestDTO.getNome());
+        return Optional.ofNullable(estabelecimentoViewRepository.findByNomeNormalizado(nomeNormalizado))
                 .orElseGet(() -> {
                     final Estabelecimento estabelecimento = modelMapper.map(estabelecimentoRequestDTO, Estabelecimento.class);
                     return estabelecimentoRepository.save(estabelecimento);
@@ -131,4 +133,13 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         favoritoRespository.save(favorito);
         return favoritoResponseDTO;
     }
+
+    private static String normalizarNome(String s) {
+        if (s == null) return null;
+        return Normalizer.normalize(s, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase()
+                .trim();
+    }
+
 }

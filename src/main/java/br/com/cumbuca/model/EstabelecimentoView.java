@@ -20,6 +20,9 @@ public class EstabelecimentoView {
     @Column(name = "NOME")
     private String nome;
 
+    @Column(name = "NOME_NORMALIZADO")
+    private String nomeNormalizado;
+
     @Column(name = "CATEGORIA")
     private String categoria;
 
