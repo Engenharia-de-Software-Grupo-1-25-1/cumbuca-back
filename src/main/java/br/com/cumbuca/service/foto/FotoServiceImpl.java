@@ -4,6 +4,8 @@ import br.com.cumbuca.exception.CumbucaException;
 import br.com.cumbuca.model.Avaliacao;
 import br.com.cumbuca.model.Foto;
 import br.com.cumbuca.repository.FotoRepository;
+import br.com.cumbuca.utils.ImageCompressor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +29,7 @@ public class FotoServiceImpl implements FotoService {
                 .forEach(f -> {
                     try {
                        final Foto foto = new Foto();
-                        foto.setConteudo(f.getBytes());
+                        foto.setConteudo(ImageCompressor.comprimirAte100KB(f.getBytes()));
                         foto.setAvaliacao(avaliacao);
                         fotoRepository.save(foto);
                     } catch (IOException e) {

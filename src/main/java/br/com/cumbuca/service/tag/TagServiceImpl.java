@@ -25,13 +25,15 @@ public class TagServiceImpl implements TagService {
     @Override
     public void criar(List<String> tags, Avaliacao avaliacao) {
         tags.stream()
-                .filter(t -> !t.isEmpty())
-                .forEach(t -> {
-                    final Tag tag = new Tag();
-                    tag.setConteudo(t);
-                    tag.setAvaliacao(avaliacao);
-                    tagRepository.save(tag);
-                });
+            .map(TagServiceImpl::normalizarTag)
+            .filter(t -> !t.isEmpty())
+            .distinct()
+            .forEach(t -> {
+                final Tag tag = new Tag();
+                tag.setConteudo(t);
+                tag.setAvaliacao(avaliacao);
+                tagRepository.save(tag);
+            });
     }
 
     @Override

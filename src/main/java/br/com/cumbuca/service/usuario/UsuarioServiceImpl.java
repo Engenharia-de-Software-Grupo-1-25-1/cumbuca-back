@@ -8,6 +8,7 @@ import br.com.cumbuca.model.Usuario;
 import br.com.cumbuca.model.UsuarioView;
 import br.com.cumbuca.repository.UsuarioRepository;
 import br.com.cumbuca.repository.UsuarioViewRepository;
+import br.com.cumbuca.utils.ImageCompressor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,7 +49,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.getSenha()));
 
         if (usuarioRequestDTO.getFoto() != null && !usuarioRequestDTO.getFoto().isEmpty()) {
-            usuario.setFoto(usuarioRequestDTO.getFoto().getBytes());
+            usuario.setFoto(ImageCompressor.comprimirAte100KB(usuarioRequestDTO.getFoto().getBytes()));
         }
 
         usuarioRepository.save(usuario);
@@ -68,7 +69,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.getSenha()));
 
         if (usuarioRequestDTO.getFoto() != null && !usuarioRequestDTO.getFoto().isEmpty()) {
-            usuario.setFoto(usuarioRequestDTO.getFoto().getBytes());
+            usuario.setFoto(ImageCompressor.comprimirAte100KB(usuarioRequestDTO.getFoto().getBytes()));
         }
 
         usuarioRepository.save(usuario);
