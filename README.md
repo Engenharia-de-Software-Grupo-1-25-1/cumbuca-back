@@ -1,8 +1,8 @@
-<h1 align="center">
-  <img src="./src/assets/logo.svg" alt="Cumbuca Logo" width="150" height="150"/>
-  <br>
-  <span style="font-size: 150px;">Cumbuca</span>
-</h1>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Engenharia-de-Software-Grupo-1-25-1/cumbuca-front/main/src/assets/logo.svg" alt="Logo Cumbuca" width="160"/>
+</p>
+
+<h1 align="center">Cumbuca</h1>
 
 
 ## Conteúdos
@@ -131,8 +131,8 @@ Após configurar o Java, execute o backend com o Gradle Wrapper incluso no proje
 
 <h2 id="equipe--autores">🤝 Equipe / Autores</h2>
 
-- [Helena Barros](https://github.com/helenazbm)
 - [Luciano Nascimento](https://github.com/LucianoLN)
 - [Márcia Thaís](https://github.com/marciathais)
+- [Maria Helena Barros](https://github.com/helenazbm)
 - [Rayanne Bento](https://github.com/rayanne-on)
 - [Thawany Fernandes](https://github.com/Thawanyfernandes)
