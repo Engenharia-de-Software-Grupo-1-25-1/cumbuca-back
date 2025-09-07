@@ -32,7 +32,7 @@ public class RecuperarSenhaServiceImpl implements RecuperarSenhaService {
                 .orElseThrow(EntityNotFoundException::new);
 
         final String token = tokenService.gerarToken(usuario);
-        final String link = "https://cumbuca.onrender.com/alterar-senha?token=" + token;
+        final String link = "http://localhost:3000/alterar-senha?token=" + token;
 
         final EmailRequestDTO mail = EmailRequestDTO.builder()
                 .destinatario(email)
