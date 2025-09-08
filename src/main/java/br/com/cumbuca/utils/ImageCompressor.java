@@ -16,6 +16,10 @@ import java.util.Iterator;
 
 public class ImageCompressor {
 
+    private ImageCompressor() {
+        throw new UnsupportedOperationException("Esta classe não pode ser instanciada.");
+    }
+
     private static byte[] comprimir(final byte[] imagemOriginal, final float qualidade) throws IOException {
         final BufferedImage src = ImageIO.read(new ByteArrayInputStream(imagemOriginal));
         if (src == null) {
@@ -42,7 +46,7 @@ public class ImageCompressor {
             final ImageWriteParam param = writer.getDefaultWriteParam();
             if (param.canWriteCompressed()) {
                 param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                param.setCompressionQuality(Math.max(0f, Math.min(1f, qualidade)));
+                param.setCompressionQuality(Math.clamp(qualidade, 0f, 1f));
             }
 
             writer.setOutput(new MemoryCacheImageOutputStream(baos));

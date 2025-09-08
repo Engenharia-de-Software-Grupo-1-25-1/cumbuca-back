@@ -39,7 +39,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -459,7 +458,6 @@ class AvaliacaoControllerTest {
         avaliacaoCara.setItemConsumido("Prato Executivo");
         avaliacaoCara.setDescricao("Prato mais caro mas muito bom");
         avaliacaoCara.setPreco(new BigDecimal("45.00"));
-        ;
         avaliacaoCara.setEstabelecimento(estabelecimento);
         avaliacaoCara.setUsuario(usuario);
 
