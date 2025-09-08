@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.mock.http.MockHttpInputMessage;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +37,7 @@ import java.time.LocalDate;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -603,22 +605,19 @@ class UsuarioControllerTest {
         @Test
         void testTratarErro400() {
             HttpMessageNotReadableException ex =
-                    new HttpMessageNotReadableException("Erro de leitura da requisição");
-
+                    new HttpMessageNotReadableException("Erro de leitura da requisição",
+                            new MockHttpInputMessage(new byte[0]));
             ResponseEntity<String> response = tratadorErros.tratarErro400(ex);
-
             assertAll(
                     () -> assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode()),
-                    () -> assertTrue(response.getBody().contains("Erro de leitura da requisição"))
+                    () -> assertTrue(Objects.requireNonNull(response.getBody()).contains("Erro de leitura da requisição"))
             );
         }
 
         @Test
-        void testTratarErro403() throws Exception {
+        void testTratarErro403() {
             AccessDeniedException ex = new AccessDeniedException("Acesso negado");
-
             ResponseEntity<String> response = tratadorErros.tratarErro403(ex);
-
             assertAll(
                     () -> assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode()),
                     () -> assertEquals("Acesso negado", response.getBody())

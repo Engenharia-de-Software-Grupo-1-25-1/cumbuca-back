@@ -58,7 +58,6 @@ public class ComentarioServiceImpl implements ComentarioService {
 
     @Override
     public void remover(Long id) {
-        final Usuario usuario = usuarioService.getUsuarioLogado();
         final Comentario comentario = comentarioRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Comentário não encontrado"));
         comentarioRepository.delete(comentario);
